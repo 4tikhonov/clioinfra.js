@@ -1,4 +1,4 @@
-function showmap(year, handle, varname, colors) {
+function showmap(datayear, mapyear, handle, varname, colors) {
     var rightdiv = document.getElementById("#showmap");
     var margin = {top: -120, right: 20, bottom: 70, left: 40},
     width = 960 - margin.left - margin.right,
@@ -52,7 +52,7 @@ function showmap(year, handle, varname, colors) {
 	}
   	})
 
-    mapapi = "/api/maps?world=on&year=" + year;
+    mapapi = "/api/maps?world=on&year=" + mapyear;
     d3.json(mapapi, function (error, world) {
         if (error) {
             console.log(error);
@@ -63,7 +63,7 @@ function showmap(year, handle, varname, colors) {
 	    locations = topojson.feature(world, world.objects.countries).features;
 	}
 
-	datapi = "/api/data?db=strikes_test&handle=" + handle + "&year=" + year + "&categories=8&datarange=calculate";
+	datapi = "/api/data?db=strikes_test&handle=" + handle + "&year=" + datayear + "&categories=8&datarange=calculate";
 	datapi = datapi + '&colors=' + colors;
 	d3.json(datapi, function (error, data) {
 
