@@ -1,0 +1,8 @@
+[config]
+path = /home/clioinfra
+dataverseroot = http://some.sandbox.socialhistoryservices.org
+key = somekeylike73883b6f-ca99-41b9-953a-b9f8be42723d
+apiroot = http://api.sandbox.socialhistoryservices.org
+branch = clio1clio
+datapath = /home/clioinfra/data/
+perl = /usr/bin/perl
