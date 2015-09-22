@@ -1,8 +1,9 @@
 # Clio Infra visualization framework 
 ## Clioinfra.js
-=====
+```
 Copyright (C) 2015 International Institute of Social History.
 http://www.socialhistory.org
+```
 
 ## Major features
 - Integration with Dataverse (https://github.com/IQSS/dataverse)
@@ -10,16 +11,20 @@ http://www.socialhistory.org
 - Historical maps
 - Descriptive statistics and histograms 
 - Datasets search, browse and download functionality
+- Customized scales
 
 ## Project team
 ```
 Project leader: Bas van Leeuwen <bas.van.leeuwen@iisg.nl> 
 Information analyst: Jerry de Vries <jvr@iisg.nl>
-Architecture and development: Vyacheslav Tykhonov <vty@iisg.nl>
+Frontend development: Gaele Strootman <gaele@guruburu.com>
+Architecture, development and integration: Vyacheslav Tykhonov <vty@iisg.nl>
 ```
 
 ## Demo
-[GDP per capita visualization](http://clearance.sandbox.socialhistoryservices.org/collabs/dashboard?action=visualize&yearmin=1500&yearmax=2012&loc=250&loc=276&loc=528&loc=380&loc=724&dataset=hdl%3A10622%2F4X6NCK%3A114%3A115)
+[Search and browse datasets](http://cliov4.sandbox.socialhistoryservices.org/datasets/search)
+[Interactive dashboard](http://clearance.sandbox.socialhistoryservices.org/collabs/dashboard?action=visualize&yearmin=1500&yearmax=2012&loc=250&loc=276&loc=528&loc=380&loc=724&dataset=hdl%3A10622%2F4X6NCK%3A114%3A115)
+[Data visualization on historical maps](http://clearance.sandbox.socialhistoryservices.org/collabs/mapslider?action=map&year=1981&dataset=4X6NCK&colors=greyscale)
 
 ## Installing prerequisites
 ```
