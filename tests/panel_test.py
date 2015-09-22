@@ -3,7 +3,8 @@
 import xlsxwriter
 import xlwt
 import sys
-sys.path.append('/home/strikes/clioinfra/modules')
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from historical import load_historical, histo

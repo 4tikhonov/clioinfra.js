@@ -3,7 +3,7 @@ import random, string
 import os
 import sys
 import errno
-sys.path.append('/home/strikes/clioinfra/modules')
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
 
 from download import get_papers
 def randomword(length):

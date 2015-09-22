@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
+import os
 import sys
-sys.path.append('/home/strikes/clioinfra/modules')
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 
