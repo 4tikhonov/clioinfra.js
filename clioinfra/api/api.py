@@ -53,9 +53,9 @@ import string
 import pylab as plt
 import re
 from urllib import urlopen
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
 from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
-sys.path.append('/home/strikes/clioinfra/modules')
 from download import get_papers, dataset2zip, compile2zip
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, pidfrompanel
