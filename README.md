@@ -1,8 +1,12 @@
-Clio Infra visualization framework (clioinfra.js)
+# Clio Infra visualization framework 
+## Clioinfra.js
 =====
 Copyright (C) 2015 International Institute of Social History.
 
 @author Vyacheslav Tykhonov <vty@iisg.nl>
+
+## Demo
+[GDP per capita visualization](http://clearance.sandbox.socialhistoryservices.org/collabs/dashboard?action=visualize&yearmin=1500&yearmax=2012&loc=250&loc=276&loc=528&loc=380&loc=724&dataset=hdl%3A10622%2F4X6NCK%3A114%3A115)
 
 ## Installing prerequisites
 ```
