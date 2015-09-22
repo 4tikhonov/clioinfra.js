@@ -31,15 +31,16 @@ def loadjson(apiurl):
 
 def findpid(handle):
     ids = re.search(r'hdl\:\d+\/(\w+)', handle, re.M|re.I)
-    (pid, fileid, revid, cliohandle) = ('', '', '', '')
+    (pid, fileid, revid, cliohandle, clearpid) = ('', '', '', '', '')
     if ids:
+	clearpid = ids.group(0)
         pid = ids.group(1)
         files = re.search(r'hdl\:\d+\/\w+\:(\d+)\:(\d+)', handle, re.M|re.I)
         if files:
             fileid = files.group(1)
             revid = files.group(2)
             cliohandle = pid + str(fileid) + '_' + str(revid)
-    return (pid, revid, cliohandle)
+    return (pid, revid, cliohandle, clearpid)
 
 def pidfrompanel(pid):
     # Check Panel
@@ -52,7 +53,7 @@ def pidfrompanel(pid):
         clearpids = re.sub('["\']+', '', pidstr)
         ptmpids = clearpids.split(',')
         for fullhandle in ptmpids:            
-            (thispid, revpid, cliopid) = findpid(fullhandle)            
+            (thispid, revpid, cliopid, clearpid) = findpid(fullhandle)            
             pids.append(thispid)
     
     return pids
@@ -83,7 +84,7 @@ def load_dataverse(apiurl):
 
 def load_metadata(dataset):
     config = configuration()
-    (pid, fileid, cliohandle) = findpid(dataset)
+    (pid, fileid, cliohandle, clearpid) = findpid(dataset)
     data = {}
     if pid:
         query = pid

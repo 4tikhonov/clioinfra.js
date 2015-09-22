@@ -8,7 +8,7 @@ from config import configuration, load_dataverse, findpid
 def metadata(dataset):
     #return ('xxx', '', '')
     config = configuration()
-    (pid, fileid) = findpid(dataset)
+    (pid, fileid, revid, clearpid) = findpid(dataset)
     #return ('xxx', '', '')
     data = {}
     if pid:
