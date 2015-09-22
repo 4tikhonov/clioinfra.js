@@ -1,0 +1,37 @@
+{% extends "base_collection.html" %}
+{% block content %}
+<div id="page">
+    <script src="http://www.menucool.com/horizontal/javascript/1/menu.js" type="text/javascript"></script>
+<script type="text/javascript" src="/collabs/static/js/jquery.min.js"></script>
+
+    <link href="/collabs/static/js/menu-1.css" rel="stylesheet" type="text/css" />
+    <script src="/collabs/static/js/menu.js" type="text/javascript"></script>
+    <link rel='stylesheet prefetch' href='http://bradfrost.github.com/this-is-responsive/styles.css'>
+    <link rel="stylesheet" href="/collabs/static/js/tabs.css" media="screen" type="text/css" />
+    <script src="/collabs/static/js/modernizr.js"></script>
+<script type="text/javascript" src="/collabs/static/hitime/swfobject.js"></script>
+<h2>Chart</h2>
+<script>
+varname = '';
+year = '';
+</script>
+
+<script type="text/javascript">
+liveurl = '/cgi-bin/livedata.pl?var=' + varname;
+swfobject.embedSWF(
+"/collabs/static/hitime/open-flash-chart.swf", "my_chart223",
+"100%", "350", "9.0.0", "/collabs/static/hitime/expressInstall.swf",
+{"data-file":liveurl} );
+</script>
+
+        <object style="visibility: visible;" id="my_chart223" data="/collabs/static/hitime/open-flash-chart.swf" type="application/x-shockwave-flash" height="300" width="350"></object>
+<div id="overview" style="display:table-cell;width:100%;margin-left: auto;margin-right: auto;text-align: center;border: 1px solid black;"></div>
+<script>
+overviewurl = '/cgi-bin/overview.pl?year=' + year + '&var=' + varname;
+$("#overview").load(overviewurl);
+scalesurl = '/cgi-bin/api.pl?year=' + year + '&var=' + varname + '&api=scales';
+$("#scales").load(scalesurl);
+</script>
+
+</div>
+{% endblock %}

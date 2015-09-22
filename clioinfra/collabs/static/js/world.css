@@ -1,0 +1,58 @@
+/*
+	=====================================
+	project: Distinctive
+	authors:  
+	Luka Cvrk (www.solucija.com)
+	Vyacheslav Tykhonov
+	-------------------------------------
+	2009. Solucija
+	=====================================
+*/
+
+*{margin:0;padding:0}:focus,:active {outline:0}img{border: 0}
+body { font: .8em Arial, Tahoma, Verdana; background: #fff repeat-x; color: #777; }
+a { text-decoration: none; color: #B20F0F; }
+h1 { font-size: 1.4em; font-weight: normal; }
+	h1 a { color: #fff; font-size: 1.6em; }
+h2 { font-size: 1.2em; }
+h3 { font-size: 1.2em; url(../images/redbg.gif) repeat-x left bottom; padding: 6px 7px; color: #fff; font-weight: normal; margin: 0 0 15px; float: left; }
+h5 { font-size: 1.2em; background: #B00A0A url(../images/redbg.gif) repeat-x left bottom; padding: 6px 7px; color: #fff; font-weight: normal; margin: 0 0 15px; float: left; }
+h4 { margin: 10px 0 15px; color: #555; font-weight: normal; font-size: 1.6em; font-weight: normal; }
+p { clear: both; line-height: 1.64em; margin: 0 0 15px; }
+.line { clear: both; border-bottom: 1px solid #ddd; margin: 0 0 45px; }
+.iishlogo { border: 0px solid #ddd; background: url(/static/socialhistory.png); width:227px; height:47px; background-repeat: no-repeat; padding: 10px 0 0 0; float: left; }
+.clear { clear: both; }
+#content { width: 1250px; margin: 0 auto; border: 0px solid #ddd; }
+	#top { color: #ccc; padding: 6px 20px 0; font-size: .84em; text-align: right; }
+	#logo { float: left; background: url(/static/socialhistory.png) ; padding: 0px 25px 0px; width:290px; height:120px; background-repeat: no-repeat; border: 0px solid #ddd; }
+	#menu { float: right; margin: 0px 10px 0; border: 0px solid #ddd; }
+		#menu li { display: inline; font-size: 1.3em; }
+			#menu li a { float: left; color: #808080; padding: 0 0 5px; margin: 0 0 0 35px; }
+			#menu li a:hover, #menu li.current a, #menu li a:focus { color: #000; border-bottom: 1px solid #ddd; }
+	#menuleft { float: left; margin: 10px 0 10px 0; }
+	#menuright { float: right; margin: 10px 0 10px 0; }
+	#menucenter { margin: 0 0 10px 0; padding: 5px 0 0px 0px; border: 1px solid #fff; height: 30px; width: 45%;}
+		#menucenter li { display: inline; margin: 0 5px 0 10px; }
+		#menucenter li a { display: inline; margin: 0 10px 0 10px;padding: 0 5px 0 5px; }
+		#menucenter li a:hover, #menu li.current a, #menu li a:focus { display: inline; margin: 0 10px 0 10px;padding: 0 5px 0 5px; border-bottom: 1px solid #ddd; }
+	#visual { float: left; margin: 10px 0 0 0; padding: 10px 0 0 0; width:100%; }
+	#explanation { float: left; display:inline; margin: 0 auto; width:100%; text-align: center; }
+
+	#pitch { float:left; padding: 0px 0px 0 0; border-bottom: 1px solid #ddd; margin: 0 0 5px; width: 100%; }
+		#pitch h1 { font-size: 1.6em; color: #000; margin: 0 0 0px; }
+		#pitch h2 { line-height: 1.3em; }
+	.main { padding: 0px 10px 10px 0; margin: 0 10px 0px 10px; width:100%; border: 0px solid #ddd; float:left; clear: both; vertical-align:top; }
+	.left { float: left; width: 10%; padding-top: 0px; border: 0px solid #ddd; vertical-align:top; }	
+	.middle { float: left; border: 1px solid #ddd; vertical-align:top; }
+	.title { float: right; width: 100%; vertical-align:top; margin-top: -30px; border: 0px solid #ddd; }
+	.right { margin-left: 150px; margin-right:150px; float: center; width: 80%; height: 550px; vertical-align:top; margin-top: -10px; border: 0px solid #ddd; clear:both; }
+	.tip { margin-left: 20px; position: relative; bottom: 0; float:center; font-size: 1em; text-align: center;  }
+	.titleblock { float:center; font-size: 1.6em; width:100%; border: 0px solid #ddd; text-align: center;  }
+        .codesblock { bottom: 80px; float:center; font-size: 1em; text-align: center;  position: absolute; width:70%; }
+		h3 a { color: #fff; font-size: 1.6em; }
+		.right h3 { background: #808080; font-size: .84em; margin: -30px 5px 0 5px; float: right; }
+		.right h1 { float:left; margin: -10px 0 0 -650px; }
+		.right h2 { padding: 0px 0 0 50px; margin: 0px 0 0 0px; border: 0px solid #ddd; }
+	.third { float: left; width: 296px; margin: 0 40px 20px 0; }
+		.last { margin-right: 0; }
+	#footer { clear: both; font-size: .84em; border-top: 1px solid #ddd; padding: 20px 0 0; }

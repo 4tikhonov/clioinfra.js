@@ -1,0 +1,81 @@
+{% extends "visualize.html" %}
+{% block navigation %}  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/3.5.2/select2.min.js"></script>
+
+  <script type="text/javascript">
+$(document).ready(function() {
+
+$("#e1").select2({
+  placeholder: "Select a country",
+  allowClear: true
+});
+
+$("#checkbox").click(function(){
+    if($("#checkbox").is(':checked') ){
+        $("#e1 > option").prop("selected","selected");
+        $("#e1").trigger("change");
+    }else{
+        $("#e1 > option").removeAttr("selected");
+         $("#e1").trigger("change");
+     }
+});
+
+$("#i1").select2({
+  placeholder: "Select an indicator"
+});
+
+{% if selectedcountries %}
+     $("#e1").select2().select2('val', [{{ selectedcountries|safe }}]);
+{% endif %}
+
+{% if selectedindicators %}
+     $("#i1").select2().select2('val', [{{ selectedindicators|safe }}]);
+{% endif %}
+
+$("#checkbox").click(function(){
+    if($("#checkbox").is(':checked') ){
+        $("#i1 > option").prop("selected","selected");
+        $("#i1").trigger("change");
+    }else{
+        $("#i1 > option").removeAttr("selected");
+         $("#i1").trigger("change");
+     }
+});
+
+$("#buttoni").click(function(){
+       alert($("#i1").val());
+});
+
+$("#buttonc").click(function(){
+	var addcountry = $("#e1").val();
+	document.getElementById('graph').src += "," + addcountry;
+});
+
+$("#cleanc").click(function(){
+   $("#e1").select2().select2('val','');
+});
+
+});
+  </script>
+</head>
+<form name="selection" id="selection" method="get">
+<input type="hidden" name="action" value="visualize">
+<div class="navigation" style="width:100%; border:0px solid;text-align:center;">
+  	<label for="edit-year-min">from </label>
+ 	<input type="text" id="edit-year-min" name="yearmin" value="{{ fromyear }}" size="4" maxlength="100" />
+  	<label for="edit-year-max">to </label>
+ 	<input type="text" id="edit-year-max" name="yearmax" value="{{ toyear }}" size="4" maxlength="100" />
+<select multiple id="e1" name="loc" style="width:250px">
+{{ locations|safe }}
+    </select>
+<select multiple id="i1" name="dataset" style="width:250px">
+{{ indicatorlist|safe }}
+</select>
+<div id="navi"  style="text-align:center; width:100%; height:30px; border:0px solid #ccc">
+<input type="button" id="buttonc" value="Plot" style="width:60px">
+<input type="button" id="cleanc" value="Clean" style="width:60px">
+<input type="submit" value="Update" style="width:60px">
+</div>
+</div>
+</form>
+{% endblock %}

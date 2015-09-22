@@ -1,0 +1,102 @@
+{% extends "base_collection.html" %}
+{% block content %}
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Create project page</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+   <link href="http://www.bootstrap-switch.org/docs/css/bootstrap.min.css" rel="stylesheet">
+    <link href="http://www.bootstrap-switch.org/docs/css/highlight.css" rel="stylesheet">
+    <link href="http://www.bootstrap-switch.org/dist/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+    <link href="http://getbootstrap.com/assets/css/docs.min.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+<div class="container">
+	<h2 class="text-muted">Create new project page</h1>
+	<form>
+        <div class="form-group">
+                <label for="emailField">Name</label>
+                        <input type="name" class="form-control inline" id="emailField" placeholder="Enter email" size="20">
+        </div>
+        <div class="form-group">
+	<center>
+    		<label for="emailField">Email</label>
+			<input type="email" class="input-small inline" id="emailField" placeholder="Enter email">
+    		<label for="passwordField inline">Password</label>
+			<input type="password" class="input-small inline" id="passwordField" placeholder="Enter password">
+		<label for="passwordField inline">Project URI</label>
+                        <input type="password" class="input-small inline" id="passwordField" placeholder="URI like /myproject">
+	</center>
+    	</div>
+        <div class="form-group">
+                <label for="passwordField">Project title</label>
+                        <input type="password" class="form-control" id="title" placeholder="Enter title">
+        </div>
+
+        <div class="form-group">
+                <label for="passwordField">Short description of the project</label>
+                        <input type="password" class="form-control" id="title" placeholder="Enter description">
+        </div>
+
+        <div class="form-group">
+                <label for="about">About</label>
+                <textarea class="form-control custom-control" id="about" rows="2" autofocus="" style="resize:none" placeholder="Some notes about this project"></textarea>
+        </div>
+
+	<div class="form-group">
+                <label for="fulldescription">Description</label>
+		<textarea class="form-control custom-control" id="textareaID" rows="2" autofocus="" style="resize:none" placeholder="Enter full description of the project"></textarea>
+        </div>
+
+	<div class="form-group">
+	    <div class="row">
+	    <center>
+	    <font size=+1>Indicators</font>
+              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
+            <font size=+1>Topics</font>
+              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
+            <font size=+1>Countries</font>
+              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
+            <font size=+1>Search</font>
+              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
+	    </center>
+	    </div>
+	<div class="input-append">
+	<h4><b>Visualize and analyze<b></font>
+	    <label class="checkbox inline">
+	      <input type="checkbox" id="inlineCheckbox1" value="1"> Charts 
+	    </label>
+	    <label class="checkbox inline">
+	      <input type="checkbox" id="inlineCheckbox2" value="2"> Graphs
+	    </label>
+	    <label class="checkbox inline">
+	      <input type="checkbox" id="inlineCheckbox3" value="3"> Maps 
+	    </label>
+	    <label class="checkbox inline">
+	      <input type="checkbox" id="inlineCheckbox3" value="4"> Statistics
+	    </label>
+	  </div>
+          </div>
+
+	<button type="submit" class="btn btn-success">Proceed</button>
+    </form>
+</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script>
+    $("[name='Search']").bootstrapSwitch();
+    </script>
+    <script src="http://www.bootstrap-switch.org/docs/js/highlight.js"></script>
+    <script src="http://www.bootstrap-switch.org/dist/js/bootstrap-switch.js"></script>
+  </body>
+{% endblock %}

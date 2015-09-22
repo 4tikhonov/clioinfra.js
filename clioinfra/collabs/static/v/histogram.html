@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+	<style>
+	.axis {
+	  font: 10px sans-serif;
+	}
+	.axis path,
+	.axis line {
+	  fill: none;
+	  stroke: #000;
+	  shape-rendering: crispEdges;
+	}
+.bar {
+  fill: orange;
+}
+
+.bar:hover {
+  fill: orangered ;
+}
+
+	</style>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
+<script>
+    var myurl=window.location.toString();
+  if (myurl.indexOf("dataset=") > 0) {
+    handle=myurl.substring(myurl.indexOf("dataset=")+8);
+    cindex=myurl.indexOf("&");
+    if (cindex > 0) {
+      handle=handle.substring(0,cindex);
+    };
+  };
+  year = 1980;
+  if (myurl.indexOf("year=") > 0) {
+    yearstr=myurl.substring(myurl.indexOf("year=")+5);
+    cindex=yearstr.indexOf("&");
+    if (cindex > 0) {
+      year=yearstr.substring(0,cindex);
+    };
+  };
+</script>
+</head>
+
+<body>
+	
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<div id="quality"></div>
+<script>
+function loader(csvdatafull) {
+
+    csvdata = csvdatafull['data'];
+    var clen = csvdata.length;
+    var histdata = new Array(clen);
+    var data = new Array(clen);
+    for (var i = 0; i < clen; i++) {
+        histdata[i] = {
+            numfill: 0,
+            meta: ""
+        };
+        data[i] = 0;
+    }
+
+    var i = 0;
+    csvdata.forEach(function (d) {
+        data[i] = d.value;
+        i = i + 1;
+    });
+
+    return data;
+    }
+
+    var data = [];
+    d3.json("/api/data?db=strikes_test&handle=4X6NCK114_115&countrycode=ARG",
+    function (csvdata) {
+        data = loader(csvdata);
+        
+    d3.select('#quality')
+        .datum(data)
+        .call(histogramChart()
+        .width(960)
+        .height(420)
+        .lowerBand(d3.min(data, function(d) { return d; }))
+        .upperBand(d3.max(data, function(d) { return d; }))
+        .bins(20)
+        .yAxisLabel("frequency")
+        .xAxisLabel("value"));
+});     
+
+    function histogramChart() {
+        var margin = {
+            top: 64,
+            right: 32,
+            bottom: 72,
+            left: 32,
+            labels: 32
+        };
+        //defaults
+        var height = 200;
+        var width = 500;
+        var lowerBand = 0;
+        var upperBand = 3000;
+        var bins = 5;
+        var chartTitle = [""];
+        var yAxisLabel = "y axis label";
+        var xAxisLabel = "x axis label";
+        var xformat = function (d) {
+            return d
+        };
+        var formatCount = d3.format(",.0f");
+
+        function chart(selection) {
+            var maxBarHeight = height - (margin.top + margin.bottom);
+            var chartWidth = width - margin.right - margin.left;
+
+            selection.selectAll('svg').remove(); //remove old charts
+
+            selection.each(function (values) {
+
+                var x = d3.scale.linear()
+                    .domain([lowerBand, upperBand])
+                    .range([margin.labels, chartWidth]);
+
+                // Generate a histogram using XX bins.
+                var data = d3.layout.histogram()
+                    .bins(x.ticks(bins))
+                (values);
+
+                //fill the chart width, with 1px spacing between
+                var numBins = data.length;
+                var barWidth = parseInt((chartWidth - margin.labels) / numBins) - 1;
+
+                var y = d3.scale.linear()
+                    .domain([0, d3.max(data, function (d) {
+                    return d.y;
+                })])
+                    .range([maxBarHeight, 0]);
+
+                var xAxis = d3.svg.axis()
+                    .scale(x)
+                    .orient("bottom")
+                    .tickFormat(xformat);
+
+                var svgContainer = d3.select(this).append("svg")
+                    .attr("class", "chart mini-column-chart")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+                var bar = svgContainer.selectAll(".bar")
+                    .data(data)
+                    .enter().append("g")
+                    .attr("class", "bar")
+                    .attr("transform", function (d) {
+                    return "translate(" + x(d.x) + "," + y(d.y) + ")";
+                });
+
+                var xAxisG = svgContainer.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate( 0," + (height - margin.top - margin.bottom) + ")")
+                    .call(xAxis)
+
+                var header = svgContainer.append("text")
+                    .attr("class", "chart-title")
+                    .attr("x", width / 2)
+                    .attr("text-anchor", "middle")
+                    .attr("dy", -32)
+                    .text(chartTitle);
+
+                bar.append("rect")
+                    .attr("x", 1)
+                    .attr("width", barWidth)
+                    .attr("height", function (d) {
+                    return maxBarHeight - y(d.y);
+                });
+
+                bar.append("text")
+                    .attr("class", "axis-label")
+                    .attr("dy", "-.75em")
+                    .attr("y", 6)
+                    .attr("x", barWidth / 2)
+                    .attr("text-anchor", "middle")
+                    .text(function (d) {
+                    return formatCount(d.y);
+                });
+
+                xAxisG.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x", margin.left)
+                    .attr("dy", 56)
+                    .text(xAxisLabel);
+
+                svgContainer.append("g")
+                    .attr("class", "y axis")
+                    .append("text")
+                    .attr("class", "axis-label")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 8)
+                    .attr("x", -(height - margin.top - margin.bottom))
+                    .style("text-anchor", "start")
+                    .text(yAxisLabel);
+
+            });
+        }
+
+
+        chart.title = function (_) {
+            if (!arguments.length) return chartTitle;
+            chartTitle = _;
+            return chart;
+        };
+
+
+        chart.lowerBand = function (_) {
+            if (!arguments.length) return lowerBand;
+            lowerBand = _;
+            return chart;
+        };
+
+        chart.upperBand = function (_) {
+            if (!arguments.length) return upperBand;
+            upperBand = _;
+            return chart;
+        };
+
+        chart.width = function (_) {
+            if (!arguments.length) return width;
+            width = _;
+            return chart;
+        };
+
+        chart.height = function (_) {
+            if (!arguments.length) return height;
+            height = _;
+            return chart;
+        };
+
+        chart.bins = function (_) {
+            if (!arguments.length) return bins;
+            bins = _;
+            return chart;
+        };
+
+        chart.xformat = function (_) {
+            if (!arguments.length) return xformat;
+            xformat = _;
+            return chart;
+        };
+
+        chart.yAxisLabel = function (_) {
+            if (!arguments.length) return yAxisLabel;
+            yAxisLabel = _;
+            return chart;
+        };
+
+        chart.xAxisLabel = function (_) {
+            if (!arguments.length) return xAxisLabel;
+            xAxisLabel = _;
+            return chart;
+        };
+
+        chart.focusLabel = function (_) {
+            if (!arguments.length) return focusLabel;
+            focusLabel = _;
+            return chart;
+        };
+
+        chart.focusValue = function (_) {
+            if (!arguments.length) return focusValue;
+            focusValue = _;
+            return chart;
+        };
+
+        return chart;
+    }
+</script>
+
+</body>

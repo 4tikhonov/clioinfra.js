@@ -1,0 +1,290 @@
+{% extends "base_collection.html" %}
+{% block content %}
+<div id="page">
+<center>
+<link rel="stylesheet" type="text/css" href="/collabs/static/js/world.css" media="screen" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css"/>
+    <script src="/collabs/static/js/d3.v3.min.js"></script>
+    <script src="/collabs/static/js/d3.geo.projection.v0.min.js"></script>
+    <script src="/collabs/static/js/topojson.v1.min.js"></script>
+    <script src="/collabs/static/js/d3.tip.v0.6.3.js"></script>
+    <script src="/collabs/static/js/d3.legend.js"></script>
+    <script src="/collabs/static/js/legend.js"></script>
+    <script src="http://www.menucool.com/horizontal/javascript/1/menu.js" type="text/javascript"></script>
+<script type="text/javascript" src="/collabs/static/js/jquery.min.js"></script>
+
+    <link href="/collabs/static/js/menu-1.css" rel="stylesheet" type="text/css" />
+    <script src="/collabs/static/js/menu.js" type="text/javascript"></script>
+    <link rel='stylesheet prefetch' href='http://bradfrost.github.com/this-is-responsive/styles.css'>
+    <link rel="stylesheet" href="/collabs/static/js/tabs.css" media="screen" type="text/css" />
+    <script src="/collabs/static/js/modernizr.js"></script>
+<script type="text/javascript" src="/collabs/static/hitime/swfobject.js"></script>
+
+    <style>
+        .background {
+            fill: #ddeeff;
+        }
+
+        .country {
+            fill: #ffffdd;
+            stroke: #226688;
+        }
+
+        .graticule {
+            fill: none;
+            stroke: #000;
+            stroke-opacity: .3;
+            stroke-dasharray: 3, 1;
+        }
+
+        .graticule.outline {
+            stroke: #333;
+            stroke-opacity: 1;
+            stroke-width: 1.5px;
+            stroke-dasharray: initial;
+        }
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+    </style>
+
+<script>
+  var apikey="";
+  var myurl=window.location.toString();
+  if (myurl.indexOf("key=") > 0) {
+    apikey=myurl.substring(myurl.indexOf("key=")+4);
+    cindex=apikey.indexOf("&");
+    if (cindex > 0) {
+      apikey=apikey.substring(0,cindex);
+    };
+  };
+  var year="1927";
+  if (myurl.indexOf("year=") > 0) {
+    yearkey=myurl.substring(myurl.indexOf("year=")+5);
+    cindex=yearkey.indexOf("&");
+    if (cindex > 0) {
+      year=yearkey.substring(0,cindex);
+    };
+  };
+  var varname="";
+  if (myurl.indexOf("var=") > 0) {
+    varkey=myurl.substring(myurl.indexOf("var=")+4);
+    cindex=varkey.indexOf("&");
+    if (cindex > 0) {
+      varname=varkey.substring(0,cindex);
+    };
+  };
+</script>
+<div id="content1">
+
+<div class="main2">
+        <div class="title">
+        <div class="tip">
+        Rotate mouse wheel forward to "zoom in" the map, backward to "zoom out" or click on the location.
+	<div class="titleblock">
+	<br>
+	{{ datasetfile|safe }}
+	</div>
+
+	</div>
+	</div>
+	<div id="thisyear"></div>
+	<div class="right">
+	<div class="codesblock">
+	<form action=/worldmap method="get">
+	<input type="hidden" name="basisyear" value="1927">
+	</form>
+	</div>
+	</div>
+
+</div>
+
+<script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
+<script src="http://clearance.sandbox.socialhistoryservices.org/static/index.js"></script>
+<script>
+    dashname = 'Interactive Map'; 
+    document.getElementById('thisyear').innerHTML='<center><h2>' + dashname + ', ' + year + '</h2></center>';
+    var rightdiv = document.getElementById("div.right");
+    var width = window.innerWidth * 0.6;
+    var height = window.innerHeight * 0.8;
+
+    var zoom = d3.behavior.zoom()
+            .scaleExtent([1, 60])
+            .size([width, height])
+            .on('zoom', onZoom);
+
+    var projection2 = d3.geo.winkel3()
+            .scale(Math.min(150 / 772 * width, 150 / 472 * height))
+
+    var projectionM = d3.geo.mercator()
+    .center([5, 52])
+    .scale(180)
+    .translate([width / 2, height / 2]);
+
+    var projection = d3.geo.equirectangular()
+    .scale(150)
+    .translate([width / 2, height / 2])
+    .precision(.1);
+
+    var path = d3.geo.path().projection(projection);
+
+    var svg = d3.select("div.right").append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .call(zoom);
+
+    var g = svg.append('g');
+
+    var visitedData = {};
+    var locations = {};
+    var cities = [];
+
+    var tip = d3.tip()
+  	.attr('class', 'd3-tip')
+  	.offset([-10, 0])
+  	.html(function(d) {
+	
+	if (typeof visitedData[d.properties.AREA] === 'undefined')
+	{
+	    return d.properties.AREA + ': no data'
+	}
+	else
+	{
+    	    return "<strong>" + d.properties.AREA + ":</strong> <span style='color:red'>" + visitedData[d.properties.AREA].value + "</span>";
+	}
+  	})
+
+    mapapi = "/cgi-bin/api.pl?api=map&year=" + year;
+    d3.json(mapapi, function (error, world) {
+        if (error) {
+            console.log(error);
+            return;
+        } 	
+	else
+	{
+	    locations = topojson.feature(world, world.objects.countries).features;
+    	    
+
+	}
+
+
+	datapi = "/cgi-bin/api.pl?api=data&year=" + year + '&var=' + varname;
+	d3.json(datapi, function (error, data) {
+
+            if (error) {
+                console.log(error);
+            } else {
+                visitedData = data;
+            }
+
+            var countries = topojson.feature(world, world.objects.countries).features;
+
+            g.selectAll('.country').data(countries).enter()
+                    .append('path')
+                    .attr('class', 'country')
+                    .attr('d', path)
+		    .attr("data-legend",function(d) { return d.properties.AREA})
+      		    .on('mouseover', tip.show)
+      		    .on('mouseout', tip.hide)
+		    .on("click", clicked)
+		    .attr("stroke", "#848482")
+                    .attr("stroke-width", 0.5)
+                    .style('fill', function (d) {
+                        var color = visitedData[d.properties.AREA] && visitedData[d.properties.AREA].color;
+                        return color || '#ffffff';
+                    })
+
+            for (var i in visitedData) {
+                if (visitedData.hasOwnProperty(i) && visitedData[i].name) {
+                    cities.push.apply(cities, visitedData[i].name);
+                }
+            }
+
+        });
+    });
+    svg.call(tip);
+
+  function legendDemo() {
+
+  sampleNumerical = [1,2.5,5,10,20];
+  var legendValues=[{color: "green", stop: [0,1]},{color: "green", stop: [1,2]},{color: "purple", stop: [2,3]},{color: "yellow", stop: [3,4]},{color: "black", stop: [4,5]}];
+
+  sampleCategoricalData = [
+ "4.766 - 8",  "2.002 - 4.766",  "0.613 - 2.002",  "0.154 - 0.613",  "0 - 0.154",  "no data", 
+  ]
+  var COLORS = [
+ "#FF0000",  "#FFA500",  "#008000",  "#006bff",  "#800080",  "#ffffff",
+  ]
+  sampleOrdinal = d3.scale.category20().domain(sampleCategoricalData);
+
+  verticalLegend = d3.svg.legend(legendValues, COLORS).labelFormat("none").cellPadding(5).orientation("vertical").units("Legend").cellWidth(25).cellHeight(18).inputScale(sampleOrdinal).cellStepping(10);
+
+  d3.select("svg").append("g").attr("transform", "translate(20,350)").attr("class", "legend").style("font-size","12px").call(verticalLegend);
+
+  }
+
+
+
+function clicked(d) {
+  var centroid = path.centroid(d),
+      translate = projection.translate();
+
+  projection.translate([
+    translate[0] - centroid[0] + width / 2,
+    translate[1] - centroid[1] + height / 2
+  ]);
+
+  projection.translate(d3.event.translate).scale(d3.event.scale);
+  zoom.translate(projection.translate());
+  onZoom();
+
+  g.selectAll("path").transition()
+      .duration(700)
+      .attr("d", path);
+}
+
+function zoomed() {
+  projection.translate(d3.event.translate).scale(d3.event.scale);
+  g.selectAll("path").attr("d", path);
+}
+    function onZoom () {
+        var t = d3.event.translate;
+        var s = d3.event.scale;
+
+        t[0] = Math.max(Math.min(t[0], 0), width * (1 - s));
+        t[1] = Math.max(Math.min(t[1], 0), height * (1 - s));
+
+        zoom.translate(t);
+
+        g.style("stroke-width", 1 / s)
+                .attr('transform', 'translate(' + t + ')scale(' + s + ')');
+    }
+</script>
+</center>
+</div>
+{% endblock %}

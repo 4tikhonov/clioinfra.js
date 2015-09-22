@@ -1,0 +1,143 @@
+{% extends "base_collection.html" %}
+{% block content %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+    $("#myTab li:eq(0) a").tab('show');
+});
+</script>
+
+<script>
+    var myurl=window.location.toString();
+    var histurl = myurl + '&' + 'hist=on';
+</script>
+
+<script type='text/javascript'>
+$(function() {
+  $('iframe').responsiveIframe({xdomain: '*'});
+});
+</script>
+
+<style type="text/css">
+	.bs-example{
+		margin: 20px;
+	}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: orange;
+}
+
+.bar:hover {
+  fill: orangered ;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+/* Pretty Pandas Dataframes */
+.dataframe * {border-color: #c0c0c0 !important;}
+.dataframe th{background: #eee;}
+.dataframe td{
+    background: #fff;
+    text-align: right; 
+    min-width:5em;
+}
+
+/* Format summary rows */
+.dataframe-summary-row tr:last-child,
+.dataframe-summary-col td:last-child{
+    background: #eee;
+    font-weight: 500;
+}
+</style>
+</head>
+<body>
+<h4 class="element-invisible">Primary tabs</h4><ul class="tabs-primary tabs primary"><li class="tabs-primary__tab"><a href="#" class="tabs-primary__tab-link">Modern</a></li>
+<li class="tabs-primary__tab is-active"><a href="#" onclick="javascript:window.open(histurl);" class="tabs-primary__tab-link is-active active">Historical <span class="element-invisible">(active tab)</span></a></li>
+</ul>               
+
+<center><h3>{{ topic }}: {{ title }}</h3></center>
+<div class="bs-example">
+    <ul class="nav nav-tabs" id="myTab">
+        <li><a data-toggle="tab" href="#sectionA">Graph</a></li>
+	<li><a data-toggle="tab" href="#sectionB">Charts</a></li>
+        <li><a data-toggle="tab" href="#sectionC">Stats</a></li>
+	<li><a data-toggle="tab" href="#sectionD">Maps</a></li>
+	<li><a data-toggle="tab" href="#sectionE">Histogram</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="sectionA" class="tab-pane fade">
+            <h3>Graph</h3>
+		<iframe id='graph' src='/collabs/static/v/chartlib.html?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&handle={{ handle }}&ctrlist={{ customcountrycodes }}' style='border:0; width: 150%; height: 420px;'></iframe>
+        </div>
+        <div id="sectionB" class="tab-pane fade">
+            <h3>Charts</h3>
+	    <iframe src='/collabs/static/v/barlib.html?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&ctrlist={{ customcountrycodes }}&handle={{ handle }}&aggr=on' style='border:0; width: 150%; height: 420px;'></iframe>
+        </div>
+        <div id="sectionC" class="tab-pane fade">
+            <h3>Summary Statistics</h3>
+	    {{ stats|safe }}
+        </div>
+        <div id="sectionD" class="tab-pane fade">
+            <h3>Maps</h3>
+		<iframe src='/collabs/static/v/worldmap.html?start=on&action=map&year=1980&dataset={{ cliopid }}' style='border:0; width: 150%; height: 420px;'></iframe>
+        </div>
+        <div id="sectionE" class="tab-pane fade">
+            <h3>Histogram</h3>
+		<iframe src='/collabs/static/v/histogram.html' style='border:0; width: 150%; height: 420px;'></iframe>
+        </div>
+
+    </div>
+</div>
+<center><h5>{{ citation|safe }}</h5></center>
+{% block navigation %}{% endblock %}
+</body>
+{% endblock %}

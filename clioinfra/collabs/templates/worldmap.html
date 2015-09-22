@@ -1,0 +1,44 @@
+{% extends "base_collection.html" %}
+{% block content %}
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css"/>
+<script src="/collabs/static/js/d3.v3.min.js"></script>
+<script src="/collabs/static/js/d3.geo.projection.v0.min.js"></script>
+<script src="/collabs/static/js/topojson.v1.min.js"></script>
+<script src="/collabs/static/js/d3.tip.v0.6.3.js"></script>
+<script src="/collabs/static/js/d3.legend.js"></script>
+<script src="/collabs/static/js/legend.js"></script>
+<script type="text/javascript" src="/collabs/static/js/jquery.min.js"></script>
+<script src="/collabs/static/js/modernizr.js"></script>
+<script src='http://codepen.io/assets/libs/fullpage/jquery.js'></script>
+<script src="http://clearance.sandbox.socialhistoryservices.org/static/index.js"></script>
+<link href="/collabs/static/nlgis/nlgis.css" rel="stylesheet" type="text/css" />
+
+<div id="page">
+<h2>Historical Map</h2>
+<script>
+    var myurl=window.location.toString();
+  if (myurl.indexOf("dataset=") > 0) {
+    handle=myurl.substring(myurl.indexOf("dataset=")+8);
+    cindex=myurl.indexOf("&");
+    if (cindex > 0) {
+      handle=handle.substring(0,cindex);
+    };
+  };
+  year = 1980;
+  if (myurl.indexOf("year=") > 0) {
+    year=myurl.substring(myurl.indexOf("year=")+5);
+    cindex=myurl.indexOf("&");
+    if (cindex > 0) {
+      year=year.substring(0,cindex);
+    };
+  };
+</script>
+<div class="showmap"></div>
+
+<script src="/collabs/static/nlgis/nlgis.js"></script>
+<script>
+year = 1986;
+showmap(year, handle);
+</script>
+</div>
+{% endblock %}

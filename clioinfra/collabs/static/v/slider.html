@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Map Slider</title>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
+
+<script>
+    var myurl=window.location.toString();
+  if (myurl.indexOf("dataset=") > 0) {
+    handle=myurl.substring(myurl.indexOf("dataset=")+8);
+    cindex=myurl.indexOf("&");
+    if (cindex > 0) {
+      handle=handle.substring(0,cindex);
+    };
+  };
+  year = 1980;
+  if (myurl.indexOf("year=") > 0) {
+    yearstr=myurl.substring(myurl.indexOf("year=")+5);
+    cindex=yearstr.indexOf("&");
+    if (cindex > 0) {
+      year=yearstr.substring(0,cindex);
+    };
+   };
+   var colors = 'greyscale';
+   if (myurl.indexOf("colors=") > 0) {
+    cstr=myurl.substring(myurl.indexOf("colors=")+7);
+    cindex=cstr.indexOf("&");
+    if (cindex > 0) {
+      colors=cstr.substring(0,cindex);
+    };
+   };
+  
+   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset=4X6NCK114_115";
+  $(function() {
+    var select = $( "#yearslider" );
+    var sliderTooltip = function(event, ui) {
+    var curValue = $( "#yearslider option:selected" ).text() || '0';
+    var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
+
+    $('.ui-slider-handle').html(tooltip);
+
+}
+    var slider = $( "<div id='slider'></div>" )
+      .insertAfter( select ).slider({
+      min: 1,
+      max: 6,
+      range: "min",
+      value: select[ 0 ].selectedIndex + 1,
+      create: sliderTooltip,
+      slide: function( event, ui ) {
+        select[ 0 ].selectedIndex = ui.value - 1;
+        $('.slider-time2').html($( "#yearslider option:selected" ).text());
+	document.getElementById('worldmap').src = '' + mapurl + '&year=' + $( "#yearslider option:selected" ).text();
+        sliderTooltip(event, ui);
+      }
+    });
+    $( "#yearslider" ).change(function() {
+      slider.slider( "value", this.selectedIndex + 1 );
+    });
+  });
+  </script>
+
+<script type='text/javascript'>
+$(function() {
+  $('iframe').responsiveIframe({xdomain: '*'});
+});
+</script>
+
+</head>
+<body>
+<iframe id="worldmap" src='"' + mapurl + '&year=' + year + '"' style='border:0; width:150%; height: 450px;'></iframe>
+<form id="ynavi" style='border:1; width: 720px;'>
+  <label for="years">Years</label>
+    <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+</p>
+  <select name="years" id="yearslider">
+    <option>1880</option>
+    <option>1902</option>
+    <option>1934</option>
+    <option>1955</option>
+    <option>1987</option>
+    <option>2012</option>
+  </select>
+</form>
+ 
+</body>
+</html>
+
