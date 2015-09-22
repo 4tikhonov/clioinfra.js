@@ -136,9 +136,11 @@ def is_location(param):
 def downloadzip(pid):
     DEBUG = 0
     fullpath = ''
-    API_TOKEN="73883b6f-ca99-41b9-953a-b9f8be42723d"
-    HOSTNAME="dv.sandbox.socialhistoryservices.org"
-    cmd = "--insecure -u " + API_TOKEN + ": https://" + HOSTNAME + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
+
+    config = configuration() 
+    API_TOKEN = config['key']
+    HOSTNAME = config['dataverseroot']
+    cmd = "--insecure -u " + API_TOKEN + ": " + HOSTNAME + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
     tmpdir = "/tmp/test"
     filerandom = randomword(10)
     arc = "data" + filerandom + ".zip"
@@ -154,14 +156,12 @@ def downloadzip(pid):
     except: 
 	donothing = 'ok'
 
-    #pid = "hdl:10622/73BBBI"
-    # y[min]=1500&y[max]
     customyear = ''
-    #customcountrycodes = '528,802'
     fromyear = request.args.get('y[min]')
     toyear = request.args.get('y[max]')
     historical = request.args.get('type[0]')
     handles = pidfrompanel(pid)
+
     # Select countries
     customcountrycodes = ''
     f = request.args
