@@ -752,19 +752,27 @@ def dashboard(settings=''):
     config = configuration()
     apiroot = config['apiroot']
     dataverseroot = config['dataverseroot']
+    key = config['key']
 
-    perlbin = "/usr/bin/perl "
-    path = "/home/strikes/sik/web/collabs/"
-    (datatitle, validate, topic, citation, cliopid, stats, fileid) = ('', '', '', '', '', '', '')
+    if config['perl']:
+	perlbin = config['perl'] + ' '
+    else:
+        perlbin = "/usr/bin/perl "
+    path = config['path']
+
+    # Default parameters
+    (datatitle, validate, topic, citation, cliopid, stats, fileid, clearpid) = ('', '', '', '', '', '', '')
     (handle, fromyear, toyear) = ('', 1500, 2012)
     (selectedcountries, selectedindicators) = ('', '')
+
+    # Variables from dashboard
     varproject = request.args.get('project')
     varbase = request.args.get('base')
     dataset = request.args.get('dataset')
     if request.args.get('pid'):
 	dataset = request.args.get('pid')
     if dataset:
-	(handle, revid, cliopid) = findpid(dataset)
+	(handle, revid, cliopid, clearpid) = findpid(dataset)
 
     action = request.args.get('action')
     year = request.args.get('year')
@@ -804,7 +812,7 @@ def dashboard(settings=''):
     # Load topics and locations
      
     api1 = apiroot + "/collabs/static/data/dataframe100_0.json"
-    branch = 'clio1clio'
+    branch = config['branch']
     indicatorlist = load_alltopics(api1, branch)
     api2 = apiroot + "/collabs/static/data/dataframe94_0.json"
     locations = load_locations(api2)
@@ -850,7 +858,6 @@ def dashboard(settings=''):
 
     pages = getindex(activepage)
     valtitle = ''
-    key = config['key']
     if validate:
 	# VALIDATION
 	cmd = path + "/../../bin/run-demo.py -d '" + dataverseroot + "' -H '" + dataset + "' -k '" + key + "'"
