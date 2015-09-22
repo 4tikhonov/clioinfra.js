@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+  <script>
+
+  $(function() {
+    $( "#dialog" ).dialog({
+      autoOpen: false,
+      show: {
+        effect: "blind",
+        duration: 100
+      },
+      hide: {
+        effect: "explode",
+        duration: 1000
+      }
+    });
+    $( "#dialog" ).dialog( "open" );
+ 
+    $( "#opener" ).click(function() {
+	alert({{ download }});
+    });
+  });
+   function changeScreenSize(w,h)
+     {
+       open(location, '_self').resizeTo( w,h )
+   	alert('test');
+     }
+  </script>
+</head>
+<body onload="moveTo(0,0); resizeTo(400,300);">
+ 
+  <p>
+  <div>
+  <input type="radio" name="group1" value="0" checked> Excel<br>
+  <input type="radio" name="group1" value="1"> STATA<br>
+  <input type="radio" name="group1" value="2"> SPSS<br>
+  <input type="radio" name="group1" value="2"> CSV
+  </div>
+  </p>
+  <p>
+  <button id="opener">Download now</button>
+  <button id="opener">Visualize data</button>
+  </p>
+ 
+ 
+ 
+</body>
+</html>

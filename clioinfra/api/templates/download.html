@@ -1,0 +1,29 @@
+ <!DOCTYPE html>
+<html>
+        <head>
+        </head>
+        <body>
+                <div id="redirect">
+                        <h2>Redirecting to another Page</h2>
+                </div>
+
+	 	<script src="http://code.jquery.com/jquery-1.11.3.min.js">
+                <script>
+
+                        // JavaScript code to redirect a URL
+                        //window.location.replace("{{ download }}");
+                      
+                        // Another way to redirect page using JavaScript
+                        //window.location.href="http://java67.blogspot.com";
+              
+
+                        //JQuery code to redirect a page or URL
+                        $(document).ready(function(){
+                            var url = "http://www.clio-infra.ru";
+                            $(location).attr('href',url);
+                        });
+                </script>
+        </body>
+</html>
+
+
