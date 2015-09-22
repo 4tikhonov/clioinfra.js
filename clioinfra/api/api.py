@@ -173,7 +173,6 @@ def downloadzip(pid):
         customcountrycodes = customcountrycodes[:-1]
     
     if handles:
-	#historical = 1
 	if historical:
             api = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/historical.json"
             (regions, countries, ctr2reg) = histo(api)
@@ -187,7 +186,7 @@ def downloadzip(pid):
     else:
 	# Clio format download
 	zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir)
-	(alonepid, revid, cliohandle) = findpid(pid)
+	(alonepid, revid, cliohandle, clearpid) = findpid(pid)
 	if alonepid:
 	    handles = [ alonepid ]
 
