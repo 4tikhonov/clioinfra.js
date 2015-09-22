@@ -761,7 +761,7 @@ def dashboard(settings=''):
     path = config['path']
 
     # Default parameters
-    (datatitle, validate, topic, citation, cliopid, stats, fileid, clearpid) = ('', '', '', '', '', '', '')
+    (datatitle, validate, topic, citation, cliopid, stats, fileid, clearpid) = ('', '', '', '', '', '', '', '')
     (handle, fromyear, toyear) = ('', 1500, 2012)
     (selectedcountries, selectedindicators) = ('', '')
 
