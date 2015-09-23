@@ -1,5 +1,4 @@
 # Clio Infra visualization framework 
-## Clioinfra.js
 Clio Infra is a research project to document and analyse the various dimensions of global inequality
 between 1500 and the present. Scholars from the International Institute of Social History (IISH) and the
 universities of Utrecht, Groningen and Tuebingen supported by National Science Foundation (NWO) and
@@ -20,7 +19,7 @@ Copyright (C) 2015 International Institute of Social History.
 http://www.socialhistory.org
 ```
 
-## Major features
+## Major features of Clioinfra.js
 - Integration with Dataverse (https://github.com/IQSS/dataverse)
 - Panel data download of all available indicators
 - Visualization of research datasets on charts and graphs
@@ -46,6 +45,9 @@ Architecture, development and integration: Vyacheslav Tykhonov <vty@iisg.nl>
 
 ## Reports and papers
 [OECD: How Was Life? Global Well-being since 1820] (http://adapt.it/englishbulletin/wp/wp-content/uploads/2014/10/oecd_2_10_2014.pdf)
+
+## Presentations
+[Data analysis in Dataverse & visualization of datasets on historical maps, Harvard Univercity, June 2015](http://projects.iq.harvard.edu/dataverse-community-meeting/people/vyacheslav-tykhonov)
 
 ## Installing prerequisites
 ```
