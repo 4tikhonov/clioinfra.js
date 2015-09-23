@@ -41,6 +41,44 @@ def json_dict(sqlnames, jsondataname, data):
 
         return json_string
 
+# Create json to fill up map
+def data2json(modern, codes, panelcells):    
+    lookup = {}
+    color = '#1F78B4'
+    dataitem = []
+    dataset = {}
+    
+    for item in panelcells:         
+        lookup[item[0]] = item
+        
+    for code in modern:
+        country = modern[code]
+        # Default
+        value = 'NaN'
+        thiscolor = '#ffffff'
+
+        dataitem = {}
+        if country in lookup:                        
+            value = item[2]  
+            thiscolor = color
+        
+        # Creating json dataset
+        dataitem['value'] = value
+        dataitem['color'] = thiscolor                
+            
+        if country:
+            dataset[country] = dataitem
+        
+    return dataset
+
+# Get all modern boundaries
+def moderncodes(handle, apiroot):
+    apifile = str(handle) + ".json"
+    jsonapi = apiroot + "/collabs/static/data/" + apifile
+    dataframe = load_api_data(jsonapi, '')
+    loccodes = loadcodes(dataframe)
+    return loccodes
+
 def loadcodes(dataframe):
     clioframe = pd.DataFrame(dataframe)
     countries = clioframe[clioframe.columns[1]]
@@ -277,7 +315,11 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
     code2ctr = {}
     unit2ind = {}
     for handle in data:
-        item = data[handle]
+	try:
+            item = data[handle]
+	except:
+	    item = {}
+
         for year in item:
             values = item[year]
         
