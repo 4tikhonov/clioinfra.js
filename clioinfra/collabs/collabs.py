@@ -256,6 +256,7 @@ def members():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear) = ('', 0, '', '1500', '2012', '') 
+    logscale = 0
     handles = []
     datahub = {}
     dataset = ''
@@ -265,11 +266,13 @@ def mapslider():
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
 	handles.append(dataset)
+    if request.args.get('logscale'):
+	logscale = 1
 
     historical = 0
 
     try:
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist)
+        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	for dataitem in handle2ind:
 	    title = handle2ind[dataitem]
     except:
