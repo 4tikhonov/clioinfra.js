@@ -1,5 +1,20 @@
 # Clio Infra visualization framework 
 ## Clioinfra.js
+Clio Infra is a research project to document and analyse the various dimensions of global inequality
+between 1500 and the present. Scholars from the International Institute of Social History (IISH) and the
+universities of Utrecht, Groningen and Tuebingen supported by National Science Foundation (NWO) and
+Royal Academy of Sciences (KNAW) are organizing collaboratories aimed at collecting and standardizing
+economic-historical datasets to that purpose. 
+
+An example of the Maddison project, which aims at continuing
+the international comparative work on historical national accounting organized by Angus Maddison in the
+past, resulting in his well-known global dataset. Similar networks of scholars working on measures of
+economic performance (real wages, heights, life expectancy) and their determinants (human capital,
+institutions, gender inequality) are producing high quality global datasets on these topics, covering the world
+in the past 500 years. 
+
+Recently also indices of sustainability have been integrated into the Clio Infra
+framework. 
 ```
 Copyright (C) 2015 International Institute of Social History.
 http://www.socialhistory.org
@@ -7,6 +22,7 @@ http://www.socialhistory.org
 
 ## Major features
 - Integration with Dataverse (https://github.com/IQSS/dataverse)
+- Panel data download of all available indicators
 - Visualization of research datasets on charts and graphs
 - Historical maps
 - Descriptive statistics and histograms 
@@ -15,7 +31,7 @@ http://www.socialhistory.org
 
 ## Project team
 ```
-Project leader: Bas van Leeuwen <bas.van.leeuwen@iisg.nl> 
+Project coordinator: Bas van Leeuwen <bas.van.leeuwen@iisg.nl> 
 Information analyst: Jerry de Vries <jvr@iisg.nl>
 Frontend development: Gaele Strootman <gaele@guruburu.com>
 Architecture, development and integration: Vyacheslav Tykhonov <vty@iisg.nl>
