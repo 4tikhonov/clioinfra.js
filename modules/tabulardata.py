@@ -57,16 +57,14 @@ def data2json(modern, codes, panelcells):
         value = 'NaN'
         thiscolor = '#ffffff'
 
-        dataitem = {}
         if country in lookup:                        
-            value = item[2]  
+            value = lookup[country][2]  
             thiscolor = color
         
-        # Creating json dataset
-        dataitem['value'] = value
-        dataitem['color'] = thiscolor                
-            
-        if country:
+	    dataitem = {}
+            # Creating json dataset
+            dataitem['value'] = value
+            dataitem['color'] = thiscolor                
             dataset[country] = dataitem
         
     return dataset
@@ -165,7 +163,7 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
                     active = 0
                     if str(country) in set(customctrlist):
                         active = 1
-                        
+
                 # years filter (from year)
                 if active and fromY:
                     if int(thisyear) >= int(fromY):
@@ -179,7 +177,7 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
                         active = 1                        
                     else:
                         active = 0
-                                            
+
                 if active:                    
                     try:
                         dataitem = dates[thisyear]
@@ -309,6 +307,11 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
 
 def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag):
     data = {}
+    # Custom year has priority
+    if customyear:
+        fromyear = ''
+        toyear = ''
+
     for handle in handles:
         (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
         data[handle] = frame
