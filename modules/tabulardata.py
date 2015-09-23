@@ -8,8 +8,9 @@ import re
 import vincent
 import numpy as np
 import sys
+import os
 from pandas.io.json import json_normalize
-sys.path.append('/home/strikes/clioinfra/modules')
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 
 def load_api_data(apiurl, fileID):
