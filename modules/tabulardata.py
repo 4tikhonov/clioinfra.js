@@ -288,7 +288,7 @@ def combinedata(countries, dataset, code2loc):
         
     return (datastring, aggrstring)
 
-def tableapis(handle, customcountrycodes, fromyear, toyear, customyear):
+def tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag):
     # years in filter
     config = {}
     indicator = ''
@@ -300,7 +300,7 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear):
     dataframe = load_api_data(jsonapi, '')
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
-    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, DEBUG)
+    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logflag, DEBUG)
     names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
 
     (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
@@ -310,7 +310,7 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear):
 def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag):
     data = {}
     for handle in handles:
-        (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear)
+        (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
         data[handle] = frame
     
     datahub = {}
