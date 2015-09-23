@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modu
 from boundaries import getboundaries
 from config import configuration
 
-class TestStringMethods(unittest.TestCase):
+class TestBoundaries(unittest.TestCase):
 
   def test_boundaries(self):
 	config = configuration()
