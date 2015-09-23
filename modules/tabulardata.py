@@ -9,6 +9,7 @@ import vincent
 import numpy as np
 import sys
 import os
+import math
 from pandas.io.json import json_normalize
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
@@ -263,7 +264,7 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear):
 
     return (years, frame, csvdata, aggrdata)
 
-def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist):
+def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag):
     data = {}
     for handle in handles:
         (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear)
@@ -294,6 +295,10 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist):
                 value = x[6]
 		unit2ind[handle] = x[3]
             
+		# If log scale
+		if logflag:
+		    value = math.log(value)
+
                 # Combine key
                 datakey = str(code) + ':' + str(year) + ':' + str(handle)
                 datapanel[datakey] = value
