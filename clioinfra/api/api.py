@@ -57,7 +57,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../m
 from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
 from download import get_papers, dataset2zip, compile2zip
-from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
+from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, pidfrompanel
 import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
@@ -1117,6 +1117,40 @@ def provincies():
 
     jsondata = json.dumps(provincies, ensure_ascii=False, sort_keys=True, indent=4)
     return Response(jsondata,  mimetype='application/json')
+
+@app.route('/dataapi')
+def dataapi():
+    handles = []
+    config = configuration()
+    customyear = ''
+    fromyear = '1500'
+    toyear = '2012'
+    customcountrycodes = ''
+
+    if request.args.get('year'):
+        customyear = request.args.get('year')
+    if request.args.get('handle'):
+        handle = request.args.get('handle')
+        handles.append(handle)
+    if request.args.get('ctrlist'):
+        customcountrycodes = ''
+        tmpcustomcountrycodes = request.args.get('ctrlist')
+        c = tmpcustomcountrycodes.split(',')
+        for ids in sorted(c):
+           if ids:
+               customcountrycodes = str(customcountrycodes) + str(ids) + ','
+        customcountrycodes = customcountrycodes[:-1]
+
+    hist = {}
+    logflag = 0
+    config = configuration()
+    (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
+
+    modern = moderncodes(config['modernnames'], config['apiroot'])
+    jsondata = data2json(modern, codes, panelcells)
+    data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
+
+    return Response(data,  mimetype='application/json')
 
 @app.route('/locations')
 def locations():
