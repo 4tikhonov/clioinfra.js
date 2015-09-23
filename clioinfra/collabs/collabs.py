@@ -262,6 +262,14 @@ def mapslider():
     dataset = ''
     warning = ''
     hist = {}
+    if request.args.get('ctrlist'):
+        customcountrycodes = ''
+        tmpcustomcountrycodes = request.args.get('ctrlist')
+        c = tmpcustomcountrycodes.split(',')
+        for ids in sorted(c):
+           if ids:
+               customcountrycodes = str(customcountrycodes) + str(ids) + ','
+        customcountrycodes = customcountrycodes[:-1]
 
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
@@ -285,7 +293,7 @@ def mapslider():
 	steps = steps + 1
     #validyears = ['1880', '1902', '1934', '1955', '1987', '2012']
 
-    return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title))
+    return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes))
 
 @app.route('/d3map')
 def d3map(settings=''):
