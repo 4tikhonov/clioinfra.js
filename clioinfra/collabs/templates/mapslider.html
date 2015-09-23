@@ -1,4 +1,5 @@
 <body>
+<head>
   <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
   <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
@@ -14,7 +15,8 @@
       handle=handle.substring(0,cindex);
     };
   };
-  year = 1980;
+  mapyear = 2012;
+  year = '';
   if (myurl.indexOf("year=") > 0) {
     yearstr=myurl.substring(myurl.indexOf("year=")+5);
     cindex=yearstr.indexOf("&");
@@ -22,6 +24,15 @@
       year=yearstr.substring(0,cindex);
     };
    };
+
+  if (myurl.indexOf("mapyear=") > 0) {
+    yearstr=myurl.substring(myurl.indexOf("mapyear=")+8);
+    cindex=yearstr.indexOf("&");
+    if (cindex > 0) {
+      mapyear=yearstr.substring(0,cindex);
+    };
+   };
+
    var colors = ''; 
    if (myurl.indexOf("colors=") > 0) {
     cstr=myurl.substring(myurl.indexOf("colors=")+7);
@@ -31,7 +42,7 @@
     };
    };
   
-   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset=4X6NCK114_115";
+   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&ctrlist={{ customcountrycodes }}";
    var starturl = mapurl + '&colors=' + colors + '&year=' + year;
  
   $(function() {
@@ -69,9 +80,8 @@ $(function() {
   $('iframe').responsiveIframe({xdomain: '*'});
 });
 
-function greyscale()
-{
-alert('grey');
+function greyscale(x){
+    alert('grey');
 };
 </script>
 
@@ -83,7 +93,8 @@ alert('grey');
 <script>document.getElementById('worldmap').src = starturl;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
-    <input type="checkbox" id="greyscale" onclick="greyscale()">Greyscale
+    <input type="checkbox" id="greyscale" onclick="greyscale('grey');">Greyscale
+    <input type="checkbox" id="logscale" onclick="alert('log scale');">Log scale
   <select name="years" id="yearslider">
   {% for year in years %}
     <option>{{ year }}</option>
