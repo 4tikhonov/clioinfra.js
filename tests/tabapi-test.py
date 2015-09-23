@@ -7,15 +7,16 @@ from tabulardata import loadcodes, load_api_data, countryset, json_dict, createf
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 
 def tableapi():
-    # years in filter
-    #host = "http://clearance.sandbox.socialhistoryservices.org"
     config = configuration()
+
+    # Test case
     customyear = ''
     fromyear = '1800'
     toyear = '2000'
     customcountrycodes = '380,250,276,804'
     handle = "F16UDU"
     DEBUG = 0
+    logscale = 0 
 
     apifile = str(handle) + ".json"
     jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
@@ -23,7 +24,7 @@ def tableapi():
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
     indicator = ''
-    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, DEBUG)
+    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
     names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
 
     (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
