@@ -18,6 +18,7 @@ toyear = '2000'
 customcountrycodes = '380,250,276,804,174,108,232,528,756'
 #customcountrycodes = '528,756'
 handles = ["GDAO0N"]
+logflag = 0
 
 if fromyear:
     historical = 1
@@ -26,7 +27,7 @@ if fromyear:
         (regions, countries, ctr2reg) = histo(api)
         hist = countries
 
-    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist)
+    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
     xdir = "/home/strikes/data"
     f = "panel.xlsx"
     panel2excel(xdir, f, header, panelcells)

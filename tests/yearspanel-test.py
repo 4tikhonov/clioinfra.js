@@ -16,10 +16,10 @@ customyear = ''
 fromyear = '1500'
 toyear = '2000'
 customcountrycodes = '380,250,276,804,174,108,232,528,756'
-#customcountrycodes = '528,756'
 handles = ["GDAO0N"]
 handles = ["4X6NCK"]
 years = 0
+logflag = 0
 
 config = configuration()
 if fromyear:
@@ -29,6 +29,6 @@ if fromyear:
         (regions, countries, ctr2reg) = histo(api)
         hist = countries
 
-    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist)
+    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
     for year in sorted(datahub):
 	print year
