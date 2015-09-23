@@ -756,6 +756,7 @@ def dashboard(settings=''):
     apiroot = config['apiroot']
     dataverseroot = config['dataverseroot']
     key = config['key']
+    logscale = ''
 
     if config['perl']:
 	perlbin = config['perl'] + ' '
@@ -772,6 +773,10 @@ def dashboard(settings=''):
     varproject = request.args.get('project')
     varbase = request.args.get('base')
     dataset = request.args.get('dataset')
+    # Log scales switch
+    if request.args.get('logscale'):
+        logscale = 1
+
     if request.args.get('pid'):
 	dataset = request.args.get('pid')
     if dataset:
@@ -891,7 +896,7 @@ def dashboard(settings=''):
 	selectedindicators = "\"" + dataset + "\""
     cliopids = cliopid
 
-    resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids))
+    resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids, logscale=logscale))
     return resp
 
 @app.route('/export')
