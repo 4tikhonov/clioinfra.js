@@ -309,6 +309,7 @@ def tableapi():
     #customcountrycodes = '380,250,276,804,826'
     customcountrycodes = ''
     aggr = ''
+    logscale = ''
 
     # Select countries
     f = request.args
@@ -340,6 +341,9 @@ def tableapi():
 	toyear = request.args.get('yearmax')
     if request.args.get('aggr'):
         aggr = request.args.get('aggr')
+    # Log scales switch
+    if request.args.get('logscale'):
+        logscale = 1
     DEBUG = 0
 
     apifile = str(handle) + ".json"
@@ -348,7 +352,7 @@ def tableapi():
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
     indicator = ''
-    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, DEBUG)
+    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
     names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
 
     (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
