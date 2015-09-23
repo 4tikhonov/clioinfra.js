@@ -47,7 +47,8 @@ Architecture, development and integration: Vyacheslav Tykhonov <vty@iisg.nl>
 [OECD: How Was Life? Global Well-being since 1820] (http://adapt.it/englishbulletin/wp/wp-content/uploads/2014/10/oecd_2_10_2014.pdf)
 
 ## Presentations
-[Data analysis in Dataverse & visualization of datasets on historical maps, Harvard Univercity, June 2015](http://projects.iq.harvard.edu/dataverse-community-meeting/people/vyacheslav-tykhonov)
+[Data analysis in Dataverse & visualization of datasets on historical maps](http://projects.iq.harvard.edu/dataverse-community-meeting/people/vyacheslav-tykhonov)
+Dataverse Community Meeting 2015, IQSS, Harvard University, June 2015
 
 ## Installing prerequisites
 ```
