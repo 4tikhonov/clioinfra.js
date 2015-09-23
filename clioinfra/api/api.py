@@ -136,6 +136,7 @@ def is_location(param):
 def downloadzip(pid):
     DEBUG = 0
     fullpath = ''
+    logscale = 0
 
     config = configuration() 
     API_TOKEN = config['key']
@@ -162,6 +163,10 @@ def downloadzip(pid):
     historical = request.args.get('type[0]')
     handles = pidfrompanel(pid)
 
+    # Log scales switch
+    if request.args.get('logscale'):
+	logscale = 1
+
     # Select countries
     customcountrycodes = ''
     f = request.args
@@ -180,7 +185,7 @@ def downloadzip(pid):
 	else:
 	    hist = ''
 
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist)
+        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	filename = filename + '.xls'
         fullpath = panel2excel(finaldir, filename, header, panelcells)
     else:
@@ -196,7 +201,7 @@ def downloadzip(pid):
             #hist = countries
 	    hist = ''
 	    filename = filename + '.xls'
-	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist)
+	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	    #codes = hist
 	    result = individual_dataset(finaldir, filename, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes)
 
