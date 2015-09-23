@@ -115,7 +115,7 @@ def countryset(countrieslist, codes):
     dates["date"] = ctrlist
     return (clist, dates)
 
-def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customctrlist, DEBUG):
+def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customctrlist, logscale, DEBUG):
     yearline = dataframe[1]
     measure = ''
     values = []
@@ -193,6 +193,11 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
 			donothing = 1
 
                     if value:                        
+                        if logscale:
+                            try:
+                                value = math.log(value)
+                            except:
+                                value = 'NaN'
                         dataitem.append(value)
                         dates[thisyear] = dataitem                                            
                         
