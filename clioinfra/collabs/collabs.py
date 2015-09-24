@@ -666,7 +666,8 @@ def datasetspace(settings=''):
 @app.route('/')
 def start(settings=''):
     activepage = 'Home'
-    path = "/home/strikes/sik/web/collabs/"
+    config = configuration()
+    path = config['path']
     pages = getindex(activepage)
     perlbin = "/usr/bin/perl "
     project = "frontpage"
