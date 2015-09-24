@@ -71,6 +71,9 @@ sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install nodejs
 sudo apt-get install python-pandas
+sudo apt-get install python-matplotlib
+sudo apt-get install python-bs4
+apt-get install catdoc
 sudo a2enmod headers
 sudo npm install -g topojson
 To verify the two installations, try
@@ -93,6 +96,8 @@ pip install numpy --upgrade
 pip install pymongo
 pip install brewer2mpl
 pip install vincent
+pip install palettable
+pip install xlsxwriter
 ```
 
 ### Change default encoding:
