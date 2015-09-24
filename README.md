@@ -70,6 +70,8 @@ apt-get install inkscape
 sudo add-apt-repository ppa:chris-lea/node.js
 sudo apt-get update
 sudo apt-get install nodejs
+sudo apt-get install python-pandas
+sudo a2enmod headers
 sudo npm install -g topojson
 To verify the two installations, try
 which ogr2ogr
@@ -88,9 +90,9 @@ pip install psycopg2
 pip install simplejson
 pip install xlwt
 pip install numpy --upgrade
-pip install pandas
 pip install pymongo
 pip install brewer2mpl
+pip install vincent
 ```
 
 ### Change default encoding:
@@ -100,4 +102,6 @@ Change
 encoding = "ascii"
 to
 encoding = "utf8"
+```
 
+### Configuration
