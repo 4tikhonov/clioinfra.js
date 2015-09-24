@@ -52,7 +52,7 @@ function showmap(datayear, mapyear, handle, varname, colors) {
 	}
   	})
 
-    mapapi = "/api/maps?world=on&year=" + mapyear;
+    mapapi = "http://clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
     d3.json(mapapi, function (error, world) {
         if (error) {
             console.log(error);
@@ -63,7 +63,7 @@ function showmap(datayear, mapyear, handle, varname, colors) {
 	    locations = topojson.feature(world, world.objects.countries).features;
 	}
 
-	datapi = "/api/data?db=strikes_test&handle=" + handle + "&year=" + datayear + "&categories=8&datarange=calculate";
+	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=8&datarange=calculate";
 	datapi = datapi + '&colors=' + colors;
 	d3.json(datapi, function (error, data) {
 
