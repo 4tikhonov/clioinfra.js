@@ -63,6 +63,7 @@ import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
+from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange
 
 defaultcolors = ['#800080','#006bff','#008000','#FFA500','#FF0000', '#ffffff']
 defaultscales = [0, 0.154, 0.613, 2.002, 4.766, 8]
@@ -631,43 +632,6 @@ def medianlimits(dataframe):
     
     return (dataframe.min(), int(avg1), int(avg), int(avg2), dataframe.max())
 
-def floattodec(s):
-    try:
-        c = float(s)
-	if int(c) == c:
-            return int(c)
-	else:
-	    if c > 10:
-	        return int(round(c))
-	    else:
-	        return s
-    except ValueError:
-        return s
-
-def combinerange(map):
-    rangestr = ''
-    rangearr = []
-    for i in reversed(range(len(map))):
-        if i > 0:
-            id = i - 1
-            min = map[id]
-            max = map[i]
-            rangestr = rangestr + str(min) + ' - ' + str(max) + ', '
-            rangearr.append(str(floattodec(min)) + ' - ' + str(floattodec(max)))
-    rangestr = rangestr[:-2]
-    return (rangearr, rangestr)
-
-def buildcategories(num):
-    step = 100 / float(num)
-    print step
-    p = []
-    for i in range(num+1):
-        if i:
-            p.append(i * step)
-        else:
-            p.append(i)
-    return p
-
 def meanlimits(dataframe):
     scale = []
     frame1 = []
@@ -727,9 +691,6 @@ def load_data(cursor, year, datatype, region, datarange, output, debug, datafram
         if request.args.get('colors') == 'greyscale':
 	    colors = gcolors
 	#colors = mpl.colors.ListedColormap(palettable.colorbrewer.sequential.Grey8.mpl_colors)
-	#colors = ['#FF0000', '#FFA500', '#008000','#006bff', '#800080']
-	#colors = ['#800080','#006bff','#008000','#FFA500','#FF0000']
-	#colors = ['#006bff','#008000','#FFA500','#FF0000','#FF0000']
 	maxColor = 0
 
         # execute our Query
@@ -1126,9 +1087,18 @@ def dataapi():
     fromyear = '1500'
     toyear = '2012'
     customcountrycodes = ''
+    getrange = ''
+    categoriesMax = 8
+    pallette = ''
 
     if request.args.get('year'):
         customyear = request.args.get('year')
+    if request.args.get('catmax'):
+        categoriesMax = int(request.args.get('catmax'))
+    if request.args.get('getrange'):
+        getrange = request.args.get('getrange')
+    if request.args.get('colors'):
+        pallette = request.args.get('colors')
     if request.args.get('handle'):
         handle = request.args.get('handle')
         handles.append(handle)
@@ -1147,10 +1117,17 @@ def dataapi():
     (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
 
     modern = moderncodes(config['modernnames'], config['apiroot'])
-    jsondata = data2json(modern, codes, panelcells)
-    data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
-
-    return Response(data,  mimetype='application/json')
+    #jsondata = data2json(modern, codes, panelcells)
+    #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
+    (defaultcolor, colors) = getcolors(categoriesMax, pallette)
+    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax)
+ 
+    if getrange:
+	(showrange, tmprange) = combinerange(ranges)
+	return str(tmprange)
+    else:
+        data = json.dumps(dataset, ensure_ascii=False, sort_keys=True, indent=4)
+        return Response(data,  mimetype='application/json')
 
 @app.route('/locations')
 def locations():
