@@ -1,4 +1,4 @@
-function showmap(datayear, mapyear, handle, varname, colors) {
+function showmap(datayear, mapyear, handle, varname, colors, catnum) {
     var rightdiv = document.getElementById("#showmap");
     var margin = {top: -120, right: 20, bottom: 70, left: 40},
     width = 960 - margin.left - margin.right,
@@ -33,22 +33,22 @@ function showmap(datayear, mapyear, handle, varname, colors) {
 
     var g = svg.append('g');
 
-    var visitedData = {};
     var locations = {};
-    var cities = [];
+    var locations = {};
+    var allcountries = [];
 
     var tip = d3.tip()
   	.attr('class', 'd3-tip')
   	.offset([-10, 0])
   	.html(function(d) {
 	
-	if (typeof visitedData[d.properties.AREA] === 'undefined')
+	if (typeof locations[d.properties.AREA] === 'undefined')
 	{
 	    return d.properties.AREA + ': no data'
 	}
 	else
 	{
-    	    return "<strong>" + d.properties.AREA + ":</strong> <span style='color:red'>" + visitedData[d.properties.AREA].value + "</span>";
+    	    return "<strong>" + d.properties.AREA + ":</strong> <span style='color:red'>" + locations[d.properties.AREA].value + "</span>";
 	}
   	})
 
@@ -63,14 +63,14 @@ function showmap(datayear, mapyear, handle, varname, colors) {
 	    locations = topojson.feature(world, world.objects.countries).features;
 	}
 
-	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=8&datarange=calculate";
+	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=" + catnum + "&datarange=calculate";
 	datapi = datapi + '&colors=' + colors;
 	d3.json(datapi, function (error, data) {
 
             if (error) {
                 console.log(error);
             } else {
-                visitedData = data;
+                locations = data;
             }
 
             var countries = topojson.feature(world, world.objects.countries).features;
@@ -86,13 +86,13 @@ function showmap(datayear, mapyear, handle, varname, colors) {
 		    .attr("stroke", "#848482")
                     .attr("stroke-width", 0.5)
                     .style('fill', function (d) {
-                        var color = visitedData[d.properties.AREA] && visitedData[d.properties.AREA].color;
+                        var color = locations[d.properties.AREA] && locations[d.properties.AREA].color;
                         return color || '#ffffff';
                     })
 
-            for (var i in visitedData) {
-                if (visitedData.hasOwnProperty(i) && visitedData[i].name) {
-                    cities.push.apply(cities, visitedData[i].name);
+            for (var i in locations) {
+                if (locations.hasOwnProperty(i) && locations[i].name) {
+                    allcountries.push.apply(allcountries, locations[i].name);
                 }
             }
 
@@ -101,23 +101,35 @@ function showmap(datayear, mapyear, handle, varname, colors) {
     svg.call(tip);
 
   function legendDemo() {
-
   sampleNumerical = [1,2.5,5,10,20];
   var legendValues=[{color: "green", stop: [0,1]},{color: "green", stop: [1,2]},{color: "purple", stop: [2,3]},{color: "yellow", stop: [3,4]},{color: "black", stop: [4,5]}];
 
-  sampleCategoricalData = [
- "4.766 - 8",  "2.002 - 4.766",  "0.613 - 2.002",  "0.154 - 0.613",  "0 - 0.154",  "no data", 
-  ]
-  var COLORS = [
- "#FF0000",  "#FFA500",  "#008000",  "#006bff",  "#800080",  "#ffffff",
-  ]
+  datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=" + catnum + "&datarange=calculate";
+  datapi = datapi + '&colors=' + colors;
+  datapi = datapi + '&getrange=yes';
+  d3.json(datapi, function (error, rangedata) {
+
+            if (error) {
+                console.log(error);
+            } else {
+                scales = rangedata;
+            }
+
+  var sampleCategoricalData = scales['scale'];
+  var COLORS = scales['colors']; 
   sampleOrdinal = d3.scale.category20().domain(sampleCategoricalData);
 
   verticalLegend = d3.svg.legend(legendValues, COLORS).labelFormat("none").cellPadding(5).orientation("vertical").units("Legend").cellWidth(25).cellHeight(18).inputScale(sampleOrdinal).cellStepping(10);
 
-  d3.select("svg").append("g").attr("transform", "translate(20,350)").attr("class", "legend").style("font-size","12px").call(verticalLegend);
+  d3.select("svg").append("g").attr("transform", "translate(20,250)").attr("class", "legend").style("font-size","12px").call(verticalLegend);
+   })
 
   }
+
+legend = svg.append("g")
+  .attr("class","legend")
+  .style("font-size","5px")
+  .call(legendDemo)
 
 function clicked(d) {
   var centroid = path.centroid(d),
