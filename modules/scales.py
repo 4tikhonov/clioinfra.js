@@ -13,8 +13,9 @@ def getcolors(catnum, pallete):
     greycolors = ['#ffffff', '#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525']
     
     if not pallete:
-        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum+1)
+        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum)
         bmapcolors = bmap.hex_colors    
+	#bmapcolors.reverse()
 	allcolors = ['#ffffff']
 	for c in bmapcolors:
 	    allcolors.append(c)
@@ -44,6 +45,7 @@ def webscales(showrange, colors, defaultcolor):
             webranges.append(irange)
             webcolors.append(icolor)
     
+	webcolors.reverse()
         webranges.append("nodata")
         webcolors.append(defaultcolor)
         webscale['scale'] = webranges
