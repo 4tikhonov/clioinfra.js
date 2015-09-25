@@ -4,15 +4,16 @@ import pandas as pd
 import random
 from random import randint
 import numpy as np
-#import brewer2mpl
+import brewer2mpl
 
 def getcolors(catnum, pallete):
     colors = []
     allcolors = []
+    colormap = 'Paired'
     greycolors = ['#ffffff', '#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525']
     
     if not pallete:
-        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum)
+        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum+1)
         allcolors = bmap.hex_colors    
     elif pallete == 'greyscale':
         allcolors = greycolors
