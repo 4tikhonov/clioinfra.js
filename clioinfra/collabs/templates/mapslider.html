@@ -42,8 +42,8 @@
     };
    };
   
-   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&ctrlist={{ customcountrycodes }}";
-   var starturl = mapurl + '&colors=' + colors + '&year=' + year;
+   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
+   var starturl = mapurl + '&colors=' + colors + '&year=' + year + '&lasty={{ lastyear }}';
  
   $(function() {
     var select = $( "#yearslider" );
@@ -89,7 +89,7 @@ function greyscale(x){
 <body>
 <div id="map" style='border:0; width:820px; height:600px;'>
 <center><h2>{{ title }}<label id="yearlab"></label></h2></center>
-<iframe id="worldmap" src='' style='border:0; width:150%; overflow: hidden; height: 420px;' scrolling="no"></iframe>
+<iframe id="worldmap" src='' style='border:0; width:150%; overflow: hidden; height: 480px;' scrolling="no"></iframe>
 <script>document.getElementById('worldmap').src = starturl;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
