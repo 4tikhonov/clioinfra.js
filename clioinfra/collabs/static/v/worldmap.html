@@ -39,9 +39,17 @@
       colors=cstr.substring(0,cindex);
     };
    };
+   var catmax = 8;
+    if (myurl.indexOf("catmax=") > 0) {
+    catstr=myurl.substring(myurl.indexOf("catmax=")+7);
+    cindex=catstr.indexOf("&");
+    if (cindex > 0) {
+      catmax=catstr.substring(0,cindex);
+    };
+   };
 </script>
 <script src="/collabs/static/nlgis/nlgis.js"></script>
 <script>
-showmap(year, mapyear, handle, '', colors);
+showmap(year, mapyear, handle, '', colors, catmax);
 </script>
 </body>
