@@ -4,7 +4,7 @@ import pandas as pd
 import random
 from random import randint
 import numpy as np
-import brewer2mpl
+#import brewer2mpl
 
 def getcolors(catnum, pallete):
     colors = []
@@ -31,7 +31,6 @@ def showwarning(tip):
 
 def buildcategories(num):
     step = 100 / float(num)
-    print step
     p = []
     for i in range(num+1):
         if i:
@@ -108,3 +107,31 @@ def getscales(data, colors, catnum):
         finalcatnum = catnum
         
     return (finalcatnum, qwranges, dataset)
+
+def floattodec(s):
+    try:
+        c = float(s)
+        if int(c) == c:
+            return int(c)
+        else:
+            if c > 10:
+                return int(round(c))
+            else:
+                return s
+    except ValueError:
+        return s
+
+# Combine all ranges to show on map    
+def combinerange(map):
+    rangestr = ''
+    rangearr = []
+    for i in reversed(range(len(map))):
+        if i > 0:
+            id = i - 1
+            min = map[id]
+            max = map[i]
+            rangestr = rangestr + str(min) + ' - ' + str(max) + ', '
+            rangearr.append(str(floattodec(min)) + ' - ' + str(floattodec(max)))
+    rangestr = rangestr[:-2]
+    return (rangearr, rangestr)
+
