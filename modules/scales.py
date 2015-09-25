@@ -14,7 +14,10 @@ def getcolors(catnum, pallete):
     
     if not pallete:
         bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum+1)
-        allcolors = bmap.hex_colors    
+        bmapcolors = bmap.hex_colors    
+	allcolors = ['#ffffff']
+	for c in bmapcolors:
+	    allcolors.append(c)
     elif pallete == 'greyscale':
         allcolors = greycolors
     
