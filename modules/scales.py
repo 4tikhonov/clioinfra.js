@@ -27,6 +27,27 @@ def getcolors(catnum, pallete):
     
     return (nodatacolor, colors)
 
+def webscales(showrange, colors, defaultcolor):
+    webranges = []
+    webcolors = []
+    webscale = {}
+    jsonscale = ''
+    
+    if showrange:
+        rangeitem = {}    
+        for i in range(0,len(showrange)):        
+            irange = showrange[i]
+            icolor = colors[i]
+            webranges.append(irange)
+            webcolors.append(icolor)
+    
+        webranges.append("nodata")
+        webcolors.append(defaultcolor)
+        webscale['scale'] = webranges
+        webscale['colors'] = webcolors
+        
+    return webscale
+
 def showwarning(tip):
     return tip
 
