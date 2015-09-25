@@ -1,4 +1,4 @@
-# Copyright (C) 2014 International Institute of Social History.
+# Copyright (C) 2015 International Institute of Social History.
 # @author Vyacheslav Tykhonov <vty@iisg.nl>
 #
 # This program is free software: you can redistribute it and/or  modify
@@ -63,10 +63,8 @@ import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
-from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange
+from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 
-defaultcolors = ['#800080','#006bff','#008000','#FFA500','#FF0000', '#ffffff']
-defaultscales = [0, 0.154, 0.613, 2.002, 4.766, 8]
 cpath = "/etc/apache2/strikes.config"
 
 def connect(custom):
@@ -1124,7 +1122,9 @@ def dataapi():
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
-	return str(tmprange)
+	webscale = webscales(showrange, colors, defaultcolor)
+	data = json.dumps(webscale, ensure_ascii=False, sort_keys=True, indent=4)
+	return Response(data,  mimetype='application/json')
     else:
         data = json.dumps(dataset, ensure_ascii=False, sort_keys=True, indent=4)
         return Response(data,  mimetype='application/json')
