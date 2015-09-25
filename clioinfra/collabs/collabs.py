@@ -255,7 +255,7 @@ def members():
 
 @app.route('/mapslider')
 def mapslider():
-    (title, steps, customcountrycodes, fromyear, toyear, customyear) = ('', 0, '', '1500', '2012', '') 
+    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 8) 
     logscale = 0
     handles = []
     datahub = {}
@@ -276,6 +276,8 @@ def mapslider():
 	handles.append(dataset)
     if request.args.get('logscale'):
 	logscale = 1
+    if request.args.get('catmax'):
+	catmax = request.args.get('catmax')
 
     historical = 0
 
@@ -288,12 +290,14 @@ def mapslider():
 	#warning = logging.exception()
 
     validyears = []
+    lastyear = ''
     for year in sorted(datahub):
 	validyears.append(year)
+	lastyear = year
 	steps = steps + 1
     #validyears = ['1880', '1902', '1934', '1955', '1987', '2012']
 
-    return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes))
+    return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
 
 @app.route('/d3map')
 def d3map(settings=''):
