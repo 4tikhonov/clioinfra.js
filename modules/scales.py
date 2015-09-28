@@ -6,11 +6,14 @@ from random import randint
 import numpy as np
 import brewer2mpl
 
-def getcolors(catnum, pallete):
+def getcolors(catnum, pallete, colormap):
     nodatacolor = '#ffffff'
     colors = []
     allcolors = []
-    colormap = 'Paired'
+    defaultcolormap = 'Paired'
+    if not colormap:
+	colormap = defaultcolormap
+	
     greycolors = ['#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#303030', '#101010']
     greycolors_advanced = ['#F8F8F8', '#F0F0F0', '#E8E8E8', '#E0E0E0', '#D8D8D8', '#D0D0D0', '#C8C8C8', '#C0C0C0', '#B8B8B8', '#B0B0B0', '#A8A8A8', '#A0A0A0', '#989898', '#909090', '#888888', '#808080', '#787878', '#707070', '#686868', '#606060', '#585858', '#505050', '#484848', '#404040', '#383838', '#303030', '#282828', '#202020', '#181818', '#101010', '#080808', '#000000']
     
