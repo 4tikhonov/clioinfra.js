@@ -7,24 +7,27 @@ import numpy as np
 import brewer2mpl
 
 def getcolors(catnum, pallete):
+    nodatacolor = '#ffffff'
     colors = []
     allcolors = []
     colormap = 'Paired'
-    greycolors = ['#ffffff', '#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525']
+    greycolors = ['#f0f0f0', '#d9d9d9', '#bdbdbd', '#969696', '#737373', '#525252', '#252525']
     
     if not pallete:
         bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum)
         bmapcolors = bmap.hex_colors    
 	#bmapcolors.reverse()
-	allcolors = ['#ffffff']
-	for c in bmapcolors:
-	    allcolors.append(c)
+        for i in range(0,catnum):
+            allcolors.append(bmapcolors[i])
+	#allcolors.reverse()
     elif pallete == 'greyscale':
-        allcolors = greycolors
+	allcolors.append(nodatacolor)
+	for c in greycolors:
+            allcolors.append(c)
     
     try:
-        nodatacolor = allcolors[0]
-        for i in range(1,catnum+1):
+        nodatacolor = nodatacolor
+        for i in range(0,catnum):
             colors.append(allcolors[i])        
     except:
         showwarning('no colors')
