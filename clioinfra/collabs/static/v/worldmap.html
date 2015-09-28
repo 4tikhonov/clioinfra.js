@@ -17,10 +17,10 @@
    var myurl=window.location.toString();
    myurl = myurl + '&'
    if (myurl.indexOf("dataset=") > 0) {
-    handle=myurl.substring(myurl.indexOf("dataset=")+8);
-    cindex=myurl.indexOf("&");
+    handlestr=myurl.substring(myurl.indexOf("dataset=")+8);
+    cindex=handlestr.indexOf("&");
     if (cindex > 0) {
-      handle=handle.substring(0,cindex);
+      handle=handlestr.substring(0,cindex);
     };
    };
    mapyear = 2012;
