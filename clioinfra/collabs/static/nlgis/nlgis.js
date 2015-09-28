@@ -63,7 +63,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum) {
 	    locations = topojson.feature(world, world.objects.countries).features;
 	}
 
-	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=" + catnum + "&datarange=calculate";
+	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
 	datapi = datapi + '&colors=' + colors;
 	d3.json(datapi, function (error, data) {
 
@@ -104,7 +104,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum) {
   sampleNumerical = [1,2.5,5,10,20];
   var legendValues=[{color: "green", stop: [0,1]},{color: "green", stop: [1,2]},{color: "purple", stop: [2,3]},{color: "yellow", stop: [3,4]},{color: "black", stop: [4,5]}];
 
-  datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&categories=" + catnum + "&datarange=calculate";
+  datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
   datapi = datapi + '&colors=' + colors;
   datapi = datapi + '&getrange=yes';
   d3.json(datapi, function (error, rangedata) {
