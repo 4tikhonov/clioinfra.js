@@ -1084,10 +1084,8 @@ def dataapi():
     customyear = ''
     fromyear = '1500'
     toyear = '2012'
-    customcountrycodes = ''
-    getrange = ''
     categoriesMax = 8
-    pallette = ''
+    (getrange, colormap, pallette, customcountrycodes) = ('', '', '', '')
 
     if request.args.get('year'):
         customyear = request.args.get('year')
@@ -1097,6 +1095,8 @@ def dataapi():
         getrange = request.args.get('getrange')
     if request.args.get('colors'):
         pallette = request.args.get('colors')
+    if request.args.get('colormap'):
+        colormap = request.args.get('colormap')
     if request.args.get('handle'):
         handle = request.args.get('handle')
         handles.append(handle)
@@ -1117,7 +1117,7 @@ def dataapi():
     modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
-    (defaultcolor, colors) = getcolors(categoriesMax, pallette)
+    (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
     (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax)
  
     if getrange:
