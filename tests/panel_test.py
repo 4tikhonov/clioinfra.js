@@ -17,14 +17,16 @@ fromyear = '1500'
 toyear = '2000'
 customcountrycodes = '380,250,276,804,174,108,232,528,756'
 logflag = 0
+thisdir = '.'
 
+config = configuration()
 if fromyear:
     historical = 1
     if historical:
-        api = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/historical.json"
+        api = config['apiroot'] + "/collabs/static/data/historical.json"
         (regions, countries, ctr2reg) = histo(api)
         hist = countries
 
     (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
     f = "panel.xlsx"
-    panel2excel(f, header, panelcells)
+    panel2excel(thisdir, f, header, panelcells)
