@@ -465,9 +465,9 @@ def load_lonlat(cursor):
         return jsondata
 
 # Search API
-def simplesearch(root, qurl):
+def simplesearch(root, qurl, apiroot):
     # Load topics
-    topicurl = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/dataframe100_0.json"
+    topicurl = apiroot + "/collabs/static/data/dataframe100_0.json"
     topics = loadjson(topicurl)
 
     # Input
@@ -949,18 +949,19 @@ def dialog():
 
 @app.route('/dataverse')
 def dataverse():
-    root = "http://dv.sandbox.socialhistoryservices.org"
+    config = configuration()
+    root = config['dataverseroot']
     query = ''
     if request.args.get('q'):
         query = request.args.get('q')
-    apiurl = root + "/api/search?q=" + str(query) + "&key=73883b6f-ca99-41b9-953a-b9f8be42723d&type=dataset"
+    apiurl = root + "/api/search?q=" + str(query) + "&key=" + config['key'] + "&type=dataset"
     url = request.url
 
     data = ''
     if query:
         rawdata = load_dataverse(apiurl)
     else:
-        rawdata = simplesearch(root, url)
+        rawdata = simplesearch(root, url, config['apiroot'])
 
     try:
         data = json.dumps(rawdata, encoding="utf-8", sort_keys=True, indent=4)
