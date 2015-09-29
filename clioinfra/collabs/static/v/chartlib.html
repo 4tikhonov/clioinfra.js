@@ -26,24 +26,8 @@ body {
 </style>
 <body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src="/collabs/static/nlgis/params.js"></script>
 <script>
-    var uri = '';
-    var myurl=window.location.toString();
-  if (myurl.indexOf("start=") > 0) {
-    handle=myurl.substring(myurl.indexOf("start=")+8);
-    cindex=myurl.indexOf("&");
-    if (cindex > 0) {
-      uri=handle.substring(0,cindex);
-    };
-  };
-  var ucolor = 'greyscale';
-  if (uri.indexOf("color=") > 0) {
-    tmpcolor=uri.substring(uri.indexOf("color=")+6);
-    cindex=tmpcolor.indexOf("&");
-    if (cindex > 0) {
-      ucolor=tmpcolor.substring(0,cindex);
-    };
-  };
   apilink = "/api/tabledata?" + uri;
 </script>
 <script>
@@ -62,7 +46,7 @@ var y = d3.scale.linear()
 
 var color;
 var stroke = [];
-if (ucolor == 'greyscale')
+if (colors == 'greyscale')
 {
 color = d3.scale.category20b()
     .range(["#000", "#111" , "#222", '#333', '#444', '#555', '#666', '#777', '#888', '#999', '#aaa', '#bbb', '#ccc', '#ddd', '#eee', '#fff']);
