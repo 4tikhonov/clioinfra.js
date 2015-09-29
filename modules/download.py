@@ -8,7 +8,7 @@ import xml.etree.ElementTree as etree
 def download(HOSTNAME, API_TOKEN, tmpdir, fileID, original):
     original = re.sub('\(|\)', '', original)
     url = HOSTNAME + "/api/access/datafile/" + str(fileID) + "?key=" 
-    cmd = "/usr/bin/wget -q https://%s%s --no-check-certificate -O %s/%s" % (url, API_TOKEN, tmpdir, original)
+    cmd = "/usr/bin/wget -q %s%s --no-check-certificate -O %s/%s" % (url, API_TOKEN, tmpdir, original)
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     (out, err) = proc.communicate()
         
@@ -47,7 +47,7 @@ def get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir):
         if isfile:
             fileID = isfile.group(1)
             fileoriginal = isfile.group(2)
-            download(HOSTNAME, API_TOKEN, tmpdir, fileID, fileoriginal)
+            status = download(HOSTNAME, API_TOKEN, tmpdir, fileID, fileoriginal)
             if DEBUG:
                 print filename.string
                 print fileoriginal
