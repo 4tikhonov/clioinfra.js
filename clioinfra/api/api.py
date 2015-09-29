@@ -141,11 +141,13 @@ def downloadzip(pid):
     API_TOKEN = config['key']
     HOSTNAME = config['dataverseroot']
     cmd = "--insecure -u " + API_TOKEN + ": " + HOSTNAME + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
-    tmpdir = "/tmp/test"
+    tmpdir = config['tmpdir']
     filerandom = randomword(10)
+    #filerandom = '12345'
     arc = "data" + filerandom + ".zip"
     filename = filerandom  
     finaldir = config['path'] + '/static/tmp'
+    # ToDO
     if filename:
         finaldir = str(finaldir) + '/' + str(filename)
         tmpdir = str(tmpdir) + '/' + str(filename)
@@ -195,7 +197,7 @@ def downloadzip(pid):
 	    handles = [ alonepid ]
 
 	for pid in handles:
-            #api = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/historical.json"
+            #api = config['apiroot'] + "/collabs/static/data/historical.json"
             #(regions, countries, ctr2reg) = histo(api)
             #hist = countries
 	    hist = ''
@@ -207,14 +209,13 @@ def downloadzip(pid):
     try:
         for everypid in handles:
 	    everypid = "hdl:10622/" + str(everypid)
-	    #filename = filename + ':' + str(everypid) + ' ' + str(tmpdir) + ' ' + str(finaldir)
+	    # Download papers
             zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, everypid, tmpdir, arc, finaldir)
-	    #filename = filename + str(zipfile)
     except:
 	nopapers = 1
 
     compile2zip(finaldir, arc)
-    filename = arc #filerandom + '/' + filename
+    filename = arc
     return filename
 
 def analyze_data(cursor, catnum):
