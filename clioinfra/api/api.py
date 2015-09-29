@@ -145,7 +145,7 @@ def downloadzip(pid):
     filerandom = randomword(10)
     arc = "data" + filerandom + ".zip"
     filename = filerandom  
-    finaldir = "/home/strikes/sik/web/collabs/static/tmp"
+    finaldir = config['path'] + '/static/tmp'
     if filename:
         finaldir = str(finaldir) + '/' + str(filename)
         tmpdir = str(tmpdir) + '/' + str(filename)
@@ -178,7 +178,7 @@ def downloadzip(pid):
     
     if handles:
 	if historical:
-            api = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/historical.json"
+            api = config['apiroot'] + "/collabs/static/data/historical.json"
             (regions, countries, ctr2reg) = histo(api)
             hist = countries
 	else:
@@ -920,14 +920,13 @@ def open():
 def download():
     pid = ''
     root = ''
-    #root = "http://clearance.sandbox.socialhistoryservices.org/api/open"
-    #return redirect(root, code=301)
+    config = configuration()
 
     if request.args.get('pid'):
         pid = request.args.get('pid')
 
     zipfile = downloadzip(pid)
-    root = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/tmp/" + zipfile
+    root = config['apiroot'] + "/collabs/static/tmp/" + zipfile
 
     # HTML
     #resp = make_response(render_template('progress.html', download=root))
