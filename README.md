@@ -73,6 +73,7 @@ sudo apt-get install nodejs
 sudo apt-get install python-pandas
 sudo apt-get install python-matplotlib
 sudo apt-get install python-bs4
+sudo apt-get install zip
 apt-get install catdoc
 sudo a2enmod headers
 sudo npm install -g topojson
