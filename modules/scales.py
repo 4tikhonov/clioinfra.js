@@ -24,7 +24,7 @@ def getcolors(catnum, pallete, newcolormap):
 	greycolors = greycolors_advanced
 
     if not pallete:
-        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum)
+        bmap = brewer2mpl.get_map(colormap, 'Qualitative', catnum+1)
         bmapcolors = bmap.hex_colors    
 	#bmapcolors.reverse()
         for i in range(0,catnum):
@@ -36,7 +36,6 @@ def getcolors(catnum, pallete, newcolormap):
             allcolors.append(c)
     
     try:
-        nodatacolor = nodatacolor
         for i in range(0,catnum):
             colors.append(allcolors[i])        
     except:
