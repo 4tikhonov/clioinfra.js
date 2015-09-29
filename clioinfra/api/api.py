@@ -1085,7 +1085,8 @@ def dataapi():
     customyear = ''
     fromyear = '1500'
     toyear = '2012'
-    categoriesMax = 8
+    categoriesMax = 6
+    countriesNum = 200
     (getrange, colormap, pallette, customcountrycodes) = ('', '', '', '')
 
     if request.args.get('year'):
@@ -1113,6 +1114,15 @@ def dataapi():
     hist = {}
     logflag = 0
     config = configuration()
+    try:
+	if len(customcountrycodes):
+            countriesNum = len(customcountrycodes.split(','))
+            if countriesNum < categoriesMax:
+	        if countriesNum >= 1:
+                    categoriesMax = countriesNum
+    except:
+	nothing = 1
+
     (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
 
     modern = moderncodes(config['modernnames'], config['apiroot'])
