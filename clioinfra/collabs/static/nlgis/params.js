@@ -3,6 +3,7 @@ var uri = '';
 var year;
 var mapyear = 2012;
 var catmax = 6;
+var lastyear;
 myurl = myurl + '&'
 var colors = '';
 
@@ -30,16 +31,22 @@ if (myurl.indexOf("&year=") > 0) {
     };
 };
 
-if (typeof(year) == 'undefined') 
-{
-       if (myurl.indexOf("&lasty=") > 0) {
-        yearstr=myurl.substring(myurl.indexOf("lasty=")+6);
-        cindex=yearstr.indexOf("&");
-    	if (cindex > 0) {
-      	year=yearstr.substring(0,cindex);
-        };
-       };
+if (myurl.indexOf("&lasty=") > 0) {
+    yearstr=myurl.substring(myurl.indexOf("lasty=")+6);
+    cindex=yearstr.indexOf("&");
+    if (cindex > 0) {
+      	lastyear=yearstr.substring(0,cindex);
+    };
 };
+
+if (typeof(year) == 'undefined')
+{
+   year = lastyear;
+}
+if (year == 'undefined')
+{
+   year = lastyear;
+}
 
 if (myurl.indexOf("colors=") > 0) {
     cstr=myurl.substring(myurl.indexOf("colors=")+7);
