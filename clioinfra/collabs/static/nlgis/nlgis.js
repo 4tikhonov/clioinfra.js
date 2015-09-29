@@ -1,4 +1,4 @@
-function showmap(datayear, mapyear, handle, varname, colors, catnum) {
+function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
     var rightdiv = document.getElementById("#showmap");
     var margin = {top: -120, right: 20, bottom: 70, left: 40},
     width = 960 - margin.left - margin.right,
@@ -64,7 +64,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum) {
 	}
 
 	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
-	datapi = datapi + '&colors=' + colors;
+	datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist;
 	d3.json(datapi, function (error, data) {
 
             if (error) {
@@ -105,7 +105,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum) {
   var legendValues=[{color: "green", stop: [0,1]},{color: "green", stop: [1,2]},{color: "purple", stop: [2,3]},{color: "yellow", stop: [3,4]},{color: "black", stop: [4,5]}];
 
   datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
-  datapi = datapi + '&colors=' + colors;
+  datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist;
   datapi = datapi + '&getrange=yes';
   d3.json(datapi, function (error, rangedata) {
 
