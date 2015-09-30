@@ -21,40 +21,43 @@
     <![endif]-->
   </head>
 <div class="container">
-	<h2 class="text-muted">Create new project page</h1>
-	<form>
+<h2 class="text-muted">Create new project page</h1>
+<form method="GET">
+	<div class="form-group">
+                <label for="passwordField inline">Dataverse URL</label>
+                        <input name="dataverse" type="uri" class="input-small inline" id="passwordField" placeholder="link to dataverse with data" value="{{ fields.dataverse }}">
+                <label for="passwordField inline">API Token</label>
+                        <input name="apitoken" type="uri" class="input-small inline" id="passwordField" placeholder="Dataverse token is optional" value="{{ fields.apitoken }}">
+	</div>
         <div class="form-group">
-                <label for="emailField">Name</label>
-                        <input type="name" class="form-control inline" id="emailField" placeholder="Enter email" size="20">
-        </div>
-        <div class="form-group">
-	<center>
     		<label for="emailField">Email</label>
-			<input type="email" class="input-small inline" id="emailField" placeholder="Enter email">
+			<input name="email" type="email" class="input-small inline" id="emailField" placeholder="Enter email" value="{{ fields.email }}">
     		<label for="passwordField inline">Password</label>
-			<input type="password" class="input-small inline" id="passwordField" placeholder="Enter password">
+			<input name="passwd" type="password" class="input-small inline" id="passwordField" placeholder="Enter password" value="{{ fields.passwd }}">
 		<label for="passwordField inline">Project URI</label>
-                        <input type="password" class="input-small inline" id="passwordField" placeholder="URI like /myproject">
-	</center>
+                        <input name="uri" type="uri" class="input-small inline" id="passwordField" placeholder="URI like /myproject" value="{{ fields.uri }}">
     	</div>
         <div class="form-group">
                 <label for="passwordField">Project title</label>
-                        <input type="password" class="form-control" id="title" placeholder="Enter title">
+                        <input name="title" type="text" class="form-control" id="title" placeholder="Enter title of the project, for example, Labor Conflicts" value="{{ fields.title }}">
         </div>
-
-        <div class="form-group">
-                <label for="passwordField">Short description of the project</label>
-                        <input type="password" class="form-control" id="title" placeholder="Enter description">
-        </div>
-
-        <div class="form-group">
-                <label for="fulldescription">Summary</label>
-                <textarea class="form-control custom-control" id="textareaID" rows="2" autofocus="" style="resize:none" placeholder="Enter full description of the project"></textarea>
-        </div>
-
         <div class="form-group">
                 <label for="about">About</label>
-                <textarea class="form-control custom-control" id="about" rows="2" autofocus="" style="resize:none" placeholder="Motivation of the project"></textarea>
+                <textarea name="about" class="form-control custom-control" id="about" rows="3" autofocus="" style="resize:none" placeholder="Motivation of the project">{{ fields.about }}</textarea>
+        </div>
+        <div class="form-group">
+                <label for="passwordField">Project logo (optional)</label>
+                        <input name="logo" type="text" class="form-control" id="title" placeholder="Enter http:// URL to project logo" value="{{ fields.logo }}">
+        </div>
+
+        <div class="form-group">
+                <label for="passwordField">Short description of the project (optional)</label>
+                        <input name="description" type="description" class="form-control" id="title" placeholder="Enter description" value="{{ fields.description }}">
+        </div>
+
+        <div class="form-group">
+                <label for="fulldescription">Summary (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter full description of the project">{{ fields.summary }}</textarea>
         </div>
 
 	<div class="form-group">
@@ -98,11 +101,13 @@
                 <input type="checkbox" name="mean"> Mean<br>
                 <input type="checkbox" name="median"> Median <br>
                 <input type="checkbox" name="std"> Standard Deviation<br>
-		<input type="checkbox" name="cov">Coefficient of Variation
+		<input type="checkbox" name="cov"> Coefficient of Variation
                 </td>
                 <td>
                 <input type="checkbox" name="news"> News<br>
                 <input type="checkbox" name="papersblock"> Papers <br>
+		<input type="checkbox" name="contact"> Contact<br>
+		<input type="checkbox" name="partners"> Partners<br>
 
                 </td>
             </tr>
