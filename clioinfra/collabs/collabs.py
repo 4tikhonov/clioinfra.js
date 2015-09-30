@@ -943,6 +943,12 @@ def signup(settings=''):
 	else:
 	     fields[field] = ''
 
+    f = request.args
+    for key in f.keys():
+	value = f.getlist(key)
+	if value == 'on':
+	    fields[key] = value
+
     if request.args.get('project'):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
