@@ -66,6 +66,7 @@ from topics import load_alltopics
 from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
+from storage import data2store, readdata
 
 Provinces = ["Groningen","Friesland","Drenthe","Overijssel","Flevoland","Gelderland","Utrecht","Noord-Holland","Zuid-Holland","Zeeland","Noord-Brabant","Limburg"]
 pagelist = ["Home", "Global labor conflicts", "Local labor conflicts", "User Guide", "About"]
@@ -934,7 +935,21 @@ def about(settings=''):
 @app.route('/signup')
 def signup(settings=''):
     config = configuration()
-    resp = make_response(render_template('signup.html'))
+    fields = {}
+    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about"]
+    for field in fieldslist:
+	if request.args.get(field):
+	     fields[field] = request.args.get(field)
+	else:
+	     fields[field] = ''
+
+    if request.args.get('project'):
+	fieldsall = readdata('projects', 'uri', request.args.get('project'))
+	for f in fieldsall:
+	    fields = f
+    else:
+        result = data2store('projects', fields)
+    resp = make_response(render_template('signup.html', fields=fields))
     return resp
 
 @app.route('/boundaries')
