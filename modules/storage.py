@@ -15,9 +15,9 @@ def data2store(dbname, data):
 def readdata(dbname, key, val):
     client = MongoClient()
     db = client.get_database(dbname)
-    collection = db.test
+    collection = db.data
     try:
-        result = db.test.find({key: val})
+        result = db.data.find({key: val})
     except:
 	result = ''
 
