@@ -55,6 +55,8 @@ from werkzeug import secure_filename
 from vincent import Axis, AxisProperties, PropertySet, ValueRef
 from pandas.io.json import json_normalize
 from math import log10, floor
+
+# Clio Infra modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
 from boundaries import getboundaries
 from statistics import createdata
@@ -255,7 +257,7 @@ def members():
 
 @app.route('/mapslider')
 def mapslider():
-    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 8) 
+    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
     logscale = 0
     handles = []
     datahub = {}
@@ -298,16 +300,6 @@ def mapslider():
     #validyears = ['1880', '1902', '1934', '1955', '1987', '2012']
 
     return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
-
-@app.route('/d3map')
-def d3map(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    apiurl = '/api/maps?' #year=' + year
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    (codes, indicators) = loadcodes(api_topics_url, code, year, custom)
-    resp = make_response(render_template('d3colored.html', topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year, codes=codes, datarange=datarange, selectedcode=code, indicators=indicators))
-    return resp
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -501,21 +493,6 @@ def download(settings=''):
     if shapefile:
         return "<a href=\"" + shapefile + "\">Download ShapeFile</a>"
     resp = make_response(render_template('download.html', image=fileonweb, svgfile=svgfileout, pdffile=pdffile))
-    return resp
-
-@app.route('/thisworld')
-def thisworld(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    apiurl = '/api/maps?world=on' #year=' + year
-    # /api/maps?&year=1982&world=on
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    if request.args.get('year'):
-        year = request.args.get('year')
-    #codes = loadcodes(api_topics_url, code, year, custom)
-    resp = make_response(render_template('world/world.html', topojsonurl=apiurl, datayear=year))
-    #, datajsonurl=dataapiurl, datayear=year, codes=codes, datarange=datarange, selectedcode=code))
-    
     return resp
 
 @app.route('/worldmap')
@@ -769,6 +746,10 @@ def dashboard(settings=''):
     apiroot = config['apiroot']
     dataverseroot = config['dataverseroot']
     key = config['key']
+    tabnum = '' 
+    ctrnum = 0
+    if not tabnum:
+	tabnum = 3 # tabs with maps is default
     logscale = ''
 
     if config['perl']:
@@ -813,6 +794,7 @@ def dashboard(settings=''):
         if key == 'loc':
             for value in sorted(f.getlist(key)):
                 customcountrycodes = str(customcountrycodes) + str(value) + ','
+		ctrnum = ctrnum + 1
     if customcountrycodes:
         customcountrycodes = customcountrycodes[:-1]
 
@@ -863,6 +845,7 @@ def dashboard(settings=''):
 	template = 'geocoder.html'
     if action == 'visualize':
 	template = 'navigation.html'
+	# DEB
  	jsonapi = apiroot + "/collabs/static/data/" + str(pid) + ".json"
 	data = createdata(jsonapi)
 	d = data.describe()
@@ -909,7 +892,12 @@ def dashboard(settings=''):
 	selectedindicators = "\"" + dataset + "\""
     cliopids = cliopid
 
-    resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids, logscale=logscale))
+    # Choose tab
+    if ctrnum <= 10:
+	if ctrnum > 0:
+	    tabnum = 0
+
+    resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids, logscale=logscale, tabnum=tabnum))
     return resp
 
 @app.route('/export')
@@ -945,6 +933,7 @@ def about(settings=''):
 
 @app.route('/signup')
 def signup(settings=''):
+    config = configuration()
     resp = make_response(render_template('signup.html'))
     return resp
 
@@ -972,7 +961,6 @@ def googlemaps(settings=''):
 
     resp = make_response(render_template('world/googlemaps.html', active=activepage, pages=pages, datayear=year))
     return resp
-
 
 @app.route('/get')
 def get(settings=''):
@@ -1071,14 +1059,6 @@ def d3index(settings=''):
     resp = make_response(render_template('datasetlist.html', active=activepage, letters=letters, topiclist=topiclist, pages=pages))
     return resp
 
-@app.route('/d3movie')
-def d3movie(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    apiurl = '/api/maps?' #year=' + year
-    dataapiurl = '/api/data?code=' + code
-    resp = make_response(render_template('d3movie.html', topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year))
-    return resp
-
 @app.route('/advanced')
 def advanced(settings=''):
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
@@ -1117,7 +1097,6 @@ def index(year=None,code=None):
     str = 'Website will be developed to render maps'
     html_code = '<select name=code>' + '<option value\=' + code + '>' + code + '</option>' '</select>'
     year_code = '&nbsp;<input type=text name=year value=' + year + '>&nbsp;<input type=submit name="Submit">';
-    #  /home/slava/nlgis2/maps/usecases/maprender.py '10426' 1997 /etc/apache2/htdocs/images/1111
 
     cmd = viewerpath + ' ' + '""' + ' ' + year + ' ' + imagepathloc + '/' + year + '.png'  
     #cmd = '/bin/echo test'
