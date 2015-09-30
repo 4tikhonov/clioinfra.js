@@ -20,7 +20,6 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body>
 <div class="container">
 	<h2 class="text-muted">Create new project page</h1>
 	<form>
@@ -49,44 +48,67 @@
         </div>
 
         <div class="form-group">
+                <label for="fulldescription">Summary</label>
+                <textarea class="form-control custom-control" id="textareaID" rows="2" autofocus="" style="resize:none" placeholder="Enter full description of the project"></textarea>
+        </div>
+
+        <div class="form-group">
                 <label for="about">About</label>
-                <textarea class="form-control custom-control" id="about" rows="2" autofocus="" style="resize:none" placeholder="Some notes about this project"></textarea>
+                <textarea class="form-control custom-control" id="about" rows="2" autofocus="" style="resize:none" placeholder="Motivation of the project"></textarea>
         </div>
 
 	<div class="form-group">
-                <label for="fulldescription">Description</label>
-		<textarea class="form-control custom-control" id="textareaID" rows="2" autofocus="" style="resize:none" placeholder="Enter full description of the project"></textarea>
-        </div>
+	<table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Navigation</th>
+                <th>Search</th>
+                <th>Visualization</th>
+                <th>Statistics</th>
+                <th>Extra pages</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                <input type="checkbox" name="ind"> Indicators<br>
+                <input type="checkbox" name="datasets"> Datasets<br>
+                <input type="checkbox" name="countries"> Countries
+                </td>
+                <td>
+                <input type="checkbox" name="searchdata"> Dataset<br>
+                <input type="checkbox" name="searchmetadata"> Metadata <br>
+                <input type="checkbox" name="searchpapers"> Papers <br>
+                </td>
+                <td>
+                Maps<br>
+                &nbsp;&nbsp;<input type="checkbox" name="modmaps"> Modern map<br>
+                &nbsp;&nbsp;<input type="checkbox" name="histmaps"> Historical map<br>
+                Charts<br>
+                &nbsp;&nbsp;<input type="checkbox" name="chart"> Chart<br>
+                &nbsp;&nbsp;<input type="checkbox" name="histogram"> Histogram<br>
+                &nbsp;&nbsp;<input type="checkbox" name="quality"> Data quality<br>
+                <input type="checkbox" name="graphs"> Graphs <br>
+                <input type="checkbox" name="treemaps"> Treemaps
 
-	<div class="form-group">
-	    <div class="row">
-	    <center>
-	    <font size=+1>Indicators</font>
-              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
-            <font size=+1>Topics</font>
-              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
-            <font size=+1>Countries</font>
-              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
-            <font size=+1>Search</font>
-              <div style="width: 108px;" class="bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-on bootstrap-switch-id-switch-state bootstrap-switch-animate"><div style="width: 159px; margin-left: 0px;" class="bootstrap-switch-container"><span style="width: 53px;" class="bootstrap-switch-handle-on bootstrap-switch-primary">ON</span><span style="width: 53px;" class="bootstrap-switch-label">&nbsp;</span><span style="width: 53px;" class="bootstrap-switch-handle-off bootstrap-switch-default">OFF</span><input id="switch-state" checked="" type="checkbox"></div></div>
-	    </center>
-	    </div>
-	<div class="input-append">
-	<h4><b>Visualize and analyze<b></font>
-	    <label class="checkbox inline">
-	      <input type="checkbox" id="inlineCheckbox1" value="1"> Charts 
-	    </label>
-	    <label class="checkbox inline">
-	      <input type="checkbox" id="inlineCheckbox2" value="2"> Graphs
-	    </label>
-	    <label class="checkbox inline">
-	      <input type="checkbox" id="inlineCheckbox3" value="3"> Maps 
-	    </label>
-	    <label class="checkbox inline">
-	      <input type="checkbox" id="inlineCheckbox3" value="4"> Statistics
-	    </label>
-	  </div>
-          </div>
+                </td>
+                <td>
+                <input type="checkbox" name="min"> Min<br>
+                <input type="checkbox" name="max"> Max <br>
+                <input type="checkbox" name="mean"> Mean<br>
+                <input type="checkbox" name="median"> Median <br>
+                <input type="checkbox" name="std"> Standard Deviation<br>
+		<input type="checkbox" name="cov">Coefficient of Variation
+                </td>
+                <td>
+                <input type="checkbox" name="news"> News<br>
+                <input type="checkbox" name="papersblock"> Papers <br>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
 
 	<button type="submit" class="btn btn-success">Proceed</button>
     </form>
@@ -98,5 +120,4 @@
     </script>
     <script src="http://www.bootstrap-switch.org/docs/js/highlight.js"></script>
     <script src="http://www.bootstrap-switch.org/dist/js/bootstrap-switch.js"></script>
-  </body>
 {% endblock %}
