@@ -936,6 +936,7 @@ def about(settings=''):
 def signup(settings=''):
     config = configuration()
     fields = {}
+    checkboxes = {}
     fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about"]
     for field in fieldslist:
 	if request.args.get(field):
@@ -945,9 +946,12 @@ def signup(settings=''):
 
     f = request.args
     for key in f.keys():
-	value = f.getlist(key)
-	if value == 'on':
+	value = str(f.getlist(key))
+	#if key == 'datasets':
+	if value == "[u'on']":
+	    value = 'checked'
 	    fields[key] = value
+	    checkboxes[key] = value
 
     if request.args.get('project'):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
@@ -955,7 +959,7 @@ def signup(settings=''):
 	    fields = f
     else:
         result = data2store('projects', fields)
-    resp = make_response(render_template('signup.html', fields=fields))
+    resp = make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
     return resp
 
 @app.route('/boundaries')
