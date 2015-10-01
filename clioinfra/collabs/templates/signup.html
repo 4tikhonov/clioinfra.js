@@ -23,12 +23,6 @@
 <div class="container">
 <h2 class="text-muted">Create new project page</h1>
 <form method="GET">
-	<div class="form-group">
-                <label for="passwordField inline">Dataverse URL</label>
-                        <input name="dataverse" type="uri" class="input-small inline" id="passwordField" placeholder="link to dataverse with data" value="{{ fields.dataverse }}">
-                <label for="passwordField inline">API Token</label>
-                        <input name="apitoken" type="uri" class="input-small inline" id="passwordField" placeholder="Dataverse token is optional" value="{{ fields.apitoken }}">
-	</div>
         <div class="form-group">
     		<label for="emailField">Email</label>
 			<input name="email" type="email" class="input-small inline" id="emailField" placeholder="Enter email" value="{{ fields.email }}">
@@ -74,46 +68,51 @@
         <tbody>
             <tr>
                 <td>
-                <input type="checkbox" name="ind"> Indicators<br>
-                <input type="checkbox" name="datasets"> Datasets<br>
-                <input type="checkbox" name="countries"> Countries
+                <input type="checkbox" name="ind" checked> Indicators<br>
+                <input type="checkbox" name="datasets" {{ fields.datasets }}> Datasets<br>
+                <input type="checkbox" name="countries" {{ fields.countries }}> Countries
                 </td>
                 <td>
-                <input type="checkbox" name="searchdata"> Dataset<br>
-                <input type="checkbox" name="searchmetadata"> Metadata <br>
-                <input type="checkbox" name="searchpapers"> Papers <br>
+                <input type="checkbox" name="searchdata" {{ fields.searchdata }}> Dataset<br>
+                <input type="checkbox" name="searchmetadata" {{ fields.searchmetadata }}> Metadata <br>
+                <input type="checkbox" name="searchpapers" {{ fields.searchpapers }}> Papers <br>
                 </td>
                 <td>
                 Maps<br>
-                &nbsp;&nbsp;<input type="checkbox" name="modmaps"> Modern map<br>
-                &nbsp;&nbsp;<input type="checkbox" name="histmaps"> Historical map<br>
-                Charts<br>
-                &nbsp;&nbsp;<input type="checkbox" name="chart"> Chart<br>
-                &nbsp;&nbsp;<input type="checkbox" name="histogram"> Histogram<br>
-                &nbsp;&nbsp;<input type="checkbox" name="quality"> Data quality<br>
-                <input type="checkbox" name="graphs"> Graphs <br>
-                <input type="checkbox" name="treemaps"> Treemaps
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="modmaps" {{ fields.modmaps }}> Modern map<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="histmaps" {{ fields.histmaps }}> Historical map<br>
+                Graphs<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="chart" {{ fields.chart }}> Chart<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="histogram" {{ fields.histogram }}> Histogram<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="quality" {{ fields.quality }}> Data quality<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="treemaps" {{ fields.treemaps }}> Treemaps
 
                 </td>
                 <td>
-                <input type="checkbox" name="min"> Min<br>
-                <input type="checkbox" name="max"> Max <br>
-                <input type="checkbox" name="mean"> Mean<br>
-                <input type="checkbox" name="median"> Median <br>
-                <input type="checkbox" name="std"> Standard Deviation<br>
-		<input type="checkbox" name="cov"> Coefficient of Variation
+                <input type="checkbox" name="min" {{ fields.min }}> Min<br>
+                <input type="checkbox" name="max" {{ fields.max }}> Max <br>
+                <input type="checkbox" name="mean" {{ fields.mean }}> Mean<br>
+                <input type="checkbox" name="median" {{ fields.median }}> Median <br>
+                <input type="checkbox" name="std" {{ fields.std }}> Standard Deviation<br>
+		<input type="checkbox" name="cov" {{ fields.cov }}> Coefficient of Variation
                 </td>
                 <td>
-                <input type="checkbox" name="news"> News<br>
-                <input type="checkbox" name="papersblock"> Papers <br>
-		<input type="checkbox" name="contact"> Contact<br>
-		<input type="checkbox" name="partners"> Partners<br>
+                <input type="checkbox" name="news" {{ fields.news }}> News<br>
+                <input type="checkbox" name="papersblock" {{ fields.papersblock }}> Papers <br>
+		<input type="checkbox" name="contact" {{ fields.contact }}> Contact<br>
+		<input type="checkbox" name="partners" {{ fields.partners }}> Partners<br>
 
                 </td>
             </tr>
         </tbody>
     </table>
     </div>
+        <div class="form-group">
+                <label for="passwordField inline">Dataverse URL (optional)</label>
+                        <input name="dataverse" type="text" size="50" class="inline" id="passwordField" placeholder="link to dataverse with data" value="{{ fields.dataverse }}">
+                <label for="passwordField inline">API Token (optional)</label>
+                        <input name="apitoken" type="uri" class="input-small inline" id="passwordField" placeholder="Dataverse token is optional" value="{{ fields.apitoken }}">
+        </div>
 
 	<button type="submit" class="btn btn-success">Proceed</button>
     </form>
