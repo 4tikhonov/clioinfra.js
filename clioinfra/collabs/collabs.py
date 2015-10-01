@@ -66,7 +66,7 @@ from topics import load_alltopics
 from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
-from storage import data2store, readdata
+from storage import data2store, readdata, removedata
 
 Provinces = ["Groningen","Friesland","Drenthe","Overijssel","Flevoland","Gelderland","Utrecht","Noord-Holland","Zuid-Holland","Zeeland","Noord-Brabant","Limburg"]
 pagelist = ["Home", "Global labor conflicts", "Local labor conflicts", "User Guide", "About"]
@@ -958,6 +958,8 @@ def signup(settings=''):
 	for f in fieldsall:
 	    fields = f
     else:
+	# Clean settings first
+        remove = removedata('projects', 'uri', fields['uri'])
         result = data2store('projects', fields)
     resp = make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
     return resp
