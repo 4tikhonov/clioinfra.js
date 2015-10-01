@@ -46,7 +46,8 @@
 
         <div class="form-group">
                 <label for="passwordField">Short description of the project (optional)</label>
-                        <input name="description" type="description" class="form-control" id="title" placeholder="Enter description" value="{{ fields.description }}">
+                <label for="fulldescription">Summary (optional)</label>
+                <textarea name="description" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter full description of the project">{{ fields.description }}</textarea>
         </div>
 
         <div class="form-group">
@@ -68,7 +69,7 @@
         <tbody>
             <tr>
                 <td>
-                <input type="checkbox" name="ind" checked> Indicators<br>
+                <input type="checkbox" name="ind" {{ fields.ind }}> Indicators<br>
                 <input type="checkbox" name="datasets" {{ fields.datasets }}> Datasets<br>
                 <input type="checkbox" name="countries" {{ fields.countries }}> Countries
                 </td>
