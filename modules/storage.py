@@ -23,4 +23,14 @@ def readdata(dbname, key, val):
 
     return result
 
+def removedata(dbname, key, val):
+    client = MongoClient()
+    db = client.get_database(dbname)
+    collection = db.data
+    try:
+        result = db.data.remove({key: val})
+    except:
+        result = ''
+
+    return result
 
