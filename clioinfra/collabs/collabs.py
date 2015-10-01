@@ -25,7 +25,7 @@
 # delete this exception statement from all source files in the program,
 # then also delete it in the license file.
 
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect
 from flask import g
 from flask import Response, make_response, request, send_from_directory
 from twisted.web import http
@@ -957,12 +957,15 @@ def signup(settings=''):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
 	    fields = f
+	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
     else:
 	# Clean settings first
-        remove = removedata('projects', 'uri', fields['uri'])
-        result = data2store('projects', fields)
-    resp = make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
-    return resp
+	if len(fields['uri']):
+            remove = removedata('projects', 'uri', fields['uri'])
+            result = data2store('projects', fields)
+	    return redirect(config['apiroot'] + '/' + fields['uri'], code=301)
+	else:
+	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
 
 @app.route('/boundaries')
 def boundaries(settings=''):
