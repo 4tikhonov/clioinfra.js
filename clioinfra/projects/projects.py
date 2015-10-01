@@ -71,9 +71,10 @@ def page_not_found(e):
 		value = item[var]
 		try:
 		    value = re.sub('\n', '<br>', value)
-		    projectinfo[var] = value
+		    if len(value) > 0:
+		        projectinfo[var] = value
 		except:
-		    error = 'wrong'
+		    error = 'no settins'
             projectdata = json.dumps(item, encoding="utf-8", sort_keys=True, indent=4)
     except:
 	data = readdata('projects', 'uri', project)
