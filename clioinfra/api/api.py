@@ -64,6 +64,7 @@ from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
+from storage import data2store, readdata
 
 cpath = "/etc/apache2/strikes.config"
 
@@ -915,6 +916,23 @@ def open():
     root = ''
     resp = make_response(render_template('progress.html', download=root))
     return resp
+
+# Collabs
+@app.route('/collabs')
+def collabs():
+    remove = ["date", "_id", "passwd"]
+    (project, jsondata) = ('', '')
+    data = {}
+    if request.args.get('project'):
+	project = request.args.get('project')
+	data = readdata('projects', 'uri', project)
+	for item in data:
+    	    for r in remove:
+		if item[r]:
+                    del item[r]
+	    jsondata = json.dumps(item, encoding="utf-8", sort_keys=True, indent=4)
+
+    return Response(jsondata,  mimetype='application/json')
 
 # Dataverse API
 @app.route('/download')
