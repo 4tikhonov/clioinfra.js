@@ -1,0 +1,74 @@
+{% extends "clioinfra.html" %}
+{% block content %}
+<link rel="stylesheet" href="/collabs/static/js/tabs.css" media="screen" type="text/css" />
+<div id="page">
+<h2>{{ projectdata.title }}</h2>
+<div id="block-views-introduction-block" class="block block-views last even">
+
+        <h2 class="block__title block-title">About</h2>
+
+  <div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
+
+
+
+      <div class="view-content">
+        <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
+
+  <div class="views-field views-field-body">        <div class="field-content"><p>
+{{ projectdata.about | safe }}
+</p> 
+</div>  </div>  </div>
+    </div>
+</div>
+</div>
+
+<div id="block-menu-menu-explore-discover" class="block block-menu first odd" role="navigation">
+
+        <h2 class="block__title block-title">Explore &amp; discover our datasets</h2>
+    
+  <ul class="menu"><li class="menu__item is-leaf first leaf"><a href="http://www.clio-infra.eu/datasets/indicators" title="" class="menu__link">Indicators</a></li>
+<li class="menu__item is-leaf leaf"><a href="http://www.clio-infra.eu/datasets/topics" title="" class="menu__link">Topics</a></li>
+<li class="menu__item is-leaf leaf"><a href="http://www.clio-infra.eu/datasets/countries" title="" class="menu__link">Countries</a></li>
+<li class="menu__item is-leaf last leaf"><a href="http://www.clio-infra.eu/datasets/combined" title="" class="menu__link">Combined search</a></li>
+</ul>
+</div>
+
+<div id="block-intro-introduction-block" class="block block-views last even">
+
+        <h2 class="block__title block-title">Brief description of the project</h2>
+    
+  <div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
+        
+  
+  
+      <div class="view-content">
+        <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
+      
+  <div class="views-field views-field-body">        <div class="field-content"><p>
+{{ projectdata.description | safe }}
+</p> 
+</div>  </div>  </div>
+    </div>
+</div>
+</div>
+
+<div id="block-info-introduction-block" class="block block-views last even">
+        <h2 class="block__title block-title">Visualize our datasets</h2>
+  <a href="/worldmap"><img width="500" src="http://preview-collab.iisg.nl/static/worldmap.png"></a>
+
+</div>
+
+
+
+<div>
+<br />
+<table border=0 valign=top width="100%">
+<tr>
+<td width="100%" valign="top">
+{{ projectdata.summary | safe }}
+</td>
+</tr>
+</table>
+</div>
+</div>
+{% endblock %}
