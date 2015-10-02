@@ -277,6 +277,10 @@ def mapslider():
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
 	handles.append(dataset)
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+	(dataset, revid, cliopid, clearpid) = findpid(handledataset)
+        handles.append(dataset)
     if request.args.get('logscale'):
 	logscale = 1
     if request.args.get('catmax'):
