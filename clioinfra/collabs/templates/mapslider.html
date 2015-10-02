@@ -4,44 +4,9 @@
   <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
   <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
-
-<script>
-    var myurl=window.location.toString();
-    myurl = myurl + '&';
-  if (myurl.indexOf("dataset=") > 0) {
-    handle=myurl.substring(myurl.indexOf("dataset=")+8);
-    cindex=myurl.indexOf("&");
-    if (cindex > 0) {
-      handle=handle.substring(0,cindex);
-    };
-  };
-  mapyear = 2012;
-  year = '';
-  if (myurl.indexOf("year=") > 0) {
-    yearstr=myurl.substring(myurl.indexOf("year=")+5);
-    cindex=yearstr.indexOf("&");
-    if (cindex > 0) {
-      year=yearstr.substring(0,cindex);
-    };
-   };
-
-  if (myurl.indexOf("mapyear=") > 0) {
-    yearstr=myurl.substring(myurl.indexOf("mapyear=")+8);
-    cindex=yearstr.indexOf("&");
-    if (cindex > 0) {
-      mapyear=yearstr.substring(0,cindex);
-    };
-   };
-
-   var colors = ''; 
-   if (myurl.indexOf("colors=") > 0) {
-    cstr=myurl.substring(myurl.indexOf("colors=")+7);
-    cindex=cstr.indexOf("&");
-    if (cindex > 0) {
-      colors=cstr.substring(0,cindex);
-    };
-   };
+  <script src="/collabs/static/nlgis/params.js"></script>
   
+<script>
    var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
    var starturl = mapurl + '&colors=' + colors + '&year=' + year + '&lasty={{ lastyear }}';
  
@@ -88,7 +53,7 @@ function greyscale(x){
 </head>
 <body>
 <div id="map" style='border:0; width:820px; height:600px;'>
-<center><h2>{{ title }}<label id="yearlab"></label></h2></center>
+<center><h2>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h2></center>
 <iframe id="worldmap" src='' style='border:0; width:150%; overflow: hidden; height: 480px;' scrolling="no"></iframe>
 <script>document.getElementById('worldmap').src = starturl;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
