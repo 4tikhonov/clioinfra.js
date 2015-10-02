@@ -8,6 +8,7 @@ import random
 import vincent
 from vincent import Axis, AxisProperties, PropertySet, ValueRef
 from pandas.io.json import json_normalize
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 import re
 
 def loadjson(apiurl):
@@ -25,6 +26,7 @@ def getindicators(url):
 
 def dataverse_search(apiurl):
     dataframe = loadjson(apiurl)
+    config = configuration()
 
     info = []
     tmpinfo = []
@@ -37,7 +39,7 @@ def dataverse_search(apiurl):
     panel['pid'] = 'Panel'
     panel['citation'] = 'citation'
 
-    link = "http://clearance.sandbox.socialhistoryservices.org/collabs/dashboard?dataset="
+    link = config['apiroot'] + "/collabs/dashboard?dataset="
     handles = []
     for item in dataframe['data']['items']:
         datasets = {}
@@ -75,6 +77,7 @@ def dataset_search(root, IDS, topics):
     if totalq:
         totalq = totalq + '"tttttt"'
         apiurl = root + "/api/search?q=" + totalq + "&key=73883b6f-ca99-41b9-953a-b9f8be42723d&type=dataset"
+	print apiurl
         data = dataverse_search(apiurl)
 
     return data
