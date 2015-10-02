@@ -307,10 +307,8 @@ def tableapi():
     customyear = ''
     fromyear = '1500'
     toyear = '2012'
-    #customcountrycodes = '380,250,276,804,826'
     customcountrycodes = ''
-    aggr = ''
-    logscale = ''
+    (aggr, logscale, dataset) = ('',0,'')
 
     # Select countries
     f = request.args
@@ -323,8 +321,12 @@ def tableapi():
         customcountrycodes = customcountrycodes[:-1]
 
     handle = "F16UDU"
+    # HANDLE
     if request.args.get('handle'):
         handle = request.args.get('handle')
+	(dataset, revid, cliohandle, clearpid) = findpid(handle)
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
 	customcountrycodes = ''
         tmpcustomcountrycodes = request.args.get('ctrlist')
@@ -347,7 +349,7 @@ def tableapi():
         logscale = 1
     DEBUG = 0
 
-    apifile = str(handle) + ".json"
+    apifile = str(dataset) + ".json"
     jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
     dataframe = load_api_data(jsonapi, '')
     loccodes = loadcodes(dataframe)
@@ -928,6 +930,15 @@ def download():
     #return "<a href=\"" + str(root) + "\">Download dataset(s) with all papers (zip archive)</a>"
     #return resp
     return redirect(root, code=301)
+
+@app.route('/webmappercodes')
+def webmapper():
+    config = configuration()
+    api = config['apiroot'] + "/collabs/static/data/historical.json"
+    (regions, countries, ctr2reg, webmapper) = histo(api)
+
+    data = json.dumps(webmapper, encoding="utf-8", sort_keys=True, indent=4)
+    return Response(data,  mimetype='application/json')
 
 @app.route('/dialog')
 def dialog():
