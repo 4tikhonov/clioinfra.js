@@ -8,7 +8,7 @@
 
 <script type="text/javascript">
 $(document).ready(function(){ 
-    $("#myTab li:eq(0) a").tab('show');
+    $("#myTab li:eq({{ tabnum }}) a").tab('show');
 });
 </script>
 
@@ -100,11 +100,6 @@ $(function() {
 </style>
 </head>
 <body>
-<h4 class="element-invisible">Primary tabs</h4><ul class="tabs-primary tabs primary"><li class="tabs-primary__tab"><a href="#" class="tabs-primary__tab-link">Modern</a></li>
-<li class="tabs-primary__tab is-active"><a href="#" onclick="javascript:window.open(histurl);" class="tabs-primary__tab-link is-active active">Historical <span class="element-invisible">(active tab)</span></a></li>
-</ul>               
-
-<center><h3>{{ topic }}: {{ title }}</h3></center>
 <div class="bs-example">
     <ul class="nav nav-tabs" id="myTab">
         <li><a data-toggle="tab" href="#sectionA">Graph</a></li>
@@ -115,20 +110,19 @@ $(function() {
     </ul>
     <div class="tab-content">
         <div id="sectionA" class="tab-pane fade">
-            <h3>Graph</h3>
-		<iframe id='graph' src='/collabs/static/v/chartlib.html?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&handle={{ handle }}&logscale={{ logscale }}&ctrlist={{ customcountrycodes }}' style='border:0; width: 150%; height: 420px;'></iframe>
+	    <center><h3>{{ topic }}: {{ title }}</h3></center>
+		<iframe id='graph' src='/collabs/chartlib?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&dataset={{ handle }}&logscale={{ logscale }}&ctrlist={{ customcountrycodes }}' style='border:0; width: 150%; height: 420px;'></iframe>
         </div>
         <div id="sectionB" class="tab-pane fade">
             <h3>Charts</h3>
-	    <iframe src='/collabs/static/v/barlib.html?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&ctrlist={{ customcountrycodes }}&handle={{ handle }}&aggr=on' style='border:0; width: 150%; height: 420px;'></iframe>
+	    <iframe src='/collabs/graphlib?start=on&yearmin={{ fromyear }}&yearmax={{ toyear }}&ctrlist={{ customcountrycodes }}&dataset={{ handle }}&aggr=on' style='border:0; width: 150%; height: 420px;'></iframe>
         </div>
         <div id="sectionC" class="tab-pane fade">
             <h3>Summary Statistics</h3>
 	    {{ stats|safe }}
         </div>
         <div id="sectionD" class="tab-pane fade">
-            <h3>Maps</h3>
-		<iframe src='/collabs/static/v/worldmap.html?start=on&action=map&year=1980&dataset={{ handle }}&ctrlist={{ customcountrycodes }}' style='border:0; width: 150%; height: 420px;'></iframe>
+		<iframe src='/collabs/mapslider?start=on&action=map&year=&dataset={{ handle }}&ctrlist={{ customcountrycodes }}&catmax={{ catmax }}' style='border:0; width: 150%; height: 620px;'></iframe>
         </div>
         <div id="sectionE" class="tab-pane fade">
             <h3>Histogram</h3>
