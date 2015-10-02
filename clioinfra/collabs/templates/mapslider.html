@@ -7,8 +7,9 @@
   <script src="/collabs/static/nlgis/params.js"></script>
   
 <script>
+   var thiscolor = '';
    var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
-   var starturl = mapurl + '&colors=' + colors + '&year=' + year + '&lasty={{ lastyear }}';
+   var starturl = mapurl + '&year=' + year + '&lasty={{ lastyear }}';
  
   $(function() {
     var select = $( "#yearslider" );
@@ -45,9 +46,6 @@ $(function() {
   $('iframe').responsiveIframe({xdomain: '*'});
 });
 
-function greyscale(x){
-    alert('grey');
-};
 </script>
 
 </head>
@@ -55,16 +53,28 @@ function greyscale(x){
 <div id="map" style='border:0; width:820px; height:600px;'>
 <center><h2>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h2></center>
 <iframe id="worldmap" src='' style='border:0; width:150%; overflow: hidden; height: 480px;' scrolling="no"></iframe>
-<script>document.getElementById('worldmap').src = starturl;</script>
+<script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
-    <input type="checkbox" id="greyscale" onclick="greyscale('grey');">Greyscale
-    <input type="checkbox" id="logscale" onclick="alert('log scale');">Log scale
+    <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
+    <input type="checkbox" id="logscale" onclick="ingrey();">Log scale
   <select name="years" id="yearslider">
   {% for year in years %}
     <option>{{ year }}</option>
   {% endfor %}
   </select>
 </form>
+<script>
+function ingrey() {
+    if ($('#greyscale').is(':checked')) {
+	colors = 'greyscale';
+    }
+    else
+    {
+        colors = '';
+    }
+    document.getElementById('worldmap').src = starturl + '&colors=' + colors;
+}
+</script>
 </div>
 </body>
