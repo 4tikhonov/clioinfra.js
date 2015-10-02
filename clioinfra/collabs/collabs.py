@@ -302,7 +302,6 @@ def mapslider():
 	validyears.append(year)
 	lastyear = year
 	steps = steps + 1
-    #validyears = ['1880', '1902', '1934', '1955', '1987', '2012']
 
     return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
 
@@ -614,6 +613,16 @@ def developers(settings=''):
 @app.route('/presentation')
 def presentation(settings=''):
     resp = make_response(render_template('menu_presentation.html'))
+    return resp
+
+@app.route('/chartlib')
+def chartlib(settings=''):
+    resp = make_response(render_template('chartlib.html'))
+    return resp
+
+@app.route('/graphlib')
+def graphlib(settings=''):
+    resp = make_response(render_template('graphlib.html'))
     return resp
 
 @app.route('/datasetspace')
