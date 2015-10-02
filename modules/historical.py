@@ -23,11 +23,13 @@ def histregions_parser(locations):
     regions = {}
     countries = {}
     ctr2reg = {}
+    oecd2webmapper = {}
     for item in locations:
         if item['ctr']:
             try:
                 ccode = int(item['ccode'])
                 pcode = int(item['parent code'])
+		gcode = item['geoinfra_id']
             except:
                 ccode = ''
                 
@@ -57,6 +59,8 @@ def histregions_parser(locations):
 	    country = str(country) + ' (xxxx - 2012)'
             
         countries[ccode] = country
+	if gcode:
+	    oecd2webmapper[ccode] = gcode 
                 
         try:
             if ctr2reg[pcode]:
@@ -66,11 +70,11 @@ def histregions_parser(locations):
                     
         continent.append(ccode)
         ctr2reg[pcode] = continent
-    return (regions, countries, ctr2reg)
+    return (regions, countries, ctr2reg, oecd2webmapper)
 
 def load_historical(api):
     locs = loadjson(api)
-    (regions, countries, ctr2reg) = histregions_parser(locs)
+    (regions, countries, ctr2reg, webmapper) = histregions_parser(locs)
 
     html = ''
     for region in sorted(regions):
@@ -86,7 +90,7 @@ def load_historical(api):
     
 def histo(api):
     locs = loadjson(api)
-    (regions, countries, ctr2reg) = histregions_parser(locs)
+    (regions, countries, ctr2reg, webmapper) = histregions_parser(locs)
     
-    return (regions, countries, ctr2reg)
+    return (regions, countries, ctr2reg, webmapper)
     
