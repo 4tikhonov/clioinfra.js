@@ -182,7 +182,7 @@ def downloadzip(pid):
     if handles:
 	if historical:
             api = config['apiroot'] + "/collabs/static/data/historical.json"
-            (regions, countries, ctr2reg) = histo(api)
+            (regions, countries, ctr2reg, webmapper) = histo(api)
             hist = countries
 	else:
 	    hist = ''
@@ -199,7 +199,7 @@ def downloadzip(pid):
 
 	for pid in handles:
             #api = config['apiroot'] + "/collabs/static/data/historical.json"
-            #(regions, countries, ctr2reg) = histo(api)
+            #(regions, countries, ctr2reg, webmapper) = histo(api)
             #hist = countries
 	    hist = ''
 	    filename = filename + '.xls'
@@ -477,30 +477,6 @@ def simplesearch(root, qurl, apiroot):
 
     datasets = dataset_search(root, IDS, topics)
     return datasets
-
-def load_dataverse1(apiurl):
-    jsondataurl = apiurl
-    
-    req = urllib2.Request(jsondataurl)
-    opener = urllib2.build_opener()
-    f = opener.open(req)
-    dataframe = simplejson.load(f)
-
-    info = []
-    link = "http://clearance.sandbox.socialhistoryservices.org/collabs/dashboard?dataset=hdl:10622/F16UDU:30:31&action=visualize"
-    for item in dataframe['data']['items']:
-        datasets = {}
-        datasets['url'] = item['url']
-        datasets['pid'] = item['global_id']
-        datasets['indicator'] = item['name']
-        datasets['topic'] = item['description']
- 	datasets['description'] = item['description']
-	datasets['startyear'] = 1812
-	datasets['endyear'] = 2010
-	datasets['analyzelink'] = link
-        info.append(datasets)
-    
-    return info
 
 def load_oecd(cursor):
         data = {}
