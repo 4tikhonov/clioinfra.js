@@ -87,14 +87,20 @@ def page_not_found(e):
     if not projectdata:
 	return project
     else:
-	dataverseurl = projectinfo['dataverse']
-	ids = re.search(r'dataverse\/(\w+)', dataverseurl, re.M|re.I)
+	dataverseurl = ''
 	try:
-	    branch = ids.group(1)
-	    if branch:
-		dataverse = branch
+	    dataverseurl = projectinfo['dataverse']
 	except:
-	    branch = dataverse
+	    dataverse = project
+
+	if dataverseurl:
+	    ids = re.search(r'dataverse\/(\w+)', dataverseurl, re.M|re.I)
+	    try:
+	        branch = ids.group(1)
+	        if branch:
+		    dataverse = branch
+	    except:
+	        branch = dataverse
 
 	return make_response(render_template('startpage.html', projectdata=projectinfo, dataverse=dataverse)) 
 	#return 'ok'
