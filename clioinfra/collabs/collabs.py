@@ -629,7 +629,11 @@ def graphlib(settings=''):
 def datasetspace(settings=''):
     config = configuration()
     root = config['apiroot']
-    jsonapi = root + "/cgi-bin/citations.cgi?dataverse=lb"
+    dataverse = 'global'
+    if request.args.get('dv'):
+	dataverse = request.args.get('dv')
+
+    jsonapi = root + "/cgi-bin/citations.cgi?dataverse=" + dataverse
     req = urllib2.Request(jsonapi)
     opener = urllib2.build_opener()
     f = opener.open(req)
