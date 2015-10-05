@@ -54,6 +54,8 @@ def browse(settings=''):
 @app.errorhandler(404)
 def page_not_found(e):
     uri = str(request.path)
+    branch = ''
+    dataverse = 'global'
     project = re.sub('/', '', uri)
 
     remove = ["date", "_id", "passwd"]
@@ -85,7 +87,16 @@ def page_not_found(e):
     if not projectdata:
 	return project
     else:
-	return make_response(render_template('startpage.html', projectdata=projectinfo)) 
+	dataverseurl = projectinfo['dataverse']
+	ids = re.search(r'dataverse\/(\w+)', dataverseurl, re.M|re.I)
+	try:
+	    branch = ids.group(1)
+	    if branch:
+		dataverse = branch
+	except:
+	    branch = dataverse
+
+	return make_response(render_template('startpage.html', projectdata=projectinfo, dataverse=dataverse)) 
 	#return 'ok'
         #return Response(projectdata,  mimetype='application/json')
 
