@@ -28,7 +28,8 @@ class TestConfiguration(unittest.TestCase):
 	#print datasets
 
 	pid = "Panel['hdl:10622/4X6NCK','hdl:10622/4X6NCG']"
-	pids = pidfrompanel(pid)
+	(pids, pidstr) = pidfrompanel(pid)
+	print '\n' + pidstr
 	self.assertEqual(str(pids), "['4X6NCK', '4X6NCG']")
 
 if __name__ == '__main__':
