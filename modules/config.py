@@ -45,7 +45,7 @@ def findpid(handle):
 def pidfrompanel(pid):
     # Check Panel
     pids = []
-    (thispid, revpid, cliopid) = ('', '', '')
+    (thispid, revpid, cliopid, pidslist) = ('', '', '', '')
     match = re.match(r'Panel\[(.+)\]', pid)
     if match:
         pidstr = match.group(1)
@@ -55,8 +55,10 @@ def pidfrompanel(pid):
         for fullhandle in ptmpids:            
             (thispid, revpid, cliopid, clearpid) = findpid(fullhandle)            
             pids.append(thispid)
+	    pidslist = pidslist + thispid + ','
     
-    return pids
+    pidslist = pidslist[0:-1]
+    return (pids, pidslist)
 
 def load_dataverse(apiurl):
     dataframe = loadjson(apiurl)
