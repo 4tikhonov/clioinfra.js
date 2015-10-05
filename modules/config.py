@@ -84,9 +84,23 @@ def load_dataverse(apiurl):
     
     return info
 
+def load_fullmetadata(dataset):
+    data = {}
+    config = configuration()
+    if dataset:
+        url = config['dataverseroot'] + '/api/search?q=' + dataset + "&key=" + config['key'] + "&per_page=1000"
+	result = json.load(urllib2.urlopen(url))
+	try:
+	   data = result['data']['items']
+	except:
+	   data = {}
+	
+    return data
+
 def load_metadata(dataset):
     config = configuration()
     (pid, fileid, cliohandle, clearpid) = findpid(dataset)
+
     data = {}
     if pid:
         query = pid
