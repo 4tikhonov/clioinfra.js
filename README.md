@@ -74,6 +74,7 @@ sudo apt-get install python-pandas
 sudo apt-get install python-matplotlib
 sudo apt-get install python-bs4
 sudo apt-get install zip
+apt-get install python-pymongo
 apt-get install catdoc
 sudo a2enmod headers
 sudo npm install -g topojson
@@ -111,3 +112,18 @@ encoding = "utf8"
 ```
 
 ### Configuration
+The example of configuration file clioinfra.config
+```
+[config]
+path = /home/somepath/clioinfra.js/clioinfra/collabs
+dataverseroot = http://dv.sandbox.socialhistoryservices.org
+key = 73883b6f-somekey-11111
+apiroot = http://dpe.sandbox.socialhistoryservices.org
+branch = clio1clio
+datapath = /home/somepath/data/
+perl = /usr/bin/perl
+modernnames = F16UDU
+tmpdir = /tmp/test
+imagepath = /home/somepath/clioinfra.js/clioinfra/collabs/static
+phantompath = /home/somepath/clioinfra.js/node_modules
+```
