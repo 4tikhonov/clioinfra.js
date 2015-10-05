@@ -163,7 +163,7 @@ def downloadzip(pid):
     fromyear = request.args.get('y[min]')
     toyear = request.args.get('y[max]')
     historical = request.args.get('type[0]')
-    handles = pidfrompanel(pid)
+    (handles, pidslist) = pidfrompanel(pid)
 
     # Log scales switch
     if request.args.get('logscale'):
