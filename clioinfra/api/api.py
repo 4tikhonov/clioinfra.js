@@ -58,7 +58,7 @@ from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
 from download import get_papers, dataset2zip, compile2zip
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, pidfrompanel
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, load_fullmetadata, pidfrompanel
 import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
@@ -135,7 +135,8 @@ def is_location(param):
 # Download ZIP archive
 def downloadzip(pid):
     DEBUG = 0
-    fullpath = ''
+    (fullpath) = ('')
+    fullmetadata = {}
     logscale = 0
 
     config = configuration() 
@@ -164,6 +165,11 @@ def downloadzip(pid):
     toyear = request.args.get('y[max]')
     historical = request.args.get('type[0]')
     (handles, pidslist) = pidfrompanel(pid)
+    try:
+        if pidslist:
+	    fullmetadata = load_fullmetadata(pidslist)
+    except:
+	showwarning = 1	
 
     # Log scales switch
     if request.args.get('logscale'):
@@ -189,7 +195,7 @@ def downloadzip(pid):
 
         (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	filename = filename + '.xls'
-        fullpath = panel2excel(finaldir, filename, header, panelcells)
+        fullpath = panel2excel(finaldir, filename, header, panelcells, fullmetadata)
     else:
 	# Clio format download
 	zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir)
@@ -205,7 +211,7 @@ def downloadzip(pid):
 	    filename = filename + '.xls'
 	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	    #codes = hist
-	    result = individual_dataset(finaldir, filename, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes)
+	    result = individual_dataset(finaldir, filename, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes, metadata)
 
     try:
         for everypid in handles:
