@@ -4,7 +4,7 @@ import xlsxwriter
 import xlwt
 import sys
 
-def panel2excel(datadir, filename, header, panelcells):
+def panel2excel(datadir, filename, header, panelcells, metadata):
     wb = xlwt.Workbook(encoding='utf')
 
     f_short_name = "Data"
@@ -27,7 +27,21 @@ def panel2excel(datadir, filename, header, panelcells):
     copyrights = "Clio Infra (2015) http://www.clio-infra.eu"
 
     wscop = wb.add_sheet(str(f_copyrights_name))
+    col_width = 256 * 30
+    for i in range(0,4):
+        wscop.col(i).width = col_width 
     wscop.write(0,0,copyrights)
+
+    lineID = 0
+    # If metadata exist
+    for item in metadata:
+	if item['url']:
+	    lineID = lineID + 1
+	    wscop.write(lineID,0, str(item['url']))
+	    #wscop.cell(lineID,0).hyperlink = str(item['url'])
+	    wscop.write(lineID,1, str(item['name']))
+	    wscop.write(lineID,2, str(item['description']))
+	    wscop.write(lineID,3, str(item['citation']))
 
     i = 0
     for dataitem in panelcells:
@@ -43,7 +57,7 @@ def panel2excel(datadir, filename, header, panelcells):
 
     return fullpath 
 
-def individual_dataset(datadir, filename, indicator, units, inputdatahub, data, codes):
+def individual_dataset(datadir, filename, indicator, units, inputdatahub, data, codes, metadata):
     wb = xlwt.Workbook(encoding='utf')
 
     f_short_name = "Data"
