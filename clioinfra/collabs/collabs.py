@@ -952,9 +952,15 @@ def about(settings=''):
 @app.route('/signup')
 def signup(settings=''):
     config = configuration()
+    (admin, user) = ('','')
     fields = {}
     checkboxes = {}
-    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about"]
+    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news"]
+    if request.args.get("user"):
+	user = request.args.get("user")
+	if user == 'admin':
+	    admin = 'user'
+
     for field in fieldslist:
 	if request.args.get(field):
 	     fields[field] = request.args.get(field)
@@ -974,7 +980,7 @@ def signup(settings=''):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
 	    fields = f
-	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
+	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
     else:
 	# Clean settings first
 	if len(fields['uri']):
@@ -982,7 +988,7 @@ def signup(settings=''):
             result = data2store('projects', fields)
 	    return redirect(config['apiroot'] + '/' + fields['uri'], code=301)
 	else:
-	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
+	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
 
 @app.route('/boundaries')
 def boundaries(settings=''):
