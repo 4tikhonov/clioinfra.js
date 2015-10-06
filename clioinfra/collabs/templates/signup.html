@@ -46,13 +46,27 @@
 
         <div class="form-group">
                 <label for="passwordField">Short description of the project (optional)</label>
-                <label for="fulldescription">Summary (optional)</label>
                 <textarea name="description" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter full description of the project">{{ fields.description }}</textarea>
         </div>
 
         <div class="form-group">
                 <label for="fulldescription">Summary (optional)</label>
                 <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter full description of the project">{{ fields.summary }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="fulldescription">Contact (optional)</label>
+                <textarea name="contact" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter contact information">{{ fields.contact }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="partners">Partners (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Enter information about partners of the project">{{ fields.partners }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="partners">News (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:none" placeholder="Latest news">{{ fields.news }}</textarea>
         </div>
 
 	<div class="form-group">
@@ -69,14 +83,15 @@
         <tbody>
             <tr>
                 <td>
-                <input type="checkbox" name="ind" {{ fields.ind }}> Indicators<br>
-                <input type="checkbox" name="datasets" {{ fields.datasets }}> Datasets<br>
+                <input type="checkbox" name="ind" {{ fields.ind }}> Datasets<br>
+                <input type="checkbox" name="datasets" {{ fields.topics }}> Topics<br>
                 <input type="checkbox" name="countries" {{ fields.countries }}> Countries
                 </td>
                 <td>
-                <input type="checkbox" name="searchdata" {{ fields.searchdata }}> Dataset<br>
-                <input type="checkbox" name="searchmetadata" {{ fields.searchmetadata }}> Metadata <br>
-                <input type="checkbox" name="searchpapers" {{ fields.searchpapers }}> Papers <br>
+                <input type="checkbox" name="searchdata" {{ fields.searchdata }}> Metadata Search<br>
+                <input type="checkbox" name="searchmetadata" {{ fields.searchmetadata }}> Browse Datasets <br>
+                <input type="checkbox" name="searchpapers" {{ fields.searchpapers }}> Full-text Dearch <br>
+		<input type="checkbox" name="searchdataverses" {{ fields.searchdataverses }}> Search in IISH Dataverses <br>
                 </td>
                 <td>
                 Maps<br>
@@ -109,10 +124,14 @@
     </table>
     </div>
         <div class="form-group">
+		<label for="question inline"><input type="checkbox" name="closed" {{ fields.closed }}> Tick this checkbox if you do have closed datasets in your project</label>
+		<br />
+{% if admin %}
                 <label for="passwordField inline">Dataverse URL (optional)</label>
                         <input name="dataverse" type="text" size="50" class="inline" id="passwordField" placeholder="link to dataverse with data" value="{{ fields.dataverse }}">
                 <label for="passwordField inline">API Token (optional)</label>
                         <input name="apitoken" type="uri" class="input-small inline" id="passwordField" placeholder="Dataverse token is optional" value="{{ fields.apitoken }}">
+{% endif %}
         </div>
 
 	<button type="submit" class="btn btn-success">Proceed</button>
