@@ -102,7 +102,7 @@ def page_not_found(e):
 	    except:
 	        branch = dataverse
 
-	return make_response(render_template('startpage.html', projectdata=projectinfo, dataverse=dataverse)) 
+	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse)) 
 	#return 'ok'
         #return Response(projectdata,  mimetype='application/json')
 
