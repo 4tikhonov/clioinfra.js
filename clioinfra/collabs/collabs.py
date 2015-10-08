@@ -285,6 +285,10 @@ def mapslider():
 	logscale = 1
     if request.args.get('catmax'):
 	catmax = request.args.get('catmax')
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
 
     historical = 0
 
@@ -917,6 +921,31 @@ def dashboard(settings=''):
 
     resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids, logscale=logscale, tabnum=tabnum))
     return resp
+
+@app.route('/statistics')
+def statistics(settings=''):
+    config = configuration()
+    handles = []
+
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+        (dataset, revid, cliopid, clearpid) = findpid(handledataset)
+        handles.append(dataset)
+
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
+	handles.append(dataset)
+
+    html = ''
+    for dataset in handles:
+        jsonapi = config['apiroot'] + "/collabs/static/data/" + str(dataset) + ".json"
+        data = createdata(jsonapi)
+        d = data.describe()
+        show = d.transpose()
+        stats = show.to_html()
+        html = html = stats + '<br>'
+
+    return html
 
 @app.route('/export')
 def export(settings=''):
