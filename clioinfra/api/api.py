@@ -64,7 +64,7 @@ from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
-from storage import data2store, readdata
+from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 
 cpath = "/etc/apache2/strikes.config"
 
@@ -945,6 +945,36 @@ def webmapper():
 
     data = json.dumps(webmapper, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
+
+@app.route('/datasets')
+def datasets():
+    config = configuration()
+    (jsondata, pid) = ('', '')
+    handles = []
+    combineddataset = []
+
+    if request.args.get('handle'):
+        pid = request.args.get('handle')
+
+    if pid:
+        (datasets, pidslist) = pidfrompanel(pid)
+
+        hquery = formdatasetquery('',datasets)
+        datainfo = readdatasets('datasets', json.loads(hquery))
+
+	data = {}
+        for dataset in datainfo:
+	    handle = dataset['handle']
+            jsondata = dataset['data']
+	    data['handle'] = handle
+	    data['data'] = jsondata
+	    combineddataset.append(data)
+
+    if combineddataset:
+        finaldata = json.dumps(combineddataset, encoding="utf-8", sort_keys=True, indent=4)
+        return Response(finaldata,  mimetype='application/json')
+    else:
+	print "No data"
 
 @app.route('/dialog')
 def dialog():
