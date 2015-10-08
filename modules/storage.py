@@ -3,6 +3,7 @@
 from pymongo import MongoClient
 import sys
 import datetime
+import json
 
 def data2store(dbname, data):
    client = MongoClient()
@@ -34,3 +35,51 @@ def removedata(dbname, key, val):
 
     return result
 
+def datasetadd(filename, handle, dataset):
+    dbname = "datasets"
+    txt = open(filename)
+    data = {}
+    data['handle'] = handle
+    data['dataset'] = dataset
+    datasettext = str(txt.read())
+    datasetjson = json.loads(datasettext)
+    data['data'] = datasetjson
+
+    result = data2store(dbname, data)
+    return result
+
+def readdataset(handle, dataset):
+    data = {}
+    result = []
+    if handle:
+        storage = readdata('datasets', 'handle', handle)
+    if dataset:
+        storage = readdata('datasets', 'dataset', dataset)
+    for item in storage:
+        if item['data']:
+            data = item
+	    result.append(data)
+
+    return result
+
+def readdatasets(dbname, query):
+    client = MongoClient()
+    db = client.get_database(dbname)
+    collection = db.data
+    print query
+    result = db.data.find(query)
+
+    return result
+
+def formdatasetquery(handles, datasets):
+    handlequery = ''
+    for handle in handles:
+        hdict = "{\"handle\": \"" + str(handle) + "\"}"
+        handlequery = handlequery + str(hdict) + ","
+    for dataset in datasets:
+	hdict = "{\"handle\": \"" + str(dataset) + "\"}"
+        handlequery = handlequery + str(hdict) + ","
+
+    handlequery = handlequery[:-1]
+    handlequery = "{\"$or\": [" + str(handlequery) + "]}"
+    return handlequery
