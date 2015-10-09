@@ -962,8 +962,8 @@ def datasets():
         hquery = formdatasetquery('',datasets)
         datainfo = readdatasets('datasets', json.loads(hquery))
 
-	data = {}
         for dataset in datainfo:
+	    data = {}
 	    handle = dataset['handle']
             jsondata = dataset['data']
 	    data['handle'] = handle
@@ -1128,6 +1128,7 @@ def dataapi():
     toyear = '2012'
     categoriesMax = 6
     countriesNum = 200
+    geocoder = ''
     (getrange, colormap, pallette, customcountrycodes) = ('', '', '', '')
 
     if request.args.get('year'):
@@ -1140,6 +1141,8 @@ def dataapi():
         pallette = request.args.get('colors')
     if request.args.get('colormap'):
         colormap = request.args.get('colormap')
+    if request.args.get('geocoder'):
+        geocoder = request.args.get('geocoder')
     if request.args.get('handle'):
         handle = request.args.get('handle')
         handles.append(handle)
@@ -1170,7 +1173,7 @@ def dataapi():
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
     (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
-    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax)
+    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder)
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
