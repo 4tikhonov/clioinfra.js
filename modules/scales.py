@@ -5,6 +5,7 @@ import random
 from random import randint
 import numpy as np
 import brewer2mpl
+from config import webmapper_geocoder
 
 def getcolors(catnum, pallete, newcolormap):
     nodatacolor = '#ffffff'
@@ -58,7 +59,7 @@ def webscales(showrange, colors, defaultcolor):
             webcolors.append(icolor)
     
 	webcolors.reverse()
-        webranges.append("nodata")
+        webranges.append("no data")
         webcolors.append(defaultcolor)
         webscale['scale'] = webranges
         webscale['colors'] = webcolors
@@ -78,10 +79,13 @@ def buildcategories(num):
             p.append(i)
     return p
     
-def getscales(data, colors, catnum):
+def getscales(data, colors, catnum, geocoder):
     values = []
     finalcatnum = 0   
     dataset = {}
+    webmapper = {}
+    if geocoder:
+        webmapper = webmapper_geocoder()
     
     try:
         # Fill values for dataframe
@@ -134,8 +138,20 @@ def getscales(data, colors, catnum):
                         if dataitem['value'] > validx:
                             dataitem['range'] = validx
                             dataitem['color'] = colors[colorID]
+			    if geocoder:
+			        dataitem['country'] = row[0]
                         colorID = colorID + 1        
-                dataset[row[0]] = dataitem
+		mainindex = row[0]
+		if geocoder:
+		    try:
+		        webmapperindex = webmapper[row[3]]
+		    except:
+		        webmapperindex = mainindex
+
+		    if webmapperindex:
+		        mainindex = webmapperindex
+
+		dataset[mainindex] = dataitem
             except:
                 showwarning("can't calculate scales")
     except:
