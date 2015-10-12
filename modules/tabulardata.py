@@ -401,6 +401,7 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
                     value = ''
             
                 cell.append(value)
+		cell.append(code)
                 #print '\t' + str(indicator) + ':' + str(value)
                 
             panelcells.append(cell)

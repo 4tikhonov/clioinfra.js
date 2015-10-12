@@ -29,6 +29,16 @@ def loadjson(apiurl):
     dataframe = simplejson.load(f)
     return dataframe
 
+def webmapper_geocoder():
+    coder = {}
+    config = configuration()
+    apiroot = config['apiroot'] + "/collabs/static/data/" + config['geocoder'] + ".json"
+    geocoder = loadjson(apiroot)
+    for item in geocoder:
+        if item['ccode']:
+            coder[int(item['ccode'])] = item['Webmapper code']
+    return coder
+
 def findpid(handle):
     ids = re.search(r'hdl\:\d+\/(\w+)', handle, re.M|re.I)
     (pid, fileid, revid, cliohandle, clearpid) = ('', '', '', '', '')

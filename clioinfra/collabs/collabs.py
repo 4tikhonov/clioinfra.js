@@ -285,6 +285,10 @@ def mapslider():
 	logscale = 1
     if request.args.get('catmax'):
 	catmax = request.args.get('catmax')
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
 
     historical = 0
 
@@ -918,6 +922,31 @@ def dashboard(settings=''):
     resp = make_response(render_template(template, active=activepage, pages=pages, title=title, datasetfile=datasetfile, dataset=dataset, stats=stats, topic=topic, citation=citation, cliopid=cliopid, indicatorlist=indicatorlist, locations=locations, fromyear=fromyear, toyear=toyear, customcountrycodes=customcountrycodes, handle=handle, selectedcountries=selectedcountries, selectedindicators=selectedindicators, cliopids=cliopids, logscale=logscale, tabnum=tabnum))
     return resp
 
+@app.route('/statistics')
+def statistics(settings=''):
+    config = configuration()
+    handles = []
+
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+        (dataset, revid, cliopid, clearpid) = findpid(handledataset)
+        handles.append(dataset)
+
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
+	handles.append(dataset)
+
+    html = ''
+    for dataset in handles:
+        jsonapi = config['apiroot'] + "/collabs/static/data/" + str(dataset) + ".json"
+        data = createdata(jsonapi)
+        d = data.describe()
+        show = d.transpose()
+        stats = show.to_html()
+        html = html = stats + '<br>'
+
+    return html
+
 @app.route('/export')
 def export(settings=''):
     activepage = 'Dashboard'
@@ -952,9 +981,15 @@ def about(settings=''):
 @app.route('/signup')
 def signup(settings=''):
     config = configuration()
+    (admin, user) = ('','')
     fields = {}
     checkboxes = {}
-    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about"]
+    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news"]
+    if request.args.get("user"):
+	user = request.args.get("user")
+	if user == 'admin':
+	    admin = 'user'
+
     for field in fieldslist:
 	if request.args.get(field):
 	     fields[field] = request.args.get(field)
@@ -974,7 +1009,7 @@ def signup(settings=''):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
 	    fields = f
-	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
+	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
     else:
 	# Clean settings first
 	if len(fields['uri']):
@@ -982,7 +1017,7 @@ def signup(settings=''):
             result = data2store('projects', fields)
 	    return redirect(config['apiroot'] + '/' + fields['uri'], code=301)
 	else:
-	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes)))
+	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
 
 @app.route('/boundaries')
 def boundaries(settings=''):

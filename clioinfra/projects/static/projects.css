@@ -1,0 +1,104 @@
+/**
+ * basic layout
+ */
+	
+	/* colors */
+	#header,
+	#footer {
+		background-color: #f1f1f1;
+	}
+	
+	#main-wrap {
+		position: relative;
+		background-color: #fff;
+		height: 100%;
+		margin: 10px;
+	}
+	
+        #abouttab {
+            float: left;
+            width: 48%;
+            height: 100%;
+            background-color: #d9B500;
+	    padding: 10px;
+	    position: absolute;
+	    color: #000;
+        }
+
+        #exploretab {
+	    padding: 10px;
+	    display: block;
+            background-color: #CADE85;
+	    font-size: 18px;
+	    height: 100%;
+	    float: right;
+	    width: 47%;
+	    position: relative;
+        }
+
+        #viztab {
+            background-color: #efefef;
+	    padding: 10px;
+            float: right;
+            width: 47%;
+        }
+
+        #fulltab {
+                background-color: #fff;
+		padding: 0px 10px 10px 10px;
+        }
+
+	#content-wrap {
+		background-color: #c5c5c5;
+		padding: 10px 10px 10px 10px;
+	}
+	
+	/* sizes */
+	#main-wrap > div {
+		min-height: 100px;
+	}
+	
+	
+	#header,
+	#footer {
+		min-height: 40px;
+	}
+	
+	
+
+	#main-wrap > div { min-height: 100px; }
+	
+	
+	#header,
+	#footer {
+	    min-height: 40px;
+	}
+	
+	
+	/* layout */
+	#main-wrap {
+	    /* overflow to handle inner floating block */
+	    overflow: hidden;
+	    width: 100%;
+	}
+	
+	#summarytab {
+            background-color: #A0522D;
+	    position: absolute;
+	    padding: 10px 10px 10px 10px;
+	    float: left;
+	    width: 48%;
+	    height: 100%;
+	    color: #000;
+	}
+
+	h2.block-title {
+	    color: #fff;
+	}
+
+	#fulltab {
+	    width: 98%;
+	}
+
+	
+

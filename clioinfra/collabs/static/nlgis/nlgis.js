@@ -1,7 +1,7 @@
 function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
     var rightdiv = document.getElementById("#showmap");
     var margin = {top: -120, right: 20, bottom: 70, left: 40},
-    width = 960 - margin.left - margin.right,
+    width = 920 - margin.left - margin.right,
     height = 420 - margin.top - margin.bottom;
 
     var zoom = d3.behavior.zoom()
