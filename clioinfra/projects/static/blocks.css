@@ -1,0 +1,395 @@
+/**
+ * @file
+ * Block Styling
+ */
+
+
+.block { /* Block wrapper */
+  margin-bottom: 1.5em;
+}
+
+.block.first { /* The first block in the region */
+}
+
+.block.last { /* The last block in the region */
+}
+
+.block.odd { /* Zebra striping for each block in the region */
+}
+
+.block.even { /* Zebra striping for each block in the region */
+}
+
+h2.block-title { /* Block title */
+}
+
+#block-aggregator-category-1 { /* Block for the latest news items in the first category */
+}
+
+#block-aggregator-feed-1 { /* Block for the latest news items in the first feed */
+}
+
+#block-clio-blocks-visualize { /* First block created with "Add block" link */
+}
+
+#block-blog-recent { /* "Recent blog posts" block */
+}
+
+#block-book-navigation { /* "Book navigation" block for the current book's table of contents */
+}
+
+#block-comment-recent { /* "Recent comments" block */
+}
+
+#block-forum-active { /* "Active forum topics" block */
+}
+
+#block-forum-new { /* "New forum topics" block */
+}
+
+#block-locale-language { /* Language switcher block */
+}
+
+#block-menu-menu-NAME { /* Custom menu block */
+}
+
+#block-node-recent { /* "Recent content" block */
+}
+
+#block-node-syndicate { /* "Syndicate" block for primary RSS feed; see also page.css's .feed-icon */
+}
+
+#block-poll-recent { /* "Most recent poll" block */
+}
+
+#block-profile-author-information { /* "Author information" block for the profile of the page's author */
+}
+
+#block-search-form { /* "Search form" block */
+}
+
+#block-shortcut-shortcuts { /* "Shortcuts" block */
+}
+
+#block-statistics-popular { /* "Popular content" block */
+}
+
+#block-system-main-menu { /* "Main menu" block */
+}
+
+#block-system-management { /* "Management" block for Drupal management menu */
+}
+
+#block-system-navigation { /* "Navigation" block for Drupal navigation menu */
+}
+
+#block-system-user-menu { /* "User menu" block for Drupal user menu */
+}
+
+#block-system-help { /* "System help" block */
+}
+
+#block-system-main { /* "Main page content" block */
+}
+
+#block-system-powered-by { /* "Powered by Drupal" block */
+}
+
+#block-user-login { /* "User login form" block */
+}
+
+#block-user-new { /* "Who's new" block for a list of the newest users */
+}
+
+#block-user-online { /* "Who's online" block for a list of the online users */
+}
+
+/* Partners */
+#block-clio-blocks-partners {
+  margin: 10px;
+  background-color: #DCDCDC;
+}
+#block-clio-blocks-partners h2.block-title {
+  text-transform: lowercase;
+  font-size: 1em;
+  line-height: inherit;
+  color: #fff;
+  background-color: #38378A;
+  padding-left: 5px;
+}
+#block-clio-blocks-partners div.sponsorlogo {
+  display: inline-block;
+  margin: 15px 10px 15px 15px;
+}
+
+#content .block {
+  width: 460px;
+  float: left;
+}
+#block-menu-menu-explore-discover {
+  margin-left: 20px;
+}
+#block-menu-menu-explore-discover h2.block-title {
+  color: #fff;
+  background-color: #96BD0D;
+  padding-left: 10px;
+}
+#block-menu-menu-explore-discover ul.menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#block-menu-menu-explore-discover ul.menu li {
+  list-style: none;
+  font-size: 2.3em;
+  line-height: 1.5em;
+  padding-left: 10px;
+  background-color: #cade85;
+  margin-top: 5px;
+}
+#block-menu-menu-explore-discover ul.menu li a {
+  color: #000;  
+  text-decoration: none;
+  background: transparent url('../images/pijltje.png') right 6px no-repeat;
+  display: inline-block;
+  padding-right: 40px;
+}
+
+/* Visualize */
+#block-clio-blocks-visualize h2.block-title {
+  color: #fff;
+  background-color: #B1007C;
+  padding-left: 10px;
+}
+#block-clio-blocks-visualize p {
+  margin: 0;
+}
+
+#block-views-news-block-1 {
+  margin-right: 20px;
+}
+#block-views-news-block-1 .views-row {
+  background-color: #C40E1F;
+  width: 215px;
+  height: 50px;
+  padding: 5px;
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 2px;
+}
+#block-views-news-block-1 .views-row a {
+  color: #fff;
+}
+
+a.views-more-link,
+.views-more-link a,
+.views-field-nothing a {
+  background: transparent url('../images/bolletje.png') center left no-repeat;
+  padding-left: 12px;
+  font-size: 14px;
+}
+
+#block-intro-introduction-block {
+  background-color: #A0522D;
+  padding-bottom: 10px;
+  height: 230px;
+}
+#block-intro-introduction-block h2.block-title {
+  color: #fff;
+  padding-left: 10px;
+}
+
+#block-info-introduction-block {
+  margin-left: 20px;
+  background-color: #4B0082;
+  height: 230px;
+}
+#block-info-introduction-block h2.block-title {
+  color: #fff;
+  padding-left: 10px;
+}
+#block-intro-introduction-block .view {
+  padding: 0 10px;
+}
+
+
+#block-views-introduction-block {
+  background-color: #D9B500;
+  padding-bottom: 10px;
+  height: 235px;
+}
+#block-views-introduction-block h2.block-title {
+  color: #fff;
+  padding-left: 10px;
+}
+#block-views-introduction-block .view {
+  padding: 0 10px;
+}
+#block-views-introduction-block a {
+  color: #fff;
+}
+#block-views-introduction-block p {
+  margin-top: 0;
+  display: inline;
+}
+
+#block-views-news-block,
+#block-views-publications-block {
+  margin-top: 10px;
+}
+#block-views-publications-block {
+  margin-left: 20px;
+}
+#block-views-news-block .views-row,
+#block-views-publications-block .views-row {
+  border-top: 5px solid #C40E1F;
+  border-right: 1px solid #C40E1F;
+  margin-bottom: 20px;
+  float: left;
+}
+#block-views-news-block .attachment,
+#block-views-publications-block .attachment {
+  margin-left: 10px;
+}
+#block-views-news-block .attachment .views-row,
+#block-views-publications-block .attachment .views-row {
+  border: 0;
+  margin-bottom: 0;
+}
+
+#block-views-news-block .views-row .views-field,
+#block-views-publications-block .views-row .views-field {
+  float: left;
+}
+#block-views-news-block .views-row .views-field-field-image,
+#block-views-publications-block .views-row .views-field-field-publication-image {
+  float: right;
+}
+
+#block-views-news-block .views-row .views-field a,
+#block-views-publications-block .views-row .views-field a {
+  color: #C40E1F;
+}
+#block-views-news-block .attachment .views-row .views-field a,
+#block-views-publications-block .attachment .views-row .views-field a {
+  color: #000;
+}
+
+#block-views-news-block .views-row .views-field-title,
+#block-views-news-block .views-row .views-field-body,
+#block-views-publications-block .views-row .views-field-title,
+#block-views-publications-block .views-row .views-field-body,
+#block-views-publications-block .views-row .views-field-nothing {
+  width: 229px;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+#block-views-news-block .attachment .views-row .views-field-title,
+#block-views-publications-block .attachment .views-row .views-field-title {
+  width: 400px;
+  margin-left: 0;
+}
+
+
+#block-views-news-block .views-row .views-field-title,
+#block-views-publications-block .views-row .views-field-title {
+  font-size: 24px;
+  line-height: 1em;
+  margin-bottom: 10px;
+}
+#block-views-news-block .attachment .views-row .views-field-title,
+#block-views-publications-block .attachment .views-row .views-field-title {
+  font-size: 13px;
+  line-height: 1.2em;
+  margin-bottom: 0;
+}
+
+#block-views-news-block .views-row .views-field-body p,
+#block-views-publications-block .views-row .views-field-body p,
+#block-views-publications-block .views-row .views-field-nothing p {
+  display: inline;
+}
+#block-views-news-block .views-more-link,
+#block-views-publications-block .views-more-link,
+#block-views-publications-block .views-field-nothing a {
+  background-image: url('../images/bolletje-rood.png');
+}
+
+.archive-title {
+  font-size: 18px;
+  color: #C40E1F;
+}
+
+
+
+#content #block-views-slideshow-block {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  background-color: #666666;
+  color: #fff;
+}
+#content #block-views-slideshow-block  .views-row {
+  height: 200px;
+  width: 940px;
+  font-size: 18px;
+}
+#content #block-views-slideshow-block .slideshow-bar {
+  width: 40px;
+  float: left;
+  position: relative;
+}
+#content #block-views-slideshow-block  .slideshow-arrow {
+  background: #666666 top left no-repeat;
+  height: 200px;
+  float: left;
+}
+#content #block-views-slideshow-block  .slideshow-arrow-low {
+  background-image: url('../images/arrow-1.png');
+  width: 100px;
+}
+#content #block-views-slideshow-block  .slideshow-arrow-high {
+  background-image: url('../images/arrow-2.png');
+  width: 135px;
+}
+#content #block-views-slideshow-block  .slideshow-text {
+  padding: 10px;
+  float: left;
+}
+#content #block-views-slideshow-block  .slideshow-text-1 {
+  margin-top: 70px;
+  height: 110px;
+  width: 310px;
+}
+#content #block-views-slideshow-block  .slideshow-text-2 {
+  margin-top: 100px;
+  height: 80px;
+  width: 275px;
+}
+.views-slideshow-controls-bottom {
+  position: absolute;
+  z-index: 10;
+  right: 3px;
+  bottom: 0;
+  height: 17px;
+  color: #fff;
+  cursor: pointer; 
+}
+.views_slideshow_pager_field_item {
+  background: transparent url('../images/pager.png') bottom left no-repeat;
+  display: inline-block;
+  color: transparent;
+  width: 10px;
+  height: 17px;
+}
+.views-slideshow-controls-bottom .active {
+  background: transparent url('../images/pager-active.png') bottom left no-repeat;
+}
+
+#block-clio-blocks-address,
+#block-clio-blocks-correspondence,
+#block-clio-blocks-telephone {
+  margin-top: 1.5em;
+}
+
+
