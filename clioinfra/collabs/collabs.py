@@ -619,6 +619,12 @@ def presentation(settings=''):
     resp = make_response(render_template('menu_presentation.html'))
     return resp
 
+@app.route('/panel')
+def panel(settings=''):
+    handle = 'test'
+    resp = make_response(render_template('panel.html', handle=handle))
+    return resp
+
 @app.route('/chartlib')
 def chartlib(settings=''):
     resp = make_response(render_template('chartlib.html'))
@@ -935,6 +941,11 @@ def statistics(settings=''):
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
 	handles.append(dataset)
+
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
 
     html = ''
     for dataset in handles:
