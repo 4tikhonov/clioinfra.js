@@ -119,20 +119,29 @@ def panel2dict(cleanedpaneldata):
     header = 'Country,'
     for handle in handles:
         header = header + str(handle) + ','
-    header = header + str('Year')
+    #header = header + str('Year')
     
     return (header, data, countries, handles, vhandles) 
 
-def panel2csv(header, data, year, countries, handles, vhandles):
+def panel2csv(header, data, year, countries, handles, vhandles, limit, codes):
     csvitem = ''    
+    ctrid = 0
     #for year in data:
     if year:
         try:
             year = int(year)
             dataset = data[year]              
             for code in countries:            
+		found = 0
                 cols = countries[code]
-                csvitem = csvitem + str(code) + ','            
+		try:
+		   thisname = codes[code]
+		except:
+		   thisname = code
+
+		if ctrid < limit:
+                    csvitem = csvitem + str(thisname) + ','            
+
                 for thishandle in handles:     
                     defaultvalue = 'NaN'
                     value = defaultvalue
@@ -142,16 +151,24 @@ def panel2csv(header, data, year, countries, handles, vhandles):
                         if thishandle == tmphandle:
                             try:
                                 thisvalue = dataset[i]                                                        
+				found = 1
                             except:
                                 skip = 1
                             if thisvalue:                        
                                 value = thisvalue                        
                             
                     #print "\t" + str(code) + ' ' + str(cols) + ' ' + str(thishandle) + ' ' + str(value)                    
-                    csvitem = csvitem + str(value) + ','
-                csvitem = csvitem + str(year) + "\n"
+		    if ctrid < limit:
+                        csvitem = csvitem + str(value) + ','
+
+		if ctrid < limit:
+		    csvitem = csvitem[:-1]
+                    csvitem = csvitem + "\n"
+		if found:
+		    ctrid = ctrid + 1
         except:
             skip = 1
+    header = header[:-1]
     csvitem = header + "\n" + csvitem
     return csvitem
 
