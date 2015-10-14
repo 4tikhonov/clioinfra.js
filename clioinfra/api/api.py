@@ -40,6 +40,7 @@ import psycopg2
 import psycopg2.extras
 import pprint
 import collections
+import ast
 import getopt
 import numpy as np
 import stat
@@ -65,6 +66,8 @@ from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
+from statistics import load_api_data
+from paneldata import paneldatafilter, panel2dict, panel2csv
 
 cpath = "/etc/apache2/strikes.config"
 
@@ -901,6 +904,37 @@ def open():
     resp = make_response(render_template('progress.html', download=root))
     return resp
 
+# Panel data
+@app.route('/panel')
+def panel():
+    (yearmin, yearmax, thisyear, ctrlist) = ('1900', '2010', 1950, '')
+    config = configuration()
+    modern = moderncodes(config['modernnames'], config['apiroot'])
+    jsonapi = config['apiroot'] + "/api/datasets?handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27%2C%20%27hdl%3A10622/ZWRBOY]"
+    dataframe = load_api_data(jsonapi, '')
+    result = ''
+    ctrlimit = 10
+    ctrlist = '380,250,52,850'
+
+    allcodes = {}
+    panel = []
+
+    for dataitem in dataframe:
+        handle = dataitem['handle']
+        (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
+        if not dataset.empty:
+            panel.append(dataset)
+
+    if panel:
+        totalpanel = pd.concat(panel)
+        cleanedpanel = totalpanel.dropna(axis=1, how='any')
+        cleanedpanel = totalpanel
+
+        (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel)  
+        result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
+
+    return Response(result,  mimetype='text/plain')
+
 # Collabs
 @app.route('/collabs')
 def collabs():
@@ -965,12 +999,14 @@ def datasets():
         for dataset in datainfo:
 	    data = {}
 	    handle = dataset['handle']
-            jsondata = dataset['data']
+            jsondata = str(dataset['data'])
+	    json_dict = ast.literal_eval(jsondata.strip())
 	    data['handle'] = handle
-	    data['data'] = jsondata
+	    data['data'] = json_dict
 	    combineddataset.append(data)
 
     if combineddataset:
+	
         finaldata = json.dumps(combineddataset, encoding="utf-8", sort_keys=True, indent=4)
         return Response(finaldata,  mimetype='application/json')
     else:
