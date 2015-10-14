@@ -907,14 +907,24 @@ def open():
 # Panel data
 @app.route('/panel')
 def panel():
-    (yearmin, yearmax, thisyear, ctrlist) = ('1900', '2010', 1950, '')
+    (yearmin, yearmax, thisyear, ctrlist) = ('1500', '2020', 1950, '')
     config = configuration()
     modern = moderncodes(config['modernnames'], config['apiroot'])
+    if request.args.get('handle'):
+        handle = request.args.get('handle')
+        (dataset, revid, cliohandle, clearpid) = findpid(handle)
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
+    if request.args.get('ctrlist'):
+        customcountrycodes = ''
+        ctrlist = request.args.get('ctrlist')
+    if request.args.get('year'):
+        thisyear = request.args.get('year')
+
     jsonapi = config['apiroot'] + "/api/datasets?handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27%2C%20%27hdl%3A10622/ZWRBOY]"
     dataframe = load_api_data(jsonapi, '')
     result = ''
     ctrlimit = 10
-    ctrlist = '380,250,52,850'
 
     allcodes = {}
     panel = []
