@@ -907,7 +907,7 @@ def open():
 # Panel data
 @app.route('/panel')
 def panel():
-    (handle, yearmin, yearmax, thisyear, ctrlist) = ('', '1500', '2020', 1950, '')
+    (handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ('', '1500', '2020', 1950, '', 2010)
     config = configuration()
     modern = moderncodes(config['modernnames'], config['apiroot'])
     if request.args.get('handle'):
@@ -923,7 +923,6 @@ def panel():
         thisyear = request.args.get('year')
 
     jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
-    #Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27%2C%20%27hdl%3A10622/ZWRBOY]"
     dataframe = load_api_data(jsonapi, '')
     result = ''
     ctrlimit = 10
@@ -943,6 +942,24 @@ def panel():
         cleanedpanel = totalpanel
 
         (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel)  
+	years = []
+	for year in sorted(data):
+            try:
+        	years.append(int(year))
+		lastyear = year
+    	    except:
+        	skip = 1
+
+	# Return only years
+	if request.args.get('showyears'):
+	    yearsdata = {}
+	    yearsdata['years'] = years
+	    yearsdata['latestyear'] = lastyear
+	    #yearsdata['data'] = data
+	    yearsjson = json.dumps(yearsdata, ensure_ascii=False, sort_keys=True, indent=4)
+	    return Response(yearsjson,  mimetype='application/json')
+
+	# Show dataframe in CSV
         result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
 
     return Response(result,  mimetype='text/plain')
