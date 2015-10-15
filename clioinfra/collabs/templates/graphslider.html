@@ -1,0 +1,83 @@
+<body>
+<head>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
+  <script src="/collabs/static/nlgis/params.js"></script>
+  
+<script>
+   var thiscolor = '';
+   var graphurl = "/collabs/panel?{{ params|safe }}";
+   {% if lastyear %}
+   year = {{ lastyear }};
+   {% endif %}
+   var starturl = graphurl + '&year=' + year;
+ 
+  $(function() {
+    var select = $( "#yearslider" );
+    var sliderTooltip = function(event, ui) {
+    var curValue = $( "#yearslider option:selected" ).text() || '0';
+    var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
+
+    $('.ui-slider-handle').html(tooltip);
+
+}
+    var slider = $( "<div id='slider'></div>" )
+      .insertAfter( select ).slider({
+      min: 1,
+      max: {{ steps }},
+      range: "min",
+      value: select[ 0 ].selectedIndex + 1,
+      create: sliderTooltip,
+      slide: function( event, ui ) {
+        select[ 0 ].selectedIndex = ui.value - 1;
+        $('.slider-time2').html($( "#yearslider option:selected" ).text());
+	$("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
+	document.getElementById('worldmap').src = '' + graphurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
+        sliderTooltip(event, ui);
+      }
+    });
+    $( "#yearslider" ).change(function() {
+      slider.slider( "value", this.selectedIndex + 1 );
+    });
+  });
+  </script>
+
+<script type='text/javascript'>
+$(function() {
+  $('iframe').responsiveIframe({xdomain: '*'});
+});
+
+</script>
+
+</head>
+<body>
+<div id="map" style='border:0; width:960px; height:600px;'>
+<center><h2>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h2></center>
+<iframe id="worldmap" src='' style='border:0; width:100%; overflow: hidden; height: 480px;' scrolling="no"></iframe>
+<script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
+<form id="ynavi" style='border:1; width: 820px;'>
+    <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
+    <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
+    <input type="checkbox" id="logscale" onclick="ingrey();">Log scale
+  <select name="years" id="yearslider">
+  {% for year in years %}
+    <option>{{ year }}</option>
+  {% endfor %}
+  </select>
+</form>
+<script>
+function ingrey() {
+    if ($('#greyscale').is(':checked')) {
+	colors = 'greyscale';
+    }
+    else
+    {
+        colors = '';
+    }
+    document.getElementById('worldmap').src = starturl + '&colors=' + colors;
+}
+</script>
+</div>
+</body>
