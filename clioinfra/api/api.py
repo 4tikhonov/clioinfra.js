@@ -66,7 +66,7 @@ from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from statistics import load_api_data
+#from statistics import load_api_data
 from paneldata import paneldatafilter, panel2dict, panel2csv
 
 cpath = "/etc/apache2/strikes.config"
@@ -562,7 +562,7 @@ def load_indicators(filename):
     
     return json.dumps(d)
 
-def load_api_data(apiurl, fileID):
+def load_api_data1(apiurl, fileID):
     jsondataurl = apiurl
     
     req = urllib2.Request(jsondataurl)
@@ -907,12 +907,13 @@ def open():
 # Panel data
 @app.route('/panel')
 def panel():
-    (yearmin, yearmax, thisyear, ctrlist) = ('1500', '2020', 1950, '')
+    (handle, yearmin, yearmax, thisyear, ctrlist) = ('', '1500', '2020', 1950, '')
     config = configuration()
     modern = moderncodes(config['modernnames'], config['apiroot'])
     if request.args.get('handle'):
-        handle = request.args.get('handle')
-        (dataset, revid, cliohandle, clearpid) = findpid(handle)
+        handle = str(request.args.get('handle'))
+	handle = handle.replace(" ", "")
+	handle = handle.replace("'", "")
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
@@ -921,7 +922,8 @@ def panel():
     if request.args.get('year'):
         thisyear = request.args.get('year')
 
-    jsonapi = config['apiroot'] + "/api/datasets?handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27%2C%20%27hdl%3A10622/ZWRBOY]"
+    jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
+    #Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27%2C%20%27hdl%3A10622/ZWRBOY]"
     dataframe = load_api_data(jsonapi, '')
     result = ''
     ctrlimit = 10
@@ -996,15 +998,21 @@ def datasets():
     (jsondata, pid) = ('', '')
     handles = []
     combineddataset = []
+    datainfo = []
 
     if request.args.get('handle'):
         pid = request.args.get('handle')
+    if request.args.get('latest'):
+	dataset = config['defaulthandle']
+   	return dataset
 
     if pid:
         (datasets, pidslist) = pidfrompanel(pid)
 
         hquery = formdatasetquery('',datasets)
         datainfo = readdatasets('datasets', json.loads(hquery))
+	#if not datainfo:
+	    #datainfo.append(pid)
 
         for dataset in datainfo:
 	    data = {}
