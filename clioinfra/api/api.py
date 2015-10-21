@@ -212,8 +212,11 @@ def downloadzip(pid):
             #hist = countries
 	    hist = ''
 	    filename = filename + '.xls'
+	    # 2DEBUG
 	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	    #codes = hist
+	    #return str(fullmetadata)
+	    metadata = fullmetadata
 	    result = individual_dataset(finaldir, filename, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes, metadata)
 
     try:
