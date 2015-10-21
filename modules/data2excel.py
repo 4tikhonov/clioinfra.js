@@ -46,6 +46,16 @@ def panel2excel(datadir, filename, header, panelcells, metadata):
     i = 0
     for dataitem in panelcells:
         i = i + 1
+	dataonly = []
+	# Append country and years
+  	dataonly.append(dataitem[0])
+        dataonly.append(dataitem[1])
+        # Skip all country codes
+	for j in range(2, len(dataitem)):
+	    if (j/2)*2 == j:
+	        dataonly.append(dataitem[j])
+
+	dataitem = dataonly
         for j in range(0, len(dataitem)):
             value = dataitem[j]
             if value == 'NaN':
