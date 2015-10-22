@@ -33,6 +33,8 @@ def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
         totalpanel = pd.concat(panel)
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
+	# Replace empty values with NaN
+	cleanedpanel = cleanedpanel.replace(r'', np.nan, regex=True)
 
     return (panel, cleanedpanel)
 
