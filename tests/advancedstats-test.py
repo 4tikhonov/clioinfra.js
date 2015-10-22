@@ -19,9 +19,13 @@ from paneldata import panel2dict, paneldatafilter, panel2csv
 
 def advanced_statistics():
     handle = 'Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/I0YK5M%27%2C%20%27hdl%3A10622/ZWRBOY%27]'
+    handle = "Panel['hdl:10622/4X6NCK', 'hdl:10622/F16UDU', 'hdl:10622/I0YK5M']"
+    handle = handle.replace(" ", '')
+    print handle
     yearmin = '1990'
     yearmax = '2010'
     ctrlist = ''
+    ctrlist = '250,276'
     config = configuration()
     modern = moderncodes(config['modernnames'], config['apiroot'])
     jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handle)
