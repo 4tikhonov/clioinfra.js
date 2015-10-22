@@ -55,6 +55,7 @@ import pylab as plt
 import re
 from urllib import urlopen
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
+from advancedstatistics import loadpanel, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
 from download import get_papers, dataset2zip, compile2zip
@@ -983,6 +984,40 @@ def collabs():
 	    jsondata = json.dumps(item, encoding="utf-8", sort_keys=True, indent=4)
 
     return Response(jsondata,  mimetype='application/json')
+
+# Advanced statistiscs
+@app.route('/advancedstats')
+def advanced_statistics():
+    (yearmin, yearmax, ctrlist) = (1500, 2020, '')
+    config = configuration()
+    handles = []
+
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+	handledataset = handledataset.replace(" ", '')
+
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
+        handles.append(dataset)
+
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
+    if request.args.get('ctrlist'):
+        ctrlist = request.args.get('ctrlist')
+
+    modern = moderncodes(config['modernnames'], config['apiroot'])
+    jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
+
+    (panel, cleanedpanel) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
+
+    ctrlimit = 200
+    #result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
+    maindataframe = data2statistics(handles, cleanedpanel)
+    showhtml = statistics_tojson(maindataframe, modern)
+    return showhtml
 
 # Dataverse API
 @app.route('/download')
