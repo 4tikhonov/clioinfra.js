@@ -91,8 +91,9 @@ def statistics_tojson(maindataframe, modern):
         infodata = maindataframe[handle]
 	datahtml = ''
         htmlhandle = "<tr><td>" + str(handle) + "</td><td>Country</td>"
-	code = 76
-	m = infodata[code]
+	for somecode in infodata:
+	    m = infodata[somecode]
+
 	for measure in sorted(m):
 	    htmlhandle = htmlhandle + "<td>" + str(measure) + "</td>"        
 	htmlhandle = htmlhandle + "</tr>"
