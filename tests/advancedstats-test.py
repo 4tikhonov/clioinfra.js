@@ -17,14 +17,14 @@ from config import configuration, dataverse2indicators, load_dataverse, findpid,
 from historical import load_historical, histo
 from paneldata import panel2dict, paneldatafilter, panel2csv
 
-def test_stats():
-    thisyear = 2010
-    jsonapi = "http://dpe.sandbox.socialhistoryservices.org/api/datasets?handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/I0YK5M%27%2C%20%27hdl%3A10622/ZWRBOY%27]"
+def advanced_statistics():
+    handle = 'Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/I0YK5M%27%2C%20%27hdl%3A10622/ZWRBOY%27]'
     yearmin = '1990'
     yearmax = '2010'
     ctrlist = ''
     config = configuration()
     modern = moderncodes(config['modernnames'], config['apiroot'])
+    jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handle)
 
     (panel, cleanedpanel) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
     (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)           
@@ -35,5 +35,5 @@ def test_stats():
     showhtml = statistics_tojson(maindataframe, modern)
     return showhtml
 
-showhtml = test_stats()
+showhtml = advanced_statistics()
 print showhtml
