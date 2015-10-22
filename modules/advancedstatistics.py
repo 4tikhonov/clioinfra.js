@@ -34,9 +34,9 @@ def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
 
-    return panel
+    return (panel, cleanedpanel)
 
-def data2statistics(handles, clearedpanel):
+def data2statistics(handles, cleanedpanel):
     maindataframe = {}    
     for handle in handles:    
         newpanel = cleanedpanel[cleanedpanel['handle'] == handle]   
@@ -104,7 +104,6 @@ def statistics_tojson(maindataframe, modern):
 	        country = str(modern[code])
 	    except:
 	 	country = str(code)
-		noname = 1
 
 	    active = 0
             countryitem = "<tr><td>&nbsp;</td>\n\t<td>" + country + "</td>\n"
@@ -127,15 +126,14 @@ def statistics_tojson(maindataframe, modern):
 		    active = 1
             
             if active:                
-		if noname:
-                    datahtml = datahtml + countryitem + "</tr>\n"   
+                datahtml = datahtml + countryitem + "</tr>\n"   
 
        	htmlhandle = htmlhandle + datahtml
         html = html + htmlhandle 
     html = html + "</table>"
     return html
 
-def panel2dict(data):
+def advpanel2dict(cleanedpanel):
     data = cleanedpanel.reset_index().to_dict()
     codes = data['Code']
     handlesdata = data['handle']
