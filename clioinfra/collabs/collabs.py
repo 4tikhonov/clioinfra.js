@@ -58,6 +58,7 @@ from math import log10, floor
 
 # Clio Infra modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
+from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
@@ -65,7 +66,7 @@ from locations import load_locations
 from topics import load_alltopics
 from locations import load_locations
 from historical import load_historical
-from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
+from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata
 
 Provinces = ["Groningen","Friesland","Drenthe","Overijssel","Flevoland","Gelderland","Utrecht","Noord-Holland","Zuid-Holland","Zeeland","Noord-Brabant","Limburg"]
@@ -255,6 +256,15 @@ def slider():
 @app.route('/members')
 def members():
     return render_template('members.html')
+
+@app.route('/graphslider')
+def graphslider():
+    params = "handle=Panel['hdl%3A10622/4X6NCK'%2C 'hdl%3A10622/I0YK5M']&ctrlist=840%2C804%2C40%2C56%2C276%2C528%2C36&yearmin=1500&yearmax=2013"
+    years = [1950, 1970, 1990, 2000, 2010]
+    title = 'Graph slider'
+    lastyear = 2010
+    steps = lastyear
+    return make_response(render_template('graphslider.html', params=params, years=years, title=title, lastyear=lastyear, steps=steps))
 
 @app.route('/mapslider')
 def mapslider():
@@ -621,7 +631,10 @@ def presentation(settings=''):
 
 @app.route('/panel')
 def panel(settings=''):
-    handle = 'test'
+    f = request.args
+    handle = ''
+    for q in f:
+	handle = str(handle) + '&' + str(q) + '=' + str(f[q])
     resp = make_response(render_template('panel.html', handle=handle))
     return resp
 
@@ -930,6 +943,38 @@ def dashboard(settings=''):
 
 @app.route('/statistics')
 def statistics(settings=''):
+    (yearmin, yearmax, ctrlist) = (1500, 2020, '')
+    config = configuration()
+    handles = []
+
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+        handledataset = handledataset.replace(" ", '')
+
+    if request.args.get('dataset'):
+        dataset = request.args.get('dataset')
+        handles.append(dataset)
+
+    if request.args.get('yearmin'):
+        yearmin = request.args.get('yearmin')
+    if request.args.get('yearmax'):
+        yearmax = request.args.get('yearmax')
+    if request.args.get('ctrlist'):
+        ctrlist = request.args.get('ctrlist')
+
+    modern = moderncodes(config['modernnames'], config['apiroot'])
+    jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
+
+    (panel, cleanedpanel) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
+
+    ctrlimit = 200
+    data = handle2statistics(handles, cleanedpanel)
+    showhtml = statistics2table(data)
+    return showhtml
+
+@app.route('/totalstatistics')
+def totalstatistics(settings=''):
     config = configuration()
     handles = []
 
