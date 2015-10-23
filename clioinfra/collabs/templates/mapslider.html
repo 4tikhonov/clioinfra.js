@@ -58,7 +58,7 @@ $(function() {
 <script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
-    <a href="/" id="print" target=_blank>Print</a>&nbsp;
+    <a href="/collabs/printall?dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}" id="print" target=_blank>Print</a>&nbsp;
     <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
     <input type="checkbox" id="logscale" onclick="ingrey();">Log scale
   <select name="years" id="yearslider">
