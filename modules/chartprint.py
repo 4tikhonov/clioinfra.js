@@ -37,7 +37,7 @@ def chartonprint(webpage, fileformat, year, code):
         outfile = year + '_' + code + '_' + 'map.png'
         outdirfile = imagepathloc + '/' + outfile
         cmd = "/usr/bin/inkscape " + filesvg + " -e " + outdirfile + " -h " + size + " -D -b '#ffffff'"
-        fileonweb = '/get?image=' + outfile
+        fileonweb = config['imagepathonweb'] + '/' + outfile
 
     if cmd:
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
