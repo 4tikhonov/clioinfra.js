@@ -9,6 +9,7 @@
 <script>
    var thiscolor = '';
    var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
+   var printurl = "/collabs/printall?dataset={{ dataset }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
    var starturl = mapurl + '&year=' + year + '&lasty={{ lastyear }}';
  
   $(function() {
@@ -32,6 +33,7 @@
         $('.slider-time2').html($( "#yearslider option:selected" ).text());
 	$("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
 	document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
+	document.getElementById('print').href = printurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
         sliderTooltip(event, ui);
       }
     });
@@ -56,6 +58,7 @@ $(function() {
 <script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
 <form id="ynavi" style='border:1; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
+    <a href="/" id="print" target=_blank>Print</a>&nbsp;
     <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
     <input type="checkbox" id="logscale" onclick="ingrey();">Log scale
   <select name="years" id="yearslider">
