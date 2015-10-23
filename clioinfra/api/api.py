@@ -55,7 +55,7 @@ import pylab as plt
 import re
 from urllib import urlopen
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
-from advancedstatistics import loadpanel, data2statistics, read_measure, statistics_tojson, advpanel2dict
+from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
 from download import get_papers, dataset2zip, compile2zip
@@ -1001,9 +1001,9 @@ def advanced_statistics():
         handles.append(dataset)
 
     if request.args.get('yearmin'):
-        fromyear = request.args.get('yearmin')
+        yearmin = request.args.get('yearmin')
     if request.args.get('yearmax'):
-        toyear = request.args.get('yearmax')
+        yearmax = request.args.get('yearmax')
     if request.args.get('ctrlist'):
         ctrlist = request.args.get('ctrlist')
 
@@ -1015,8 +1015,10 @@ def advanced_statistics():
 
     ctrlimit = 200
     #result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
-    maindataframe = data2statistics(handles, cleanedpanel)
-    showhtml = statistics_tojson(maindataframe, modern)
+    #maindataframe = data2statistics(handles, cleanedpanel)
+    #showhtml = statistics_tojson(maindataframe, modern)
+    data = handle2statistics(handles, cleanedpanel)
+    showhtml = statistics2table(data)
     return showhtml
 
 # Dataverse API
