@@ -39,7 +39,7 @@ def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
     return (panel, cleanedpanel)
 
 def handle2statistics(handles, cleanedpanel):
-    maindataframe = {}
+    maindataframe = []
     for handle in handles:
         newpanel = cleanedpanel[cleanedpanel['handle'] == handle]
         newpanel = newpanel.drop('handle', axis=1)
@@ -52,6 +52,7 @@ def handle2statistics(handles, cleanedpanel):
             arrdata = newpanel #.ix[code]
 
             ctrdata = pd.DataFrame(arrdata)
+            data['Handle'] = handle
             # Mean
             tmpframe = ctrdata.mean()
             data['Mean'] = tmpframe.mean()
@@ -73,9 +74,22 @@ def handle2statistics(handles, cleanedpanel):
             ymax = max(ypanel)
             period = str(ymin) + '-' + str(ymax)
             data['Period'] = period
-            maindataframe[handle] = data
+            maindataframe.append(data)
 
     return maindataframe
+
+def statistics2table(data):
+    html = "<table border=1>\n<tr bgcolor=#efefef>\n"
+    for item in sorted(data[0]):
+        html = html + "<td>" + str(item) + "</td>" 
+    html = html + "</tr>\n"
+    for dataitem in data:
+        html = html + "\t<tr>"
+        for item in sorted(dataitem):
+            html = html + "<td>" + str(dataitem[item]) + "</td>"
+        html = html + "</tr>\n"
+    html = html + "</table>"
+    return html
 
 def data2statistics(handles, cleanedpanel):
     maindataframe = {}    
