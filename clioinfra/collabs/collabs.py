@@ -58,6 +58,7 @@ from math import log10, floor
 
 # Clio Infra modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
+from chartprint import chartonprint
 from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
@@ -950,6 +951,9 @@ def statistics(settings=''):
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         handledataset = handledataset.replace(" ", '')
+	panelcheck = re.search(r'Panel', handledataset)
+	if not panelcheck:
+            handledataset = "Panel[" + handledataset + "]"
 
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
@@ -1196,6 +1200,24 @@ def d3index(settings=''):
     pages = getindex(activepage)
     resp = make_response(render_template('datasetlist.html', active=activepage, letters=letters, topiclist=topiclist, pages=pages))
     return resp
+
+@app.route('/printall')
+def printall():
+    config = configuration()
+    colors = ''# 'greyscale'
+    root = request.url
+    urigroup = re.search('\?(.+)', root)
+    try:
+        uri = urigroup.group(1)
+    except:
+        uri = root
+    #webpage = config['apiroot'] + "/collabs/static/v/worldmap.html?start=on&action=map&dataset=4X6NCK&catmax=6&ctrlist=&year=1981&lasty=2010&colors=" + colors
+    webpage = config['apiroot'] + "/collabs/static/v/worldmap.html?start=on&action=map&" + str(uri)  
+    fileformat = 'png'
+    year = '1982'
+    code = '4X6NCK'
+    imagefile = chartonprint(webpage, fileformat, year, code)
+    return redirect(imagefile, code=301)
 
 @app.route('/advanced')
 def advanced(settings=''):
