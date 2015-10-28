@@ -270,6 +270,7 @@ def graphslider():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    handledataset = ''
     logscale = 0
     handles = []
     datahub = {}
@@ -290,8 +291,17 @@ def mapslider():
 	handles.append(dataset)
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
-	(dataset, revid, cliopid, clearpid) = findpid(handledataset)
-        handles.append(dataset)
+        handlestring = request.args.get('handle')
+        ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
+        if ishandle:
+            handle = ishandle.group(1)
+            handle = handle.replace("'", "")
+        else:
+            handle = handlestring
+
+	(dataset, revid, cliopid, clearpid) = findpid(handle)
+        #handles.append(dataset)
+	handles.append(handle)
     if request.args.get('logscale'):
 	logscale = 1
     if request.args.get('catmax'):
@@ -318,7 +328,7 @@ def mapslider():
 	lastyear = year
 	steps = steps + 1
 
-    return make_response(render_template('mapslider.html', years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
+    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -906,7 +916,7 @@ def dashboard(settings=''):
     valtitle = ''
     if validate:
 	# VALIDATION
-	cmd = path + "/../../bin/run-demo.py -d '" + dataverseroot + "' -H '" + dataset + "' -k '" + key + "'"
+	cmd = path + "/../../bin/import.py -d '" + dataverseroot + "' -H '" + dataset + "'"
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
 	valtitle = maincontent
