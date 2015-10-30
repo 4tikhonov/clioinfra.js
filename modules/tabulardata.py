@@ -292,10 +292,21 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
     indicator = ''
     config = configuration()
     DEBUG = 0
+    try:
+	(dataset, revid, cliopid, clearpid) = findpid(handle)
+    except:
+	dataset = handle
 
-    apifile = str(handle) + ".json"
-    jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
-    dataframe = load_api_data(jsonapi, '')
+    try:
+        apifile = str(dataset) + ".json"
+        jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
+        dataframe = load_api_data(jsonapi, '')
+    except:
+	jsonapi = config['apiroot'] + "/api/datasets?handle=Panel[" + handle + "]"
+	datajson = load_api_data(jsonapi, '')
+	for handledata in datajson:
+	    dataframe = handledata['data']
+
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
     (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logflag, DEBUG)
@@ -313,6 +324,7 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
         toyear = ''
 
     for handle in handles:
+	print handle
         (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
         data[handle] = frame
     
