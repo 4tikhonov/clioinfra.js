@@ -35,12 +35,14 @@ def removedata(dbname, key, val):
 
     return result
 
-def datasetadd(filename, handle, dataset):
+def datasetadd(filename, handle, dataset, title, units):
     dbname = "datasets"
     txt = open(filename)
     data = {}
     data['handle'] = handle
     data['dataset'] = dataset
+    data['title'] = title
+    data['units'] = units
     datasettext = str(txt.read())
     datasetjson = json.loads(datasettext)
     data['data'] = datasetjson
@@ -66,7 +68,6 @@ def readdatasets(dbname, query):
     client = MongoClient()
     db = client.get_database(dbname)
     collection = db.data
-    print query
     result = db.data.find(query)
 
     return result
@@ -77,7 +78,7 @@ def formdatasetquery(handles, datasets):
         hdict = "{\"handle\": \"" + str(handle) + "\"}"
         handlequery = handlequery + str(hdict) + ","
     for dataset in datasets:
-	hdict = "{\"handle\": \"" + str(dataset) + "\"}"
+	hdict = "{\"dataset\": \"" + str(dataset) + "\"}"
         handlequery = handlequery + str(hdict) + ","
 
     handlequery = handlequery[:-1]
