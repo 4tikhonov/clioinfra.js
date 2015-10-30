@@ -205,7 +205,7 @@ def downloadzip(pid):
 	zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir)
 	(alonepid, revid, cliohandle, clearpid) = findpid(pid)
 	if alonepid:
-	    handles = [ alonepid ]
+	    handles = [ clearpid ]
 
 	for pid in handles:
             #api = config['apiroot'] + "/collabs/static/data/historical.json"
@@ -222,7 +222,6 @@ def downloadzip(pid):
 
     try:
         for everypid in handles:
-	    everypid = "hdl:10622/" + str(everypid)
 	    # Download papers
             zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, everypid, tmpdir, arc, finaldir)
     except:
@@ -1064,19 +1063,23 @@ def datasets():
    	return dataset
 
     if pid:
-        (datasets, pidslist) = pidfrompanel(pid)
+        (handles, pidslist) = pidfrompanel(pid)
 
-        hquery = formdatasetquery('',datasets)
+        hquery = formdatasetquery(handles,'')
         datainfo = readdatasets('datasets', json.loads(hquery))
 	#if not datainfo:
 	    #datainfo.append(pid)
 
+	#return 'test'
         for dataset in datainfo:
 	    data = {}
 	    handle = dataset['handle']
             jsondata = str(dataset['data'])
+	    jsondata = jsondata.replace(".0,", ",")
 	    json_dict = ast.literal_eval(jsondata.strip())
 	    data['handle'] = handle
+	    data['title'] = dataset['title']
+	    data['units'] = dataset['units']
 	    data['data'] = json_dict
 	    combineddataset.append(data)
 
@@ -1255,8 +1258,15 @@ def dataapi():
     if request.args.get('geocoder'):
         geocoder = request.args.get('geocoder')
     if request.args.get('handle'):
-        handle = request.args.get('handle')
+        handlestring = request.args.get('handle')
+	ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
+	if ishandle:
+    	    handle = ishandle.group(1)
+	    handle = handle.replace("'", "")
+	else:
+	    handle = handlestring
         handles.append(handle)
+
     if request.args.get('ctrlist'):
         customcountrycodes = ''
         tmpcustomcountrycodes = request.args.get('ctrlist')
