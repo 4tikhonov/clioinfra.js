@@ -5,9 +5,9 @@ import getopt
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
-from excel2data import parsehandle, dataextractor, downloadfile, load_api_data, getfiles
+from excel2data import excelvalidator, parsehandle, dataextractor, downloadfile, load_api_data, getfiles
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
-from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
+from storage import removedata, data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 
 def main():
     handle = ''
@@ -42,6 +42,8 @@ def main():
     root = config['dataverseroot']
     key = config['key']
     dvname = config['branch']
+    title = 'Title'
+    units = 'Units'
 
     if dataverse:
 	root = dataverse
@@ -69,13 +71,19 @@ def main():
 	 fullpath = downloadfile(root, path, fileID, key)
 	 print fullpath
 	 (pid, revid, cliohandle, clearpid) = findpid(handle)
+	 jsonfile = ''
 	 #try:
 	 if pid:
 	     handle = pid
-	     jsonfile = dataextractor(fullpath, path, pid, fileID)
+	     try:
+	        (jsonfile, title, units) = dataextractor(fullpath, path, pid, fileID)
+	     except:
+		resultfile = config['tmpdir'] + "/" + fileID
+		(jsonfile, title, units) = excelvalidator(config['phantompath'], fullpath, resultfile, config['tmpdir'])
+	
 	     if jsonfile:
-		title = 'Test'
-        	datasetadd(jsonfile, clearpid, handle, title)
+		remove = removedata('datasets', 'handle', clearpid)
+        	datasetadd(jsonfile, clearpid, handle, title, units)
                 print handle
         	print clearpid
 	 #except:
