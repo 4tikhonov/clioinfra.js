@@ -76,13 +76,18 @@ def main():
 	 if pid:
 	     handle = pid
 	     try:
-	        (jsonfile, title, units) = dataextractor(fullpath, path, pid, fileID)
+	        (jsonfile, tmptitle, tmpunits) = dataextractor(fullpath, path, pid, fileID)
 	     except:
 		resultfile = config['tmpdir'] + "/" + fileID
-		(jsonfile, title, units) = excelvalidator(config['phantompath'], fullpath, resultfile, config['tmpdir'])
+		(jsonfile, tmptitle, tmpunits) = excelvalidator(config['phantompath'], fullpath, resultfile, config['tmpdir'])
 	
 	     if jsonfile:
 		remove = removedata('datasets', 'handle', clearpid)
+		try:
+		    title = str(tmptitle)
+		    units = str(tmpunits)
+		except:
+		    donothing = 1
         	datasetadd(jsonfile, clearpid, handle, title, units)
                 print handle
         	print clearpid
