@@ -935,9 +935,11 @@ def panel():
 
     allcodes = {}
     panel = []
+    names = {}
 
     for dataitem in dataframe:
         handle = dataitem['handle']
+	names[handle] = dataitem['title']
         (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
         if not dataset.empty:
             panel.append(dataset)
@@ -947,7 +949,7 @@ def panel():
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
 
-        (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel)  
+        (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel, names)  
 	years = []
 	for year in sorted(data):
             try:
