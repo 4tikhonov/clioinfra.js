@@ -82,7 +82,7 @@ def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):
             
     return (data, codes)    
 
-def panel2dict(cleanedpaneldata):
+def panel2dict(cleanedpaneldata, names):
     data = cleanedpaneldata.reset_index().to_dict()
     codes = data['Code']
     handlesdata = data['handle']
@@ -118,7 +118,7 @@ def panel2dict(cleanedpaneldata):
     panelout = {}
     header = 'Country,'
     for handle in handles:
-        header = header + str(handle) + ','
+        header = header + str(names[handle]) + ','
     #header = header + str('Year')
     
     return (header, data, countries, handles, vhandles) 
@@ -172,3 +172,70 @@ def panel2csv(header, data, year, countries, handles, vhandles, limit, codes):
     csvitem = header + "\n" + csvitem
     return csvitem
 
+def data2statistics(handles, clearedpanel):
+    maindataframe = {}
+    for handle in handles:    
+        newpanel = cleanedpanel[cleanedpanel['handle'] == handle]   
+        newpanel = newpanel.drop('handle', axis=1)    
+        cdataframe = {}
+        for code in newpanel.index:
+            data = {}
+            arrdata = newpanel.ix[code]        
+        
+            ctrdata = pd.DataFrame(arrdata) 
+            # Mean
+            data['Mean'] = ctrdata.mean(axis=0).to_json()
+            # Min
+            data['Min'] = ctrdata.min(axis=0).to_json()
+            # Min
+            data['Max'] = ctrdata.max(axis=0).to_json()
+            # Std
+            data['Std'] = ctrdata.std(axis=0).to_json()
+            # Count
+            data['N'] = ctrdata.count(axis=0).to_json()
+            # Yearmin 
+            ymin = min(ctrdata.index)
+            # Min
+            ymax = max(ctrdata.index)        
+            period = str(ymin) + '-' + str(ymax)        
+            data['Period'] = period
+            cdataframe[code] = data
+        maindataframe[handle] = cdataframe
+        
+    return maindataframe
+
+def read_measure(measure, data):
+    value = ''
+    if measure:            
+        values = {}      
+        value = ''
+        try:
+            values = json.loads(data[measure])
+            for x in values:
+                value = values[x]
+        except:
+            value = data[measure]            
+            
+    return value    
+                    
+def statistics_tojson(maindataframe):
+    for handle in maindataframe:
+        infodata = maindataframe[handle]
+        print str(handle) 
+        for code in infodata:
+            print "\t" + str(modern[code]) 
+            data = infodata[code]
+            minvalue = read_measure('Min', data)            
+            if minvalue != None:
+                for measure in data:            
+                    values = {}      
+                    value = ''
+                    try:
+                        values = json.loads(data[measure])
+                        for x in values:
+                            value = values[x]
+                    except:
+                        value = data[measure]            
+                        
+                    print "\t\t" + str(measure) + "\t" + str(value) 
+    return 'ok'
