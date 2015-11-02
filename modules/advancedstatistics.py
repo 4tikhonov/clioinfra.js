@@ -23,8 +23,15 @@ def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
 
     allcodes = {}
     panel = []
+    names = {}
     for dataitem in dataframe: 
         handle = dataitem['handle']        
+	try:
+	    title = dataitem['title']
+	except:
+	    title = handle
+
+	names[handle] = title
         (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)    
         if not dataset.empty:                
             panel.append(dataset)
@@ -36,9 +43,9 @@ def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
 	# Replace empty values with NaN
 	cleanedpanel = cleanedpanel.replace(r'', np.nan, regex=True)
 
-    return (panel, cleanedpanel)
+    return (panel, cleanedpanel, names)
 
-def handle2statistics(handles, cleanedpanel):
+def handle2statistics(handles, cleanedpanel, names):
     maindataframe = []
     for handle in handles:
         newpanel = cleanedpanel[cleanedpanel['handle'] == handle]
@@ -52,7 +59,7 @@ def handle2statistics(handles, cleanedpanel):
             arrdata = newpanel #.ix[code]
 
             ctrdata = pd.DataFrame(arrdata)
-            data['Handle'] = handle
+            data['Handle'] = names[handle]
             # Mean
             tmpframe = ctrdata.mean()
             data['Mean'] = tmpframe.mean()
