@@ -483,8 +483,11 @@ def load_lonlat(cursor):
 # Search API
 def simplesearch(root, qurl, apiroot):
     # Load topics
-    topicurl = apiroot + "/collabs/static/data/dataframe100_0.json"
-    topics = loadjson(topicurl)
+    #topicurl = apiroot + "/collabs/static/data/dataframe100_0.json"
+    topicurl = apiroot + "/api/datasets?handle=Panel[%27hdl:10622/0PCZX5%27]"
+    topicsframe = loadjson(topicurl)
+    for item in topicsframe:
+	topics = item['data']
 
     # Input
     IDS = getindicators(qurl)
@@ -1009,7 +1012,7 @@ def advanced_statistics():
     modern = moderncodes(config['modernnames'], config['apiroot'])
     jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
 
-    (panel, cleanedpanel) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    (panel, cleanedpanel, names) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
     (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
 
     ctrlimit = 200
@@ -1078,8 +1081,12 @@ def datasets():
 	    jsondata = jsondata.replace(".0,", ",")
 	    json_dict = ast.literal_eval(jsondata.strip())
 	    data['handle'] = handle
-	    data['title'] = dataset['title']
-	    data['units'] = dataset['units']
+	    try:
+	        data['title'] = dataset['title']
+	        data['units'] = dataset['units']
+	    except:
+		data['title'] = 'Title'
+		data['units'] = 'Units'
 	    data['data'] = json_dict
 	    combineddataset.append(data)
 
@@ -1117,6 +1124,7 @@ def dataverse():
         rawdata = load_dataverse(apiurl)
     else:
         rawdata = simplesearch(root, url, config['apiroot'])
+	#return rawdata
 
     try:
         data = json.dumps(rawdata, encoding="utf-8", sort_keys=True, indent=4)
