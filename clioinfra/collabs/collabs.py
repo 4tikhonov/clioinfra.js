@@ -979,11 +979,11 @@ def statistics(settings=''):
     modern = moderncodes(config['modernnames'], config['apiroot'])
     jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
 
-    (panel, cleanedpanel) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    (panel, cleanedpanel, names) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
     (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
 
     ctrlimit = 200
-    data = handle2statistics(handles, cleanedpanel)
+    data = handle2statistics(handles, cleanedpanel, names)
     showhtml = statistics2table(data)
     return showhtml
 
