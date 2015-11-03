@@ -64,7 +64,7 @@ def pidfrompanel(pid):
         ptmpids = clearpids.split(',')
         for fullhandle in ptmpids:            
             (thispid, revpid, cliopid, clearpid) = findpid(fullhandle)            
-            pids.append(thispid)
+            pids.append(clearpid)
 	    pidslist = pidslist + thispid + ','
     
     pidslist = pidslist[0:-1]
@@ -117,6 +117,43 @@ def load_metadata(dataset):
         apiurl = config['dataverseroot'] + "/api/search?q=" + query + '&key=' + config['key'] + '&type=dataset&per_page=1000'
         data = load_dataverse(apiurl)
     return (data, pid, fileid, cliohandle)
+
+def get_citation(citejson):    
+    metadata = {}    
+    latestversion = ''
+    for item in citejson:
+        if not latestversion:
+            latestversion = item
+
+    cite = latestversion['metadataBlocks']['citation']
+    notfound = 0
+    for meta in cite:
+        for item in cite[meta]:
+            #print item
+            try:
+                typeName = item['typeName']            
+                if typeName == 'author':
+                    value = item['value']                    
+                    try:
+                        metadata['org'] = value[0]['authorAffiliation']['value']
+                    except:
+                        notfound = 1
+                    try:
+                        metadata['authors'] = value[0]['authorName']['value']
+                    except:
+                        notfound = 1
+                                                        
+                if typeName == 'title':                                     
+                    value = item['value']
+                    title = value
+            except:
+                notfound = 0 
+            
+    citation = ''
+    for item in sorted(metadata):        
+        citation = citation + metadata[item] + ', '
+    citation = citation[:-2]
+    return citation
 
 def dataverse2indicators(branch):
     config = configuration()
