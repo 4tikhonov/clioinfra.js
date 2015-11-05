@@ -62,7 +62,7 @@ from chartprint import chartonprint
 from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation
 from locations import load_locations
 from topics import load_alltopics
 from locations import load_locations
@@ -162,7 +162,7 @@ def load_remote_data(apiurl, code, year):
 def first_digit(pop_data):
     return int(str(pop_data)[0])
 
-def load_api_data(apiurl, code, year, custom, scales, catnum):
+def load_api_data1(apiurl, code, year, custom, scales, catnum):
     pyear = ''
     amscode = ''
     if code:
@@ -1209,6 +1209,24 @@ def d3index(settings=''):
     activepage = 'Index'
     pages = getindex(activepage)
     resp = make_response(render_template('datasetlist.html', active=activepage, letters=letters, topiclist=topiclist, pages=pages))
+    return resp
+
+@app.route('/print')
+def printme():
+    config = configuration()
+    datasetID = 232
+    root = "https://dv.sandbox.socialhistoryservices.org/api/datasets/" + str(datasetID) + "/versions/?key=73883b6f-ca99-41b9-953a-b9f8be42723d&show_entity_ids=true&q=authorName:*"
+    data = load_api_data(root, 1)
+    (title, citation) = get_citation(data['data'])
+    year = request.args.get("year")
+    handle = request.args.get("handle")
+    uhandle = handle
+    uhandle = uhandle.replace('hdl:', '')
+    mapcopyright = config['cshapes_copyright']
+    if int(year) < 1946:
+	mapcopyright = config['geacron_copyright']
+    # "Note: Map polygons provided by Geacron <a href=\"geacron.com\">http://www.geacron.com</a>"
+    resp = make_response(render_template('printall.html', title=title, citation=citation, mapcopyright=mapcopyright, year=year, handle=handle, uhandle=uhandle))
     return resp
 
 @app.route('/printall')
