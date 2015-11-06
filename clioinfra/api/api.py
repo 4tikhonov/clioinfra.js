@@ -192,7 +192,7 @@ def downloadzip(pid):
     if handles:
 	if historical:
             api = config['apiroot'] + "/collabs/static/data/historical.json"
-            (regions, countries, ctr2reg, webmapper) = histo(api)
+            (regions, countries, ctr2reg, webmapper, geocoder) = histo(api)
             hist = countries
 	else:
 	    hist = ''
@@ -1048,9 +1048,25 @@ def download():
 def webmapper():
     config = configuration()
     api = config['apiroot'] + "/collabs/static/data/historical.json"
-    (regions, countries, ctr2reg, webmapper) = histo(api)
+    (regions, countries, ctr2reg, webmapper, geocoder) = histo(api)
 
     data = json.dumps(webmapper, encoding="utf-8", sort_keys=True, indent=4)
+    return Response(data,  mimetype='application/json')
+
+@app.route('/geocoder')
+def geocoder():
+    config = configuration()
+    fromyear = 1500
+    cfilter = ''
+    if request.args.get('name'):
+        cfilter = request.args.get('name')
+
+    if fromyear:
+        historical = 1
+        if historical:
+            api = config['apiroot'] + "/collabs/static/data/historical.json"
+            (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, cfilter)
+    data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
 
 @app.route('/datasets')
