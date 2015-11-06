@@ -19,17 +19,26 @@ def loadjson(apiurl):
     dataframe = simplejson.load(f)
     return dataframe
 
-def histregions_parser(locations):
+def histregions_parser(locations, cfilter):
     regions = {}
     countries = {}
     ctr2reg = {}
     oecd2webmapper = {}
+    geocoder = []
     for item in locations:
+	geoitem = {}
         if item['ctr']:
             try:
                 ccode = int(item['ccode'])
                 pcode = int(item['parent code'])
 		gcode = item['geoinfra_id']
+		if gcode:
+    		    result = re.search('(\d+)', gcode)
+    		    if result:
+        		geoid = result.group(0)
+    		    else:
+        		geoid = country
+		geoitem['id'] = geoid
             except:
                 ccode = ''
                 
@@ -44,6 +53,7 @@ def histregions_parser(locations):
                 
         pcode = int(item['parent code'])
         country = item['country']
+	geoitem['name'] = country	
         # Found time
         try:
             validfromtoken = item['validfrom']
@@ -52,9 +62,14 @@ def histregions_parser(locations):
             validfrom = fromre.group(0)
             tore = re.search(r'\d{4}', validtotoken)
             validto = tore.group(0)
+	    geoitem['label'] = country + ' (' + validfromtoken + ' - ' + validtotoken + ')' 
             country = country + ' (' + str(validfrom) + '-' + str(validto) + ')'
+	    geoitem['validfrom'] = validfromtoken
+	    geoitem['validuntil'] = validtotoken
+	    geoitem['year'] = country
         except:
             validfrom = ''
+	    geoitem['year'] = ''
             validto = ''
 	    country = str(country) + ' (xxxx - 2012)'
             
@@ -70,7 +85,15 @@ def histregions_parser(locations):
                     
         continent.append(ccode)
         ctr2reg[pcode] = continent
-    return (regions, countries, ctr2reg, oecd2webmapper)
+	if cfilter:
+    	    result = re.search(cfilter, country, flags=re.IGNORECASE)
+    	    if result:
+		if geoitem['year']:
+	            geocoder.append(geoitem)
+	else:
+	    if geoitem['year']:
+	        geocoder.append(geoitem)
+    return (regions, countries, ctr2reg, oecd2webmapper, geocoder)
 
 def load_historical(api):
     locs = loadjson(api)
@@ -88,9 +111,9 @@ def load_historical(api):
         html = html + "</optgroup>\n" 
     return html
     
-def histo(api):
+def histo(api, cfilter):
     locs = loadjson(api)
-    (regions, countries, ctr2reg, webmapper) = histregions_parser(locs)
+    (regions, countries, ctr2reg, webmapper, geocoder) = histregions_parser(locs, cfilter)
     
-    return (regions, countries, ctr2reg, webmapper)
+    return (regions, countries, ctr2reg, webmapper, geocoder)
     
