@@ -44,6 +44,12 @@
     });
     $( "#yearslider" ).change(function() {
       slider.slider( "value", this.selectedIndex + 1 );
+      var curValue = $( "#yearslider option:selected" ).text() || '0';
+      var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
+      $('.ui-slider-handle').html(tooltip);
+        $('.slider-time2').html($( "#yearslider option:selected" ).text());
+        $("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
+      document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
     });
   });
   </script>
@@ -63,7 +69,7 @@ $(function() {
 <script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
 <form id="ynavi" style='border:0; width: 820px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
-    <a href="/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}" id="print" target=_blank>Print</a>&nbsp;
+    <label id="printlab"><a href="/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}" id="print" target=_blank>Print</a>&nbsp;</label>
     <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
     <input type="checkbox" id="logscale" onclick="inlog();">Log scale
   <select name="years" id="yearslider">
