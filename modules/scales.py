@@ -141,6 +141,12 @@ def getscales(data, colors, catnum, geocoder):
 			    if geocoder:
 			        dataitem['country'] = row[0]
                         colorID = colorID + 1        
+
+		    # Check if round required
+		    rlen = len(str(value))
+		    if rlen > 10:
+		        rvalue = "%.2f" % value
+		        dataitem['value'] = rvalue
 		mainindex = row[0]
 		if geocoder:
 		    try:
