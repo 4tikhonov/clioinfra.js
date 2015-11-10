@@ -1262,6 +1262,7 @@ def provincies():
 @app.route('/dataapi')
 def dataapi():
     handles = []
+    logscale = ''
     config = configuration()
     customyear = ''
     fromyear = '1500'
@@ -1271,6 +1272,8 @@ def dataapi():
     geocoder = ''
     (getrange, colormap, pallette, customcountrycodes) = ('', '', '', '')
 
+    if request.args.get('logscale'):
+        logscale = request.args.get('logscale')
     if request.args.get('year'):
         customyear = request.args.get('year')
     if request.args.get('catmax'):
@@ -1303,7 +1306,6 @@ def dataapi():
         customcountrycodes = customcountrycodes[:-1]
 
     hist = {}
-    logflag = 0
     config = configuration()
     try:
 	if len(customcountrycodes):
@@ -1314,7 +1316,7 @@ def dataapi():
     except:
 	nothing = 1
 
-    (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
+    (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
     modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
