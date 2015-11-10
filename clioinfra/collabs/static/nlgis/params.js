@@ -5,6 +5,7 @@ var mapyear = 2012;
 var catmax = 6;
 var ctrlist = '';
 var lastyear;
+var logscale = '';
 myurl = myurl + '&'
 var colors = '';
 
