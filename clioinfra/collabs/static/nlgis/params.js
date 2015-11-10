@@ -25,6 +25,14 @@ if (myurl.indexOf("dataset=") > 0) {
     };
 };
 
+if (myurl.indexOf("handle=") > 0) {
+    handlestr=myurl.substring(myurl.indexOf("handle=")+7);
+    cindex=handlestr.indexOf("&");
+    if (cindex > 0) {
+      handle=handlestr.substring(0,cindex);
+    };
+};
+
 if (myurl.indexOf("ctrlist=") > 0) {
     ctrstr=myurl.substring(myurl.indexOf("ctrlist=")+8);
     cindex=ctrstr.indexOf("&");
@@ -48,6 +56,15 @@ if (myurl.indexOf("&lasty=") > 0) {
       	lastyear=yearstr.substring(0,cindex);
     };
 };
+
+if (myurl.indexOf("&logscale=") > 0) {
+    logstr=myurl.substring(myurl.indexOf("logscale=")+9);
+    cindex=yearstr.indexOf("&");
+    if (cindex > 0) {
+        logscale=logstr.substring(0,cindex);
+    };
+};
+
 
 if (typeof(year) == 'undefined')
 {
