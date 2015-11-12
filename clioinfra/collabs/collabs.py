@@ -68,7 +68,7 @@ from topics import load_alltopics
 from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
-from storage import data2store, readdata, removedata
+from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
 
 Provinces = ["Groningen","Friesland","Drenthe","Overijssel","Flevoland","Gelderland","Utrecht","Noord-Holland","Zuid-Holland","Zeeland","Noord-Brabant","Limburg"]
 pagelist = ["Home", "Global labor conflicts", "Local labor conflicts", "User Guide", "About"]
@@ -314,7 +314,7 @@ def mapslider():
     historical = 0
 
     try:
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+        (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	for dataitem in handle2ind:
 	    title = handle2ind[dataitem]
     except:
@@ -328,6 +328,7 @@ def mapslider():
 	lastyear = year
 	steps = steps + 1
 
+    #validyears.reverse()
     return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
@@ -1214,12 +1215,21 @@ def d3index(settings=''):
 @app.route('/print')
 def printme():
     config = configuration()
-    datasetID = 232
-    root = "https://dv.sandbox.socialhistoryservices.org/api/datasets/" + str(datasetID) + "/versions/?key=73883b6f-ca99-41b9-953a-b9f8be42723d&show_entity_ids=true&q=authorName:*"
-    data = load_api_data(root, 1)
-    (title, citation) = get_citation(data['data'])
     year = request.args.get("year")
     handle = request.args.get("handle")
+    handles = []
+    handles.append(handle)
+
+    hquery = formdatasetquery(handles,'')
+    datainfo = readdatasets('datasets', json.loads(hquery))
+    try:
+	for item in datainfo:
+	    datasetID = item['datasetID']
+    except:
+	datasetID = 228
+    root = config['dataverseroot'] + "/api/datasets/" + str(datasetID) + "/versions/?key=73883b6f-ca99-41b9-953a-b9f8be42723d&show_entity_ids=true&q=authorName:*"
+    data = load_api_data(root, 1)
+    (title, citation) = get_citation(data['data'])
     uhandle = handle
     uhandle = uhandle.replace('hdl:', '')
     mapcopyright = config['cshapes_copyright']
