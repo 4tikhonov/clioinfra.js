@@ -197,7 +197,7 @@ def downloadzip(pid):
 	else:
 	    hist = ''
 
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+        (header, panelcells, codes, datahub, data, handle2ind, unit2ind, original) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	filename = filename + '.xls'
         fullpath = panel2excel(finaldir, filename, header, panelcells, fullmetadata)
     else:
@@ -214,7 +214,7 @@ def downloadzip(pid):
 	    hist = ''
 	    filename = filename + '.xls'
 	    # 2DEBUG
-	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 	    #codes = hist
 	    #return str(fullmetadata)
 	    metadata = fullmetadata
@@ -367,7 +367,7 @@ def tableapi():
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
     indicator = ''
-    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
+    (frame, years, values, dates, original) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
     names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
 
     (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
@@ -930,6 +930,7 @@ def panel():
 
     jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
     dataframe = load_api_data(jsonapi, '')
+    
     result = ''
     ctrlimit = 10
 
@@ -939,11 +940,18 @@ def panel():
 
     for dataitem in dataframe:
         handle = dataitem['handle']
-	names[handle] = dataitem['title']
-        (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
-        if not dataset.empty:
-            panel.append(dataset)
-
+	try:
+	    names[handle] = dataitem['title']
+	except:
+	    names[handle] = 'title'
+	try:
+            (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
+	    if not dataset.empty:
+                panel.append(dataset)
+	except:
+	    nodata = 0
+	
+    #return str(panel)
     if panel:
         totalpanel = pd.concat(panel)
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
@@ -1091,7 +1099,6 @@ def datasets():
 	#if not datainfo:
 	    #datainfo.append(pid)
 
-	#return 'test'
         for dataset in datainfo:
 	    data = {}
 	    handle = dataset['handle']
@@ -1102,9 +1109,11 @@ def datasets():
 	    try:
 	        data['title'] = dataset['title']
 	        data['units'] = dataset['units']
+		data['datasetID'] = dataset['datasetID']
 	    except:
 		data['title'] = 'Title'
 		data['units'] = 'Units'
+		data['datasetID'] = 228
 	    data['data'] = json_dict
 	    combineddataset.append(data)
 
@@ -1316,13 +1325,13 @@ def dataapi():
     except:
 	nothing = 1
 
-    (header, panelcells, codes, x1, x2, x3, x4) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+    (header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
     modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
     (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
-    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder)
+    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder, originalvalues)
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
