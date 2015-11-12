@@ -79,7 +79,7 @@ def buildcategories(num):
             p.append(i)
     return p
     
-def getscales(data, colors, catnum, geocoder):
+def getscales(data, colors, catnum, geocoder, original):
     values = []
     finalcatnum = 0   
     dataset = {}
@@ -145,8 +145,12 @@ def getscales(data, colors, catnum, geocoder):
 		    # Check if round required
 		    rlen = len(str(value))
 		    if rlen > 10:
-		        rvalue = "%.2f" % value
-		        dataitem['value'] = rvalue
+		        rvalue = "%.5f" % value
+			try:
+			    uvalue = original[str(rvalue)]
+			except:
+			    uvalue = ''
+		        dataitem['value'] = uvalue
 		mainindex = row[0]
 		if geocoder:
 		    try:

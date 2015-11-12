@@ -120,6 +120,7 @@ def excelvalidator(path, filename, resultfile, tmpdir):
 
 def dataextractor(fullpath, path, handle, fileID):
     dataset = {}
+    (title, units) = ('', '')
     DEBUG = ''
     xl = pd.ExcelFile(fullpath)
     sheetid = 0
@@ -130,6 +131,10 @@ def dataextractor(fullpath, path, handle, fileID):
 	pd.options.display.float_format = '{:,.0f}'.format
         df = xl.parse(sheetname) #, dtype=int)
 	df = df.fillna('')
+	if df.columns[0]:
+            title = df.columns[0]
+            units = df.ix[0][0]
+
         info = df.head()
         data = df
     
@@ -172,7 +177,7 @@ def dataextractor(fullpath, path, handle, fileID):
         with open(path + tablename + '.json', 'w') as filej:
             filej.write(json.dumps(d))
         sheetid = sheetid + 1
-	return jsondatafile
+	return (jsondatafile, title, units)
 
     if DEBUG:
         for sheet in dataset:

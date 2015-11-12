@@ -18,7 +18,7 @@ def chartonprint(webpage, fileformat, year, code):
     if fileformat == 'shapefile':
         year = year
     else:
-        cmd = phantompath + "/phantomjs/lib/phantom/bin/phantomjs " + path + "/static/renderHTML.js '" + webpage + "'"
+        cmd = phantompath + "/phantomjs/lib/phantom/bin/phantomjs --disk-cache=true " + path + "/static/renderHTML.js '" + webpage + "'"
 
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         html = p.communicate()[0]
@@ -37,7 +37,7 @@ def chartonprint(webpage, fileformat, year, code):
         outfile = year + '_' + code + '_' + 'map.png'
         outdirfile = imagepathloc + '/' + outfile
         cmd = "/usr/bin/inkscape " + filesvg + " -e " + outdirfile + " -h " + size + " -D -b '#ffffff'"
-        fileonweb = config['imagepathonweb'] + '/' + outfile
+        fileonweb = config['apiroot']  + config['imagepathonweb'] + '/' + outfile
 
     if cmd:
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)

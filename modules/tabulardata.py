@@ -116,6 +116,7 @@ def countryset(countrieslist, codes):
 def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customctrlist, logscale, DEBUG):
     yearline = dataframe[1]
     measure = ''
+    original = {}
     values = []
     allyears = []
     dframe = {}
@@ -191,11 +192,20 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
 			donothing = 1
 
                     if value:                        
+		        origvalue = value
                         if logscale:
                             try:
-                                value = math.log(value)
+				if logscale == '2':
+                                    value = math.log(value, 2)
+				else:
+				    value = math.log10(value)
+				rvalue = "%.5f" % value
                             except:
                                 value = 'NaN'
+				rvalue = 'NaN'
+			    original[str(rvalue)] = origvalue
+			else:
+			    original[origvalue] = origvalue
                         dataitem.append(value)
                         dates[thisyear] = dataitem                                            
                         
@@ -230,7 +240,7 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
                 cframe[theyear] = dframe            
     
     sortyears = sorted(allyears)
-    return (cframe, sortyears, values, dates)
+    return (cframe, sortyears, values, dates, original)
 
 def combinedata(countries, dataset, code2loc):
     datastring = ''
@@ -309,12 +319,12 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
 
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
-    (frame, years, values, dates) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logflag, DEBUG)
+    (frame, years, values, dates, original) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logflag, DEBUG)
     names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
 
     (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
 
-    return (years, frame, csvdata, aggrdata)
+    return (years, frame, csvdata, aggrdata, original)
 
 def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag):
     data = {}
@@ -325,7 +335,7 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
 
     for handle in handles:
 	print handle
-        (y, frame, csvdata, aggrdata) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
+        (y, frame, csvdata, aggrdata, original) = tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
         data[handle] = frame
     
     datahub = {}
@@ -358,8 +368,8 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
 		unit2ind[handle] = x[3]
             
 		# If log scale
-		if logflag:
-		    value = math.log(value)
+		#if logflag:
+		    #value = math.log(value)
 
                 # Combine key
                 datakey = str(code) + ':' + str(year) + ':' + str(handle)
@@ -418,5 +428,5 @@ def data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, 
                 
             panelcells.append(cell)
 
-    return (header, panelcells, code2ctr, datahub, data, handle2ind, unit2ind)
+    return (header, panelcells, code2ctr, datahub, data, handle2ind, unit2ind, original)
 

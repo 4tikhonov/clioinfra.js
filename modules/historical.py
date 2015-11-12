@@ -97,7 +97,7 @@ def histregions_parser(locations, cfilter):
 
 def load_historical(api):
     locs = loadjson(api)
-    (regions, countries, ctr2reg, webmapper) = histregions_parser(locs)
+    (regions, countries, ctr2reg, webmapper, geocoder) = histregions_parser(locs, '')
 
     html = ''
     for region in sorted(regions):

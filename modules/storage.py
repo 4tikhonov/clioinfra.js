@@ -17,6 +17,7 @@ def readdata(dbname, key, val):
     client = MongoClient()
     db = client.get_database(dbname)
     collection = db.data
+    result = db.data.find({key: val})
     try:
         result = db.data.find({key: val})
     except:
@@ -35,7 +36,7 @@ def removedata(dbname, key, val):
 
     return result
 
-def datasetadd(filename, handle, dataset, title, units):
+def datasetadd(filename, handle, dataset, title, units, fileID):
     dbname = "datasets"
     txt = open(filename)
     data = {}
@@ -43,6 +44,7 @@ def datasetadd(filename, handle, dataset, title, units):
     data['dataset'] = dataset
     data['title'] = title
     data['units'] = units
+    data['datasetID'] = fileID
     datasettext = str(txt.read())
     datasetjson = json.loads(datasettext)
     data['data'] = datasetjson

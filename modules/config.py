@@ -66,6 +66,9 @@ def pidfrompanel(pid):
             (thispid, revpid, cliopid, clearpid) = findpid(fullhandle)            
             pids.append(clearpid)
 	    pidslist = pidslist + thispid + ','
+    else:
+	pids.append(pid)
+	pidslist = pid
     
     pidslist = pidslist[0:-1]
     return (pids, pidslist)
@@ -121,6 +124,7 @@ def load_metadata(dataset):
 def get_citation(citejson):    
     metadata = {}    
     latestversion = ''
+    title = ''
     for item in citejson:
         if not latestversion:
             latestversion = item
@@ -153,7 +157,7 @@ def get_citation(citejson):
     for item in sorted(metadata):        
         citation = citation + metadata[item] + ', '
     citation = citation[:-2]
-    return citation
+    return (title, citation)
 
 def dataverse2indicators(branch):
     config = configuration()
