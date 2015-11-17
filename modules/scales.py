@@ -6,6 +6,7 @@ from random import randint
 import numpy as np
 import brewer2mpl
 from config import webmapper_geocoder
+import math
 
 def getcolors(catnum, pallete, newcolormap):
     nodatacolor = '#ffffff'
@@ -79,11 +80,23 @@ def buildcategories(num):
             p.append(i)
     return p
     
-def getscales(data, colors, catnum, geocoder, original):
+def get_normal_scale(catmax, valarray):
+    (amin, amax) = (valarray.min(), valarray.max())    
+    diff = (amax - amin)/catmax
+    ranges = []
+    for i in range(1,catmax+1):
+        imin = amin + (i-1) * diff
+        imax = amin + i * diff
+        #print str(imin) + ' ' + str(imax)
+        ranges.append(round(imin, 2))
+    ranges.append(round(imax, 2))
+    return ranges
+
+def getscales(data, colors, catnum, geocoder, original, logscale):
     values = []
     finalcatnum = 0   
-    dataset = {}
     webmapper = {}
+    dataset = {}
     if geocoder:
         webmapper = webmapper_geocoder()
     
@@ -123,6 +136,9 @@ def getscales(data, colors, catnum, geocoder, original):
             for i in p:
                 val = round(np.percentile(df, i), 2)
                 qwranges.append(val)
+
+        valdata = pd.DataFrame(values)
+        qwranges = get_normal_scale(catnum, valdata.values.astype('float64'))
                 
         # Put data in different colors and ranges
         for row in data:
@@ -171,6 +187,12 @@ def getscales(data, colors, catnum, geocoder, original):
     if finalcatnum == 0:
         finalcatnum = catnum
         
+    realranges = []
+    if logscale:
+	for val in qwranges:
+	    val = math.pow(int(logscale),val) 
+	    realranges.append(val)
+    	    qwranges = realranges
     return (finalcatnum, qwranges, dataset)
 
 def floattodec(s):
