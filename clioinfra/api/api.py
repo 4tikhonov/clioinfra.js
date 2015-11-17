@@ -192,7 +192,7 @@ def downloadzip(pid):
     if handles:
 	if historical:
             api = config['apiroot'] + "/collabs/static/data/historical.json"
-            (regions, countries, ctr2reg, webmapper, geocoder) = histo(api)
+            (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, '')
             hist = countries
 	else:
 	    hist = ''
@@ -208,10 +208,12 @@ def downloadzip(pid):
 	    handles = [ clearpid ]
 
 	for pid in handles:
-            #api = config['apiroot'] + "/collabs/static/data/historical.json"
-            #(regions, countries, ctr2reg, webmapper) = histo(api)
-            #hist = countries
-	    hist = ''
+	    if historical:
+                api = config['apiroot'] + "/collabs/static/data/historical.json"
+                (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, '')
+                hist = countries
+	    else:
+	        hist = ''
 	    filename = filename + '.xls'
 	    # 2DEBUG
 	    (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
@@ -1044,6 +1046,7 @@ def download():
         pid = request.args.get('pid')
 
     zipfile = downloadzip(pid)
+    # DEBUG1
     root = config['apiroot'] + "/collabs/static/tmp/" + zipfile
 
     # HTML
@@ -1330,8 +1333,9 @@ def dataapi():
     modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
+    # SCALES
     (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
-    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder, originalvalues)
+    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder, originalvalues, logscale)
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
