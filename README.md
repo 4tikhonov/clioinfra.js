@@ -41,7 +41,11 @@ Architecture, development and integration: Vyacheslav Tykhonov <vty@iisg.nl>
 
 [Interactive dashboard](http://dpe.sandbox.socialhistoryservices.org/collabs/dashboard?action=visualize&yearmin=1500&yearmax=2012&loc=250&loc=276&loc=528&loc=380&loc=724&dataset=hdl%3A10622%2F4X6NCK%3A114%3A115)
 
-[Data visualization on historical maps](http://dpe.sandbox.socialhistoryservices.org/collabs/mapslider?action=map&year=1981&dataset=4X6NCK)
+[Data visualization on historical maps](http://dpe.sandbox.socialhistoryservices.org/collabs/mapslider?action=map&year=1981&handle=hdl:10622/4X6NCK)
+
+[Panel data visualization](http://dpe.sandbox.socialhistoryservices.org/collabs/panel?start=on&aggr=on&hist=&handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27]&ctrlist=276%2C528&yearmin=1900&yearmax=2013)
+
+[Descriptive statistics](http://dpe.sandbox.socialhistoryservices.org/collabs/statistics?start=on&aggr=on&hist=&handle=Panel[%27hdl%3A10622/4X6NCK%27%2C%20%27hdl%3A10622/F16UDU%27]&ctrlist=&yearmin=1900&yearmax=2013)
 
 ## Reports and papers
 [OECD: How Was Life? Global Well-being since 1820] (http://adapt.it/englishbulletin/wp/wp-content/uploads/2014/10/oecd_2_10_2014.pdf)
