@@ -86,7 +86,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
         .datum(topojson.feature(data, data.objects['land']))
         .attr('d', path)
         .style("fill", "none")
-        .style("stroke", "red")
+        .style("stroke", "black")
         .attr("stroke-width", 0.5)
     });
     };
