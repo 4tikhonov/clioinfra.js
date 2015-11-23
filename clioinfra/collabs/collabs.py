@@ -270,7 +270,15 @@ def graphslider():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    handleface = ''
+    urlmatch = re.search(r'(.+)\&face', request.url)
+    try:
+        if urlmatch.group(0):
+            thismapurl = urlmatch.group(1)
+    except:
+	thismapurl = request.url
     geocoder = ''
+    pids = []
     handledataset = ''
     logscale = 0
     handles = []
@@ -309,6 +317,8 @@ def mapslider():
 	(dataset, revid, cliopid, clearpid) = findpid(handle)
         #handles.append(dataset)
 	handles.append(handle)
+	handleface = handle
+
     if request.args.get('logscale'):
 	logscale = 1
     if request.args.get('catmax'):
@@ -321,6 +331,15 @@ def mapslider():
         geocoder = request.args.get('geocoder')
     if request.args.get('hist'):
         geocoder = request.args.get('hist') 
+    if request.args.get('face'):
+        handleface = request.args.get('face')
+    if handleface:
+	handles = []
+	handles.append(handleface)
+	try:
+	    pids.remove(handleface)
+	except:
+	    nothing = 1
 
     historical = 0
 
@@ -339,8 +358,16 @@ def mapslider():
 	lastyear = year
 	steps = steps + 1
 
+    handledict = {}
+    if pids:
+	hquery = formdatasetquery(pids,'')
+	d = readdatasets('datasets', json.loads(hquery))
+	for x in d:
+	    thishandle = x['handle']
+	    handledict[thishandle] = x['title']
+
     #validyears.reverse()
-    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
+    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear, indicators=pids, thismapurl=thismapurl, handledict=handledict))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
