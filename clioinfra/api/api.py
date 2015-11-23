@@ -360,7 +360,7 @@ def tableapi():
         aggr = request.args.get('aggr')
     # Log scales switch
     if request.args.get('logscale'):
-        logscale = 1
+        logscale = request.args.get('logscale')
     DEBUG = 0
 
     apifile = str(dataset) + ".json"
