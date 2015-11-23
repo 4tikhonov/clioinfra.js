@@ -1,8 +1,23 @@
-function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
+function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, logscale, histo) {
     var rightdiv = document.getElementById("#showmap");
-    var margin = {top: -120, right: 20, bottom: 70, left: 40},
+    var margin = {top: -120, right: 20, bottom: 40, left: 40};
+    var margin = {top: -80, right: 0, bottom: 40, left: 0};
+    
     width = 920 - margin.left - margin.right,
     height = 420 - margin.top - margin.bottom;
+
+    if (histo == 'on')
+    {
+        mapapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/fetch?format=topojson&year=" + year;
+        countryindex = 'country';
+        idindex = 'id';
+    }
+    else
+    {
+        mapapi = "http://clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
+        countryindex = 'AREA';
+        idindex = 'AREA';
+    }
 
     var zoom = d3.behavior.zoom()
             .scaleExtent([1, 60])
@@ -12,11 +27,6 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
     var projection2 = d3.geo.winkel3()
             .scale(Math.min(150 / 772 * width, 150 / 472 * height))
 
-    var projectionM = d3.geo.mercator()
-    .center([5, 52])
-    .scale(180)
-    .translate([width / 2, height / 2]);
-
     var projection = d3.geo.equirectangular()
     .scale(150)
     .translate([width / 2, height / 2])
@@ -25,7 +35,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
     var path = d3.geo.path().projection(projection);
 
     d3.select("svg")
-       .transition().duration(250).style("opacity", 0).remove();
+       .transition().duration(0).style("opacity", 0).remove();
     var svg = d3.select("#showmap").append("svg")
             .attr("width", width)
             .attr("height", height)
@@ -42,17 +52,45 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
   	.offset([-10, 0])
   	.html(function(d) {
 	
-	if (typeof locations[d.properties.AREA] === 'undefined')
+	var cID;
+	var country;
+	if (histo)
 	{
-	    return d.properties.AREA + ': no data'
+	    cID = d.properties[idindex];
+	    country = d.properties['name'];
 	}
 	else
 	{
-    	    return "<strong>" + d.properties.AREA + ":</strong> <span style='color:red'>" + locations[d.properties.AREA].value + "</span>";
+	    cID = d.properties['AREA'];
+	    country = cID;
+	}
+	if (typeof locations[cID] === 'undefined')
+	{
+	    return country + ': no data'
+	}
+	else
+	{
+	    if (histo) {
+	        country = locations[cID].country;
+	    }
+    	    return "<strong>" + country + ":</strong> <span style='color:red'>" + locations[cID].value + "</span>";
 	}
   	})
 
-    mapapi = "http://clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
+   if (histo == 'on')
+   {
+    contapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/static/basemap.topojson";
+    contapi = "http://dpe.sandbox.socialhistoryservices.org/collabs/static/world.topojson"
+    d3.json(contapi, function(error, data) {
+      svg.append('path')
+        .datum(topojson.feature(data, data.objects['land']))
+        .attr('d', path)
+        .style("fill", "none")
+        .style("stroke", "red")
+        .attr("stroke-width", 0.5)
+    });
+    };
+
     d3.json(mapapi, function (error, world) {
         if (error) {
             console.log(error);
@@ -64,7 +102,11 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
 	}
 
 	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
-	datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist;
+	datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist + '&logscale=' + logscale;
+        if (histo)
+	{
+	    datapi = datapi + "&geocoder='on'";
+	}
 	d3.json(datapi, function (error, data) {
 
             if (error) {
@@ -79,14 +121,14 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
                     .append('path')
                     .attr('class', 'country')
                     .attr('d', path)
-		    .attr("data-legend",function(d) { return d.properties.AREA})
+		    .attr("data-legend",function(d) { return d.properties[countryindex]})
       		    .on('mouseover', tip.show)
       		    .on('mouseout', tip.hide)
 		    .on("click", clicked)
 		    .attr("stroke", "#848482")
                     .attr("stroke-width", 0.5)
                     .style('fill', function (d) {
-                        var color = locations[d.properties.AREA] && locations[d.properties.AREA].color;
+                        var color = locations[d.properties[idindex]] && locations[d.properties[idindex]].color;
                         return color || '#ffffff';
                     })
 
@@ -106,7 +148,12 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist) {
 
   datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
   datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist;
-  datapi = datapi + '&getrange=yes';
+  datapi = datapi + '&getrange=yes' + '&logscale=' + logscale;
+  if (histo)
+  {
+      datapi = datapi + "&geocoder='on'";
+  }
+
   d3.json(datapi, function (error, rangedata) {
 
             if (error) {
