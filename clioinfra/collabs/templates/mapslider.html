@@ -8,9 +8,17 @@
   
 <script>
    var thiscolor = '';
-   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&histo={{ geocoder }}";
-   var printurl = "/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&histo={{ geocoder }}";
+   var histo = '';
+   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
+   var printurl = "/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
    var starturl = mapurl + '&year=' + year + '&lasty={{ lastyear }}';
+
+   {% if geocoder %}
+   histo = '{{ geocoder }}';
+   mapurl = mapurl + "&histo={{ geocoder }}";
+   printurl = printurl + "&histo={{ geocoder }}";
+   starturl = starturl + "&histo={{ geocoder }}";
+   {% endif %}
  
   $(function() {
     $('#logscale2').attr('checked', false);
@@ -82,6 +90,7 @@ $(function() {
 <form id="ynavi" style='border:0; width: 880px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
     <label id="printlab"><a href="/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}&histo={{ geocoder }}" id="print" target=_blank>Print</a>&nbsp;</label>
+    <input type="checkbox" id="histo" onclick="historical()">Historical
     <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
     <input type="checkbox" id="logscale2" onclick="inlog(2);">Log2
     <input type="checkbox" id="logscale10" onclick="inlog(10);">Log10
@@ -92,6 +101,23 @@ $(function() {
   </select>
 </form>
 <script>
+if (histo)
+{
+   document.getElementById("histo").checked = true;
+}
+
+function historical() {
+
+    if ($('#histo').is(':checked')) {
+        histo = 'on';
+    }
+    else
+    {
+        histo = '';
+    }
+    document.getElementById('worldmap').src = starturl + '&colors=' + colors + '&logscale=' + logscale + '&histo=' + histo;
+}
+
 function ingrey() {
     if ($('#greyscale').is(':checked')) {
 	colors = 'greyscale';
@@ -119,6 +145,10 @@ function inlog(clog) {
         logscale = '';
     }
     document.getElementById('worldmap').src = starturl + '&colors=' + colors + '&logscale=' + logscale;
+    if (histo)
+    {
+	document.getElementById('worldmap').src = document.getElementById('worldmap').src + '&histo=' + histo;
+    }
 }
 </script>
 </div>
