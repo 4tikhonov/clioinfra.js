@@ -106,6 +106,9 @@ if (histo)
 {
    document.getElementById("histo").checked = true;
 }
+{% if lastyear %}
+document.getElementById("yearslider").value = '{{ lastyear }}';
+{% endif %}
 
 function historical() {
 
