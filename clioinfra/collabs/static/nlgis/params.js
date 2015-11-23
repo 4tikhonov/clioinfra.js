@@ -8,6 +8,7 @@ var lastyear;
 var logscale = '';
 myurl = myurl + '&'
 var colors = '';
+var histo = '';
 
 if (myurl.indexOf("start=") > 0) {
     handle=myurl.substring(myurl.indexOf("start=")+8);
@@ -15,6 +16,14 @@ if (myurl.indexOf("start=") > 0) {
     if (cindex > 0) {
       uri=handle.substring(0,cindex);
       uri = handle.substring(2,myurl.length);
+    };
+};
+
+if (myurl.indexOf("histo=") > 0) {
+    histostr=myurl.substring(myurl.indexOf("histo=")+6);
+    cindex=histostr.indexOf("&");
+    if (cindex > 0) {
+      histo=histostr.substring(0,cindex);
     };
 };
 
