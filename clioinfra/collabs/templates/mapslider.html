@@ -8,11 +8,14 @@
   
 <script>
    var thiscolor = '';
-   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
-   var printurl = "/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
+   var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&histo={{ geocoder }}";
+   var printurl = "/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&histo={{ geocoder }}";
    var starturl = mapurl + '&year=' + year + '&lasty={{ lastyear }}';
  
   $(function() {
+    $('#logscale2').attr('checked', false);
+    $('#logscale10').attr('checked', false);
+    $('#greyscale').attr('checked', false);
     var select = $( "#yearslider" );
     var sliderTooltip = function(event, ui, start) {
     var curValue = $( "#yearslider option:selected" ).text() || '0';
@@ -37,7 +40,16 @@
         select[ 0 ].selectedIndex = ui.value - 1;
         $('.slider-time2').html($( "#yearslider option:selected" ).text());
 	$("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
-	document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
+        if ($('#logscale2').is(':checked')) {
+	    logscale = 2;
+	}
+        if ($('#logscale10').is(':checked')) {
+            logscale = 10;
+        }
+        if ($('#greyscale').is(':checked')) {
+            colors = 'greyscale';
+        }
+	document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text() + '&logscale=' + logscale;
 	document.getElementById('print').href = printurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
         sliderTooltip(event, ui, 1);
       }
@@ -63,15 +75,16 @@ $(function() {
 
 </head>
 <body>
-<div id="map" style='border:0; width:900px; height:500px;'>
+<div id="map" style='border:0; width:900px; height:470px;'>
 <center><h2>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h2></center>
-<iframe id="worldmap" src='' style='border:0; width:100%; overflow: hidden; height: 480px;' scrolling="no"></iframe>
+<iframe id="worldmap" src='' style='border:0; width:100%; overflow: hidden; height: 470px;' scrolling="no"></iframe>
 <script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
-<form id="ynavi" style='border:0; width: 820px;'>
+<form id="ynavi" style='border:0; width: 880px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
-    <label id="printlab"><a href="/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}" id="print" target=_blank>Print</a>&nbsp;</label>
+    <label id="printlab"><a href="/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}&year={{ lastyear }}&histo={{ geocoder }}" id="print" target=_blank>Print</a>&nbsp;</label>
     <input type="checkbox" id="greyscale" onclick="ingrey()">Greyscale
-    <input type="checkbox" id="logscale" onclick="inlog();">Log scale
+    <input type="checkbox" id="logscale2" onclick="inlog(2);">Log2
+    <input type="checkbox" id="logscale10" onclick="inlog(10);">Log10
   <select name="years" id="yearslider">
   {% for year in years %}
     <option>{{ year }}</option>
@@ -87,11 +100,19 @@ function ingrey() {
     {
         colors = '';
     }
-    document.getElementById('worldmap').src = starturl + '&colors=' + colors;
+    document.getElementById('worldmap').src = starturl + '&colors=' + colors + '&logscale=' + logscale;
 }
-function inlog() {
-    if ($('#logscale').is(':checked')) {
-        logscale = '2';
+function inlog(clog) {
+    if ($('#logscale' + clog).is(':checked')) {
+        logscale = clog;
+	if (clog == 2)
+	{
+	    $('#logscale10').attr('checked', false);
+	}
+        if (clog == 10)
+        {
+            $('#logscale2').attr('checked', false);
+        }
     }
     else
     {
