@@ -270,6 +270,7 @@ def graphslider():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    geocoder = ''
     handledataset = ''
     logscale = 0
     handles = []
@@ -310,6 +311,10 @@ def mapslider():
         fromyear = request.args.get('yearmin')
     if request.args.get('yearmax'):
         toyear = request.args.get('yearmax')
+    if request.args.get('geocoder'):
+        geocoder = request.args.get('geocoder')
+    if request.args.get('hist'):
+        geocoder = request.args.get('hist') 
 
     historical = 0
 
@@ -329,7 +334,7 @@ def mapslider():
 	steps = steps + 1
 
     #validyears.reverse()
-    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
+    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
