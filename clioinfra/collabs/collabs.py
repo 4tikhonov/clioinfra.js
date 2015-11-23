@@ -62,7 +62,7 @@ from chartprint import chartonprint
 from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation, pidfrompanel
 from locations import load_locations
 from topics import load_alltopics
 from locations import load_locations
@@ -290,8 +290,14 @@ def mapslider():
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
 	handles.append(dataset)
+
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
+	try:
+  	    (pids, pidslist) = pidfrompanel(handledataset)
+	except:
+	    nopanel = 'yes'
+
         handlestring = request.args.get('handle')
         ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
         if ishandle:
