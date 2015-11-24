@@ -62,7 +62,7 @@ from chartprint import chartonprint
 from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation, pidfrompanel
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation, pidfrompanel, graphlinks
 from locations import load_locations
 from topics import load_alltopics
 from locations import load_locations
@@ -335,6 +335,7 @@ def mapslider():
         handleface = request.args.get('face')
     if handleface:
 	handles = []
+	handle = handleface
 	handles.append(handleface)
 	try:
 	    pids.remove(handleface)
@@ -679,23 +680,86 @@ def presentation(settings=''):
     resp = make_response(render_template('menu_presentation.html'))
     return resp
 
+@app.route('/treemap')
+def treemap(settings=''):
+    resp = make_response(render_template('treemap.html'))
+    return resp
+
 @app.route('/panel')
 def panel(settings=''):
+    showpanel = ''
+    config = configuration()
     f = request.args
     handle = ''
     for q in f:
-	handle = str(handle) + '&' + str(q) + '=' + str(f[q])
-    resp = make_response(render_template('panel.html', handle=handle))
+	value = f[q]
+	if value:
+	    handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+    # Default countris
+    if not f['ctrlist']:
+	handle = str(handle) + '&ctrlist=' + config['ctrlist'] 
+    try:
+	if f['print']:
+	    showpanel = ''
+    except:
+	showpanel = 'yes'
+
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
     return resp
 
 @app.route('/chartlib')
 def chartlib(settings=''):
-    resp = make_response(render_template('chartlib.html'))
+    (apilink, ctrlist) = ('', '')
+    showpanel = 'yes'
+    try:
+        if request.args.get('print'):
+            showpanel = ''
+    except:
+        showpanel = 'yes'
+    f = request.args
+    handle = ''
+    for q in f:
+        value = f[q]
+        if value:
+            handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+
+    if request.args.get('ctrlist'):
+        ctrlist = request.args.get('ctrlist')
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+        except:
+            nopanel = 'yes'
+	if pids[0]:
+	    apilink = "/api/tabledata?handle=" + str(pids[0])
+	    if ctrlist:
+	        apilink = apilink + '&ctrlist=' + ctrlist
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('chartlib.html', apilink=apilink, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
     return resp
 
 @app.route('/graphlib')
 def graphlib(settings=''):
-    resp = make_response(render_template('graphlib.html'))
+    showpanel = 'yes'
+    try:
+        if request.args.get('print'):
+            showpanel = ''
+    except:
+        showpanel = 'yes'
+    f = request.args
+    handle = ''
+    for q in f:
+        value = f[q]
+        if value:
+            handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('graphlib.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
     return resp
 
 @app.route('/datasetspace')
