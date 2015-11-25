@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
-
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
 <head>
 	<style>
 	.axis {
@@ -17,8 +20,36 @@
 
 <body>
 	
+{% if showpanel %}
+  <select name="viz" class="alright" onchange="vizswitch($(this).val())">
+     <option value="3">Bar Graph</option>
+     <option value="1">Panel Bar</option>
+     <option value="2">Time Series Plot</option>
+     <option value="4">Treemap</option>
+  </select>
+{% endif %}
+
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
+function vizswitch(viztype) {
+   if (viztype == '1')
+   {
+        window.location = "{{ panellib|safe }}";
+   }
+   if (viztype == '2')
+   {
+        window.location = "{{ chartlib|safe }}";
+   }
+   if (viztype == '3')
+   {
+        window.location = "{{ barlib|safe }}";
+   }
+   if (viztype == '4')
+   {
+        window.location = "{{ treemaplib|safe }}";
+   }
+}
+
     var uri = '';
     var myurl=window.location.toString();
   if (myurl.indexOf("start=") > 0) {
@@ -32,8 +63,8 @@
 </script>
 <script>
 var margin = {top: 20, right: 20, bottom: 70, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 420 - margin.top - margin.bottom;
+    width = 900 - margin.left - margin.right,
+    height = 380 - margin.top - margin.bottom;
 // Parse the date / time
 var	parseDate = d3.time.format("%Y").parse;
 var x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
@@ -88,5 +119,8 @@ d3.csv(apilink, function(error, data) {
       .attr("height", function(d) { return height - y(d.value); });
 });
 </script>
-
+{% if showpanel %}
+<p align="left">
+<a href="/collabs/graphlib?start=on&print=yes&{{ handle | safe}}" target=_blank>Print</p><br>
+{% endif %}
 </body>

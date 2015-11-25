@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+  <script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
+
 <style>
 
 body {
@@ -23,18 +27,70 @@ body {
   stroke-width: 1.5px;
 }
 
+.right {
+        float: right;
+}
+
+.left {
+        float: left;
+}
+
 </style>
 <body>
+{% if indicators %}
+  <select name="handles" class="right" onchange="mapswitch($(this).val())">
+     <option value="{{ handle }}" selected>{{ title }}</option>
+     {% for handle in indicators %}
+     <option value="{{ handle }}">{{ handledict[handle] }}</option>
+     {% endfor %}
+  </select>
+  </div>
+{% endif %}
+{% if showpanel %}
+  <select name="viz" class="left" onchange="vizswitch($(this).val())">
+     <option value="2" selected>Time Series Plot</option>
+     <option value="1">Panel Bar</option>
+     <option value="3">Bar Graph</option>
+     <option value="4">Treemap</option>
+  </select>
+
+{% endif %}
+<br>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script src="/collabs/static/nlgis/params.js"></script>
 <script>
+{% if apilink %}
+  apilink = "{{ apilink|safe }}";
+{% else %}
   apilink = "/api/tabledata?" + uri;
+{% endif %}
 </script>
 <script>
+function vizswitch(viztype) {
+   if (viztype == '1')
+   {
+        window.location = "{{ panellib|safe }}";
+   }
+   if (viztype == '2')
+   {
+        window.location = "{{ chartlib|safe }}";
+   }
+   if (viztype == '3')
+   {
+        window.location = "{{ barlib|safe }}";
+   }
+   if (viztype == '4')
+   {
+        window.location = "{{ treemaplib|safe }}";
+   }
+
+}
+
 
 var margin = {top: 20, right: 80, bottom: 30, left: 50},
-    width = 960 - margin.left - margin.right,
-    height = 420 - margin.top - margin.bottom;
+    width = 900 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%Y").parse;
 
@@ -140,3 +196,7 @@ d3.tsv(apilink, function(error, data) {
 });
 
 </script>
+{% if showpanel %}
+<p align="left">
+<a href="/collabs/chartlib?start=on&print=yes&{{ handle | safe}}" target=_blank>Print</p><br>
+{% endif %}

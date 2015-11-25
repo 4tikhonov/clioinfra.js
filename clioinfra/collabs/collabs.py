@@ -62,7 +62,7 @@ from chartprint import chartonprint
 from advancedstatistics import loadpanel, statistics2table, handle2statistics, data2statistics, read_measure, statistics_tojson, advpanel2dict
 from boundaries import getboundaries
 from statistics import createdata
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, get_citation, pidfrompanel, graphlinks
 from locations import load_locations
 from topics import load_alltopics
 from locations import load_locations
@@ -270,7 +270,15 @@ def graphslider():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    handleface = ''
+    urlmatch = re.search(r'(.+)\&face', request.url)
+    try:
+        if urlmatch.group(0):
+            thismapurl = urlmatch.group(1)
+    except:
+	thismapurl = request.url
     geocoder = ''
+    pids = []
     handledataset = ''
     logscale = 0
     handles = []
@@ -290,8 +298,14 @@ def mapslider():
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
 	handles.append(dataset)
+
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
+	try:
+  	    (pids, pidslist) = pidfrompanel(handledataset)
+	except:
+	    nopanel = 'yes'
+
         handlestring = request.args.get('handle')
         ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
         if ishandle:
@@ -303,6 +317,8 @@ def mapslider():
 	(dataset, revid, cliopid, clearpid) = findpid(handle)
         #handles.append(dataset)
 	handles.append(handle)
+	handleface = handle
+
     if request.args.get('logscale'):
 	logscale = 1
     if request.args.get('catmax'):
@@ -315,6 +331,16 @@ def mapslider():
         geocoder = request.args.get('geocoder')
     if request.args.get('hist'):
         geocoder = request.args.get('hist') 
+    if request.args.get('face'):
+        handleface = request.args.get('face')
+    if handleface:
+	handles = []
+	handle = handleface
+	handles.append(handleface)
+	try:
+	    pids.remove(handleface)
+	except:
+	    nothing = 1
 
     historical = 0
 
@@ -333,8 +359,16 @@ def mapslider():
 	lastyear = year
 	steps = steps + 1
 
+    handledict = {}
+    if pids:
+	hquery = formdatasetquery(pids,'')
+	d = readdatasets('datasets', json.loads(hquery))
+	for x in d:
+	    thishandle = x['handle']
+	    handledict[thishandle] = x['title']
+
     #validyears.reverse()
-    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear))
+    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear, indicators=pids, thismapurl=thismapurl, handledict=handledict))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -646,23 +680,86 @@ def presentation(settings=''):
     resp = make_response(render_template('menu_presentation.html'))
     return resp
 
+@app.route('/treemap')
+def treemap(settings=''):
+    resp = make_response(render_template('treemap.html'))
+    return resp
+
 @app.route('/panel')
 def panel(settings=''):
+    showpanel = ''
+    config = configuration()
     f = request.args
     handle = ''
     for q in f:
-	handle = str(handle) + '&' + str(q) + '=' + str(f[q])
-    resp = make_response(render_template('panel.html', handle=handle))
+	value = f[q]
+	if value:
+	    handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+    # Default countris
+    if not f['ctrlist']:
+	handle = str(handle) + '&ctrlist=' + config['ctrlist'] 
+    try:
+	if f['print']:
+	    showpanel = ''
+    except:
+	showpanel = 'yes'
+
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
     return resp
 
 @app.route('/chartlib')
 def chartlib(settings=''):
-    resp = make_response(render_template('chartlib.html'))
+    (apilink, ctrlist) = ('', '')
+    showpanel = 'yes'
+    try:
+        if request.args.get('print'):
+            showpanel = ''
+    except:
+        showpanel = 'yes'
+    f = request.args
+    handle = ''
+    for q in f:
+        value = f[q]
+        if value:
+            handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+
+    if request.args.get('ctrlist'):
+        ctrlist = request.args.get('ctrlist')
+    if request.args.get('handle'):
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+        except:
+            nopanel = 'yes'
+	if pids[0]:
+	    apilink = "/api/tabledata?handle=" + str(pids[0])
+	    if ctrlist:
+	        apilink = apilink + '&ctrlist=' + ctrlist
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('chartlib.html', apilink=apilink, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
     return resp
 
 @app.route('/graphlib')
 def graphlib(settings=''):
-    resp = make_response(render_template('graphlib.html'))
+    showpanel = 'yes'
+    try:
+        if request.args.get('print'):
+            showpanel = ''
+    except:
+        showpanel = 'yes'
+    f = request.args
+    handle = ''
+    for q in f:
+        value = f[q]
+        if value:
+            handle = str(handle) + '&' + str(q) + '=' + str(f[q])
+
+    links = graphlinks(handle)
+
+    resp = make_response(render_template('graphlib.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
     return resp
 
 @app.route('/datasetspace')
