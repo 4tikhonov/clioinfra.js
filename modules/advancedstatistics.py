@@ -236,3 +236,29 @@ def advpanel2dict(cleanedpanel):
     header = header + str('Year')
     
     return (header, data, countries, handles, vhandles) 
+
+def countrystats(dataset):
+    stats = {}
+    newpanel = dataset.drop('Code', axis=1)
+    newpanel = newpanel.drop('Continent, Region, Country', axis=1)
+    newpanel = newpanel.drop('Unnamed: 0', axis=1)
+    newpanel = newpanel.ix[3:]
+    df = newpanel
+    df = df.convert_objects(convert_numeric=True)
+    df = df.replace(r'', np.nan, regex=True)
+    sum_row = {col: df[col].sum() for col in df}
+    codes = df.index
+    cols = df.sum()
+    total = cols.sum()    
+    for code in codes:    
+        percent = 0
+        try:
+            localsum = df.ix[code].sum()
+            if localsum > 0:
+                percent = (localsum / total) * 100
+        except:
+            skip = 1
+        
+        if percent > 0:
+            stats[code] = percent
+    return stats
