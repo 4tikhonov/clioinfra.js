@@ -20,6 +20,18 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
+def loadgeocoder(dataset):
+    geocoder = dataset.iloc[:, 1:12]
+    geocoder = geocoder.ix[3:]
+    geocoder = geocoder.convert_objects(convert_numeric=True)
+    geocoder = geocoder.replace(r'', np.nan, regex=True)
+    geocoder = geocoder.replace('NaN', np.nan, regex=True)
+    modern = geocoder[pd.notnull(geocoder['ccode'])]
+    historical = geocoder[pd.isnull(geocoder['ccode'])]
+    modern.index = modern['ccode']
+    
+    return (modern, historical)
+
 def adjustdataframe(df):
     cols = df.columns
     checkcount = 0
@@ -62,14 +74,21 @@ def loaddataset_fromurl(apiroot, handle):
     res = requests.get(url)
     csvio = StringIO(res.content)
     dataframe = pd.read_csv(csvio, sep='\t', dtype='unicode')
+    df = ''
     
+    # Classification (None|Modern|Historical)
+    classtype = 'None'
     maincode = 'Code'
-    df = adjustdataframe(dataframe)    
-    df.index = df[maincode]    
+    webmappercode = 'Webmapper numeric code'
+    if maincode in dataframe:
+	classtype = 'modern'
+        df = adjustdataframe(dataframe)    
+        df.index = df[maincode]    
 
-    #if df['Webmapper numeric code']:
-    #    df.index = df['Webmapper numeric code']
-    #elif df['Code']:
-    #    df.index = df['Code']
+    if classtype == 'None':
+        if webmappercode in dataframe:
+	    classtype = 'historical'
+	    df = dataframe
+            df.index = df[webmappercode]
         
-    return df
+    return (classtype, dataframe)
