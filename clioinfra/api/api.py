@@ -69,6 +69,7 @@ from scales import getcolors, showwarning, buildcategories, getscales, floattode
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 #from statistics import load_api_data
 from paneldata import paneldatafilter, panel2dict, panel2csv
+from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap
 
 cpath = "/etc/apache2/strikes.config"
 
@@ -912,6 +913,34 @@ def open():
     resp = make_response(render_template('progress.html', download=root))
     return resp
 
+@app.route('/treemap')
+def treemapweb():
+    config = configuration()
+    handle = ''
+    if request.args.get('handle'):
+        handle = request.args.get('handle')
+    config['remote'] = 'on'
+    handles = []
+    dataset = ''
+    if config['remote']:
+        (classification, dataset) = loaddataset_fromurl(config['apiroot'], config['geocoderhandle'])
+    else:
+        dataset = loaddataset(handles)
+
+    (modern, historical) = loadgeocoder(dataset)
+    handles = []
+    handles.append(handle)
+    try:
+        if config['remote']:
+            (class1, dataset) = loaddataset_fromurl(config['apiroot'], handle)
+        else:
+            dataset = loaddataset(handles)
+    except:
+	return 'No dataset ' + handle
+
+    treemapdata = treemap(dataset)
+    return Response(treemapdata,  mimetype='application/json')
+
 # Panel data
 @app.route('/panel')
 def panel():
@@ -1068,7 +1097,10 @@ def webmapper():
 def geocoder():
     config = configuration()
     fromyear = 1500
+    toyear = 2016
     cfilter = ''
+    if request.args.get('name'):
+        cfilter = request.args.get('name')
     if request.args.get('name'):
         cfilter = request.args.get('name')
 
@@ -1086,8 +1118,12 @@ def datasets():
     (jsondata, pid) = ('', '')
     handles = []
     combineddataset = []
+    resultdataset = ''
     datainfo = []
+    outformat = 'json'
 
+    if request.args.get('format'):
+        outformat = request.args.get('format')
     if request.args.get('handle'):
         pid = request.args.get('handle')
     if request.args.get('latest'):
@@ -1105,27 +1141,31 @@ def datasets():
         for dataset in datainfo:
 	    data = {}
 	    handle = dataset['handle']
-            jsondata = str(dataset['data'])
-	    jsondata = jsondata.replace(".0,", ",")
-	    json_dict = ast.literal_eval(jsondata.strip())
-	    data['handle'] = handle
-	    try:
-	        data['title'] = dataset['title']
-	        data['units'] = dataset['units']
-		data['datasetID'] = dataset['datasetID']
-	    except:
-		data['title'] = 'Title'
-		data['units'] = 'Units'
-		data['datasetID'] = 228
-	    data['data'] = json_dict
-	    combineddataset.append(data)
+	    if outformat == 'json':
+                jsondata = str(dataset['data'])
+	        jsondata = jsondata.replace(".0,", ",")
+	        json_dict = ast.literal_eval(jsondata.strip())
+	        data['handle'] = handle
+	        try:
+	            data['title'] = dataset['title']
+	            data['units'] = dataset['units']
+		    data['datasetID'] = dataset['datasetID']
+	        except:
+		    data['title'] = 'Title'
+		    data['units'] = 'Units'
+		    data['datasetID'] = 228
+	        data['data'] = json_dict
+	        combineddataset.append(data)
+	    elif outformat == 'csv':
+		data['data'] = dataset['csvframe']
+		resultdataset = data['data']
 
-    if combineddataset:
-	
-        finaldata = json.dumps(combineddataset, encoding="utf-8", sort_keys=True, indent=4)
-        return Response(finaldata,  mimetype='application/json')
-    else:
-	print "No data"
+    if outformat == 'json':
+	if combineddataset:
+            finaldata = json.dumps(combineddataset, encoding="utf-8", sort_keys=True, indent=4)
+            return Response(finaldata,  mimetype='application/json')
+    elif outformat == 'csv':
+        return Response(resultdataset,  mimetype='text/plain')
 
 @app.route('/dialog')
 def dialog():
