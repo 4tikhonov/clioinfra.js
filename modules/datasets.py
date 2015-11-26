@@ -21,22 +21,27 @@ from storage import data2store, readdata, readdataset, readdatasets, datasetadd,
 from sys import argv
 
 def loadgeocoder(dataset):
+    (modern, historical) = ('', '')
     geocoder = dataset.iloc[:, 1:12]
     geocoder = geocoder.ix[3:]
     geocoder = geocoder.convert_objects(convert_numeric=True)
     geocoder = geocoder.replace(r'', np.nan, regex=True)
     geocoder = geocoder.replace('NaN', np.nan, regex=True)
-    modern = geocoder[pd.notnull(geocoder['ccode'])]
-    historical = geocoder[pd.isnull(geocoder['ccode'])]
-    modern.index = modern['ccode']
+    if 'ccode' in geocoder:
+        modern = geocoder[pd.notnull(geocoder['ccode'])]
+        historical = geocoder[pd.isnull(geocoder['ccode'])]
+        modern.index = modern['ccode']
     
     return (modern, historical)
 
 def countrystats(dataset):
     stats = {}
-    newpanel = dataset.drop('Code', axis=1)
-    newpanel = newpanel.drop('Continent, Region, Country', axis=1)
-    newpanel = newpanel.drop('Unnamed: 0', axis=1)
+    newpanel = dataset
+    if 'Code' in dataset:
+        newpanel = newpanel.drop('Code', axis=1)
+        newpanel = newpanel.drop('Continent, Region, Country', axis=1)
+    if 'Unnamed: 0' in dataset:
+        newpanel = newpanel.drop('Unnamed: 0', axis=1)
     newpanel = newpanel.ix[3:]
     df = newpanel
     df = df.convert_objects(convert_numeric=True)
@@ -106,7 +111,7 @@ def loaddataset_fromurl(apiroot, handle):
     classtype = 'None'
     maincode = 'Code'
     webmappercode = 'Webmapper numeric code'
-    if maincode in dataframe:
+    if maincode in dataframe[:2].values:
 	classtype = 'modern'
         df = adjustdataframe(dataframe)    
         df.index = df[maincode]    
@@ -118,3 +123,19 @@ def loaddataset_fromurl(apiroot, handle):
             df.index = df[webmappercode]
         
     return (classtype, df)
+
+def treemap(dataset):
+    jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
+    (df, result) = countrystats(dataset)
+    for idc in result:
+        value = result[idc]
+        try:
+            ctr = dataset.ix[idc]['Continent, Region, Country']
+            jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
+        except:
+            skip = idc
+
+    jsonresult = jsonresult[:-2]
+    jsonresult = jsonresult + "\n]}"
+    return jsonresult
+
