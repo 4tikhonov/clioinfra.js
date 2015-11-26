@@ -12,7 +12,6 @@ from sys import argv
 import pandas as pd
 import numpy as np
 
-
 handles = []
 remote = 'on'
 handle = "hdl:10622/LIKXCZ"
@@ -24,22 +23,29 @@ else:
     dataset = loaddataset(handles)
 
 (modern, historical) = loadgeocoder(dataset)    
-handle = "hdl:10622/DIUBXI"
 handles = []
 handles.append(handle)
 if remote:
-    (class1, dataset) = loaddataset_fromurl(config['apiroot'], handle)
+    (class1, dataset) = loaddataset_fromurl(config['apiroot'], config['geocoderhandle'])
 else:
     dataset = loaddataset(handles)
 
 #modern.ix[76]['country']
 #historical.ix[1]
 #dataset.ix[56]
-(df, result) = countrystats(dataset)
-for idc in result:
-    value = result[idc]    
-    try:
-        ctr = dataset.ix[idc]['Continent, Region, Country']
-        print "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + "}, "
-    except:
-        skip = idc
+
+def treemap(dataset):
+    jsonresult = ''
+    (df, result) = countrystats(dataset)
+    for idc in result:
+        value = result[idc]    
+        try:
+            ctr = dataset.ix[idc]['Continent, Region, Country']
+            print "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + "}, "
+        except:
+            skip = idc
+
+    return jsonresult
+
+res = treemap(dataset)
+print res
