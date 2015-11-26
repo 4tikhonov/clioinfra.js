@@ -5,6 +5,18 @@
   <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   <script src="http://npr.github.io/responsiveiframe/js/jquery.responsiveiframe.js"></script>
   <script src="/collabs/static/nlgis/params.js"></script>
+  <style>
+  .indicators select {
+	float: center;
+  }
+  .indicators h3 {
+	text-align: center;
+  }
+  .alright {
+	float: right;
+	margin-top: -10px;
+   }
+  </style>
   
 <script>
    var thiscolor = '';
@@ -84,9 +96,18 @@ $(function() {
 
 </head>
 <body>
-<div id="map" style='border:0; width:900px; height:470px;'>
-<center><h2>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h2></center>
-<iframe id="worldmap" src='' style='border:0; width:100%; overflow: hidden; height: 470px;' scrolling="no"></iframe>
+<div id="map" style='border:0; width:900px; height:410px;'>
+<div class="indicators"><h3>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h3>
+{% if indicators %}
+  <select name="handles" class="alright" onchange="mapswitch($(this).val())">
+     <option value="{{ handle }}" selected>{{ title }}</option>
+     {% for handle in indicators %}
+     <option value="{{ handle }}">{{ handledict[handle] }}</option>
+     {% endfor %}
+  </select>
+  </div>
+{% endif %}
+<iframe id="worldmap" src='' style='border:0; width:100%; overflow: hidden; height: 410px;' scrolling="no"></iframe>
 <script>document.getElementById('worldmap').src = starturl + '&colors=' + colors;</script>
 <form id="ynavi" style='border:0; width: 880px;'>
     <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold; text-align:left;">
@@ -109,6 +130,10 @@ if (histo)
 {% if lastyear %}
 document.getElementById("yearslider").value = '{{ lastyear }}';
 {% endif %}
+
+function mapswitch(newhandle) {
+   window.location = "{{ thismapurl|safe }}&face=" + newhandle;
+}
 
 function historical() {
 
