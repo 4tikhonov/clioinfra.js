@@ -100,8 +100,8 @@ def loaddataset(handles):
     #print df.index
     return df
 
-def loaddataset_fromurl(apiroot, handle):
-    url = apiroot + "/api/datasets?handle=Panel[%27" + handle + "]&format=csv"
+def loaddataset_fromurl(config, handle):
+    url = str(config['apiroot']) + "/api/datasets?handle=Panel[%27" + handle + "]&format=csv"
     res = requests.get(url)
     csvio = StringIO(res.content)
     dataframe = pd.read_csv(csvio, sep='\t', dtype='unicode')
@@ -109,12 +109,21 @@ def loaddataset_fromurl(apiroot, handle):
     
     # Classification (None|Modern|Historical)
     classtype = 'None'
-    maincode = 'Code'
-    webmappercode = 'Webmapper numeric code'
-    if maincode in dataframe[:2].values:
-	classtype = 'modern'
-        df = adjustdataframe(dataframe)    
-        df.index = df[maincode]    
+    maincode = config['moderncode']
+    webmappercode = config['webmappercode']
+
+    # Look for code in the column names 
+    if maincode in dataframe:
+        classtype = 'modern'
+        df = adjustdataframe(dataframe)
+        df.index = df[maincode]
+
+    # Check first rows if code is present there
+    if classtype == 'None':
+        if maincode in dataframe[:2].values:
+	    classtype = 'modern'
+            df = adjustdataframe(dataframe)    
+            df.index = df[maincode]    
 
     if classtype == 'None':
         if webmappercode in dataframe:
