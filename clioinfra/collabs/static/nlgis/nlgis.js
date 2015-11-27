@@ -73,7 +73,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 	    if (histo) {
 	        country = locations[cID].country;
 	    }
-    	    return "<strong>" + country + ":</strong> <span style='color:red'>" + locations[cID].value + "</span>";
+    	    return country + ": <span style='color:red'>" + locations[cID].value + "</span>";
 	}
   	})
 
