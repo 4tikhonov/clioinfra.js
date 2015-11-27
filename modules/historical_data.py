@@ -3,8 +3,13 @@ from pandas.io.json import json_normalize
 import pandas as pd
 import numpy as np
 import re
+import os
+import sys
 import openpyxl
+from random import randint
 from openpyxl.cell import get_column_letter
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
+from search import dataset_search, getindicators, loadjson
 
 def dataframe_filter(codes, maincode, clioframe):    
     result = {}
@@ -89,24 +94,32 @@ def save_historical_dataset(fullpath, geocoder, countryinfo, yearscolumns, datas
     ws = wb.get_active_sheet()
     ws.title = "Data"
 
-    i = 0
     col_width = 256 * 20
     # Forming header    
     order = []
+    start = 2
+    c = ws.cell(row=0, column=0)
+    ws.column_dimensions[get_column_letter(1)].width = 20
+    c.value = 'Dataset title'
+    c.style.font.bold = True
+    c = ws.cell(row=1, column=0)
+    c.value = 'Units'
+    c.style.font.bold = True
+    i = 0
     for newcolumn in sorted(countryinfo):        
-        c = ws.cell(row=0, column=i)
+        c = ws.cell(row=start, column=i)
         c.value = newcolumn
         c.style.font.bold = True
         order.append(newcolumn)
         ws.column_dimensions[get_column_letter(i+1)].width = 15
         i = i + 1
     for year in sorted(yearscolumns):        
-        c = ws.cell(row=0, column=i)
+        c = ws.cell(row=start, column=i)
         c.value = str(year)
         c.style.font.bold = True        
         i = i + 1        
         
-    i = 0
+    i = start
     for idc in geocoder:
         i = i + 1
         metadata = geocoder[idc]
@@ -122,6 +135,7 @@ def save_historical_dataset(fullpath, geocoder, countryinfo, yearscolumns, datas
                 c.value = tmpval[0]                
             except:
                 c.value = ''
+		c.value = randint(0,9)
             j = j + 1
         
     wb.save(fullpath)
@@ -166,3 +180,24 @@ def match_geocoders(maincode, tmpgeocoder, geo, countryinfo, limityear):
             skip = 1
     return geocoder
 
+def datasetreader(handle, config):
+    coder = {}
+    maindata = []
+    apiroot = config['apiroot'] + "/api/datasets?handle=" + handle
+    datasets = loadjson(apiroot)
+    for item in datasets:
+        maindata = item['data']
+    return maindata
+
+def produce_historicaldata(config, fullfilepath, clioframe, codes, maincode, limityear):
+    clioframe.index = clioframe[maincode]
+    (countryinfo, line, geoexcel, yearscolumns) = get_info(clioframe)
+    # Filter data from dataframe
+    (totaldf, navicolumns, result, ycodes, emptyrow) = dataframe_filter(codes, maincode, clioframe)
+    # Geocoder
+    geocoderapi = config['geocoderapi']
+    tmpgeocoder = loadjson(geocoderapi)
+    geocoder = match_geocoders(maincode, tmpgeocoder, geoexcel, countryinfo, limityear)
+    # Save as Excel file
+    datafile = save_historical_dataset(fullfilepath, geocoder, countryinfo, yearscolumns, result)
+    return fullfilepath

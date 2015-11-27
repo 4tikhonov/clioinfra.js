@@ -196,9 +196,11 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
                         if logscale:
                             try:
 				if logscale == '2':
-                                    value = math.log(value, 2)
+                                    value = math.log(value, int(logscale))
+                                elif logscale == '10':
+                                    value = math.log10(value)
 				else:
-				    value = math.log10(value)
+				    value = math.log(value)
 				rvalue = "%.5f" % value
                             except:
                                 value = 'NaN'
@@ -317,6 +319,8 @@ def tableapis(handle, customcountrycodes, fromyear, toyear, customyear, logflag)
 	for handledata in datajson:
 	    dataframe = handledata['data']
 
+    # DEBUG2
+    #print dataframe
     loccodes = loadcodes(dataframe)
     (ctr, header) = countryset(customcountrycodes, loccodes)
     (frame, years, values, dates, original) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logflag, DEBUG)

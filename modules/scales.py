@@ -88,8 +88,8 @@ def get_normal_scale(catmax, valarray):
         imin = amin + (i-1) * diff
         imax = amin + i * diff
         #print str(imin) + ' ' + str(imax)
-        ranges.append(round(imin, 2))
-    ranges.append(round(imax, 2))
+        ranges.append(imin)
+    ranges.append(imax)
     return ranges
 
 def getscales(data, colors, catnum, geocoder, original, logscale):
@@ -156,12 +156,14 @@ def getscales(data, colors, catnum, geocoder, original, logscale):
                             dataitem['color'] = colors[colorID]
 			    if geocoder:
 			        dataitem['country'] = row[0]
+				dataitem['id'] = webmapper[row[3]]
                         colorID = colorID + 1        
 
 		    # Check if round required
 		    rlen = len(str(value))
 		    if rlen > 10:
 		        rvalue = "%.5f" % value
+			#rvalue = value
 			try:
 			    uvalue = original[str(rvalue)]
 			except:

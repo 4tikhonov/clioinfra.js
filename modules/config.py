@@ -36,7 +36,7 @@ def webmapper_geocoder():
     geocoder = loadjson(apiroot)
     for item in geocoder:
         if item['ccode']:
-            coder[int(item['ccode'])] = item['Webmapper code']
+            coder[int(item['ccode'])] = item['Webmapper numeric code']
     return coder
 
 def findpid(handle):
@@ -188,3 +188,12 @@ def dataverse2indicators(branch):
         condition = start < total
 
     return datasets
+
+def graphlinks(handle):
+    links = {}
+    links['chartlib'] = "/collabs/chartlib?start=on" + handle + "&logscale="
+    links['barlib'] = "/collabs/graphlib?start=on" + handle
+    links['panellib'] = '/collabs/panel?start=on&aggr=on&hist=' + handle
+    links['treemaplib'] = '/collabs/treemap'
+
+    return links

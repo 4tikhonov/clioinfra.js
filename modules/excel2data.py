@@ -99,8 +99,12 @@ def excelvalidator(path, filename, resultfile, tmpdir):
     col = data.ix[2]
     title = data.ix[0][0]
     units = data.ix[1][0]
-    df.columns = col
-    df.to_csv(resultfile + '.csv', cols=col, sep='\t', encoding='utf-8')
+    csvfile = resultfile + '.csv'
+    try:
+	df.columns = col
+        df.to_csv(csvfile, cols=col, sep='\t', encoding='utf-8')
+    except:
+	skip = 1
 
     # Save json
     if col.any():
@@ -116,7 +120,7 @@ def excelvalidator(path, filename, resultfile, tmpdir):
         with open(jsondatafile, 'w') as filej:
             filej.write(json.dumps(d))
 
-    return (jsondatafile, title, units)
+    return (jsondatafile, csvfile, title, units)
 
 def dataextractor(fullpath, path, handle, fileID):
     dataset = {}
@@ -147,8 +151,11 @@ def dataextractor(fullpath, path, handle, fileID):
 
         if DEBUG:
             print sql
-	print str(path) + str(tablename) + '.csv'
-        df.to_csv(path + tablename + '.csv', cols=col, sep='\t', encoding='utf-8')
+	csvfile = str(path) + str(tablename) + '.csv'
+	#backupcol = df.columns
+	#df.columns = data.ix[1]
+        df.to_csv(csvfile, cols=col, sep='\t', encoding='utf-8')
+	#df.columns = backupcol
         dataset[sheetname] = data
 
 	godata = {}
@@ -177,7 +184,9 @@ def dataextractor(fullpath, path, handle, fileID):
         with open(path + tablename + '.json', 'w') as filej:
             filej.write(json.dumps(d))
         sheetid = sheetid + 1
-	return (jsondatafile, title, units)
+	print jsondatafile
+	print csvfile
+	return (jsondatafile, csvfile, title, units)
 
     if DEBUG:
         for sheet in dataset:
