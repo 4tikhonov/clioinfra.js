@@ -17,7 +17,7 @@ handles.append(handle)
 config = configuration()
 
 if remote:
-    dataset = loaddataset_fromurl(config['apiroot'], handle)
+    (class1, dataset) = loaddataset_fromurl(config, handle)
 else:
     dataset = loaddataset(handles)
 
@@ -25,5 +25,5 @@ else:
 ccode = '150'
 year = '2004'
 x = dataset.ix[str(ccode)][str(year)] 
-#print dataset.to_html
-print x
+print dataset.to_html
+#print x
