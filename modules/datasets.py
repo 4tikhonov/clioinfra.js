@@ -160,7 +160,10 @@ def treemap(config, dataset, classification):
     for idc in result:
         value = result[idc]
         try:
-            ctr = dataset.ix[idc]['Continent, Region, Country']
+	    if classification == 'modern':
+                ctr = dataset.ix[idc]['Continent, Region, Country']
+	    elif classification == 'historical':
+		ctr = dataset.ix[idc]['country']
             jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
         except:
             skip = idc
