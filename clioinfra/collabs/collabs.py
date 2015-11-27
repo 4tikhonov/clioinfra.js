@@ -682,7 +682,18 @@ def presentation(settings=''):
 
 @app.route('/treemap')
 def treemap(settings=''):
-    resp = make_response(render_template('treemap.html'))
+    showpanel = 'yes'
+    (historical, handle) = ('', '')
+    if request.args.get('handle'):
+        handle = request.args.get('handle')
+    if request.args.get('historical'):
+        historical = request.args.get('historical')
+    mainlink = '&handle=' + str(handle)
+    if historical:
+	mainlink = str(mainlink) + '&historical=on'
+    links = graphlinks(mainlink)
+
+    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical))
     return resp
 
 @app.route('/panel')
