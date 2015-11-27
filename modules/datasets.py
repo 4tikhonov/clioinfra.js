@@ -161,9 +161,9 @@ def treemap(config, dataset, classification):
         value = result[idc]
         try:
 	    if classification == 'modern':
-                ctr = dataset.ix[idc]['Continent, Region, Country']
+                ctr = dataset.ix[idc][config['moderncountry']]
 	    elif classification == 'historical':
-		ctr = dataset.ix[idc]['country']
+		ctr = dataset.ix[idc][config['webmappercountry']]
             jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
         except:
             skip = idc
