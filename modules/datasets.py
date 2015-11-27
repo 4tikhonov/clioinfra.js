@@ -34,23 +34,44 @@ def loadgeocoder(dataset):
     
     return (modern, historical)
 
-def countrystats(dataset):
+def countrystats(config, dataset, classification):
     stats = {}
+    cols = []
     newpanel = dataset
-    if 'Code' in dataset:
-        newpanel = newpanel.drop('Code', axis=1)
+    if classification == 'modern':
+    # Delete all columns without data in modern classification
+        newpanel = newpanel.drop(config['moderncode'], axis=1)
         newpanel = newpanel.drop('Continent, Region, Country', axis=1)
-    if 'Unnamed: 0' in dataset:
-        newpanel = newpanel.drop('Unnamed: 0', axis=1)
+        if 'Unnamed: 0' in dataset:
+            newpanel = newpanel.drop('Unnamed: 0', axis=1)
+        if '1' in dataset:
+            newpanel = newpanel.drop('1', axis=1)
+
+    # Delete all extra columns without data
+    elif classification == 'historical':
+        newpanel = newpanel.drop(config['webmappercode'], axis=1)
+        cols = newpanel.columns
+        deletecolumns = []
+        for colname in cols:
+            year = ''
+            try:
+                year = int(colname) 
+            except:
+                deletecolumns.append(colname) 
+        for colname in deletecolumns:
+            newpanel = newpanel.drop(colname, axis=1)
+
     newpanel = newpanel.ix[3:]
     df = newpanel
     df = df.convert_objects(convert_numeric=True)
     df = df.replace(r'', np.nan, regex=True)
+    #return (df, deletecolumns)
     sum_row = {col: df[col].sum() for col in df}
+    #return (df, stats)
     codes = df.index
     cols = df.sum()
-    total = cols.sum()    
-    for code in codes:    
+    total = cols.sum()
+    for code in codes:
         percent = 0
         try:
             localsum = df.ix[code].sum()
@@ -58,7 +79,7 @@ def countrystats(dataset):
                 percent = (localsum / total) * 100
         except:
             skip = 1
-        
+
         if percent > 0:
             stats[code] = percent
     return (df, stats)
@@ -133,9 +154,9 @@ def loaddataset_fromurl(config, handle):
         
     return (classtype, df)
 
-def treemap(dataset):
+def treemap(config, dataset, classification):
     jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
-    (df, result) = countrystats(dataset)
+    (df, result) = countrystats(config, dataset, classification)
     for idc in result:
         value = result[idc]
         try:
