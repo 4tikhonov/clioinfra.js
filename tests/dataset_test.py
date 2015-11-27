@@ -7,7 +7,7 @@ import simplejson
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder
 from sys import argv
 
 handles = []
@@ -21,6 +21,8 @@ if remote:
 else:
     dataset = loaddataset(handles)
 
+geocoder = buildgeocoder(dataset, config)
+print geocoder
 (modern, historical) = loadgeocoder(dataset, 'geocoder') 
 
 switch = 'historical'

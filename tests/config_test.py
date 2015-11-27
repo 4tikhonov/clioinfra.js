@@ -4,7 +4,7 @@ import sys
 import os
 import unittest
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
-from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, pidfrompanel
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, load_fullmetadata, pidfrompanel
 
 class TestConfiguration(unittest.TestCase):
     config = configuration()
@@ -31,6 +31,13 @@ class TestConfiguration(unittest.TestCase):
 	(pids, pidstr) = pidfrompanel(pid)
 	print '\n' + pidstr
 	self.assertEqual(str(pids), "['4X6NCK', '4X6NCG']")
+
+	dataset = "4X6NCK,I0YK5M"
+        if dataset:
+	    metadata = load_fullmetadata(dataset)
+	    for item in metadata:
+	        print str(item['name']) + ' ' + str(item['authors'])
+	    self.assertEqual(dataset, dataset)
 
 if __name__ == '__main__':
     unittest.main()

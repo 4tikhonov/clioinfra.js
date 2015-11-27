@@ -14,10 +14,7 @@ hist = {}
 
 # Test case
 handles = ["4X6NCK", "F16UDU","ZWRBOY"]
-handles = ["hdl:10622/4X6NCK"]
-handles = ["hdl:10622/QNTAZA"]
-handles = ["hdl:10622/F9418N"]
-#handles = ["hdl:10622/4VGTV9"]
+handles = ["4X6NCK"]
 customyear = '1901'
 fromyear = '1500'
 toyear = '2000'
@@ -26,18 +23,15 @@ logflag = 0
 DEBUG = 0
         
 config = configuration()
+cfilter = {}
 if fromyear:
-    historical = 0
+    historical = 1
     if historical:
         api = config['apiroot'] + "/collabs/static/data/historical.json"
-        (regions, countries, ctr2reg) = histo(api)
+	cfilter['query'] = 'ukr'
+	cfilter['startyear'] = 1900
+	cfilter['endyear'] = 2012
+        (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, cfilter)
         hist = countries
 
-# In: (handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
-    (header, panelcells, codes, x1, x2, x3, x4, x5) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
-# Out: (header, panelcells, code2ctr, datahub, data, handle2ind, unit2ind, original)
-
-modern = moderncodes(config['modernnames'], config['apiroot'])
-jsondata = data2json(modern, codes, panelcells)
-result = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
-print result
+print geocoder

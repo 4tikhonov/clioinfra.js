@@ -17,13 +17,14 @@ def testdownload():
     tmpdir = "/tmp/test"
     filename = randomword(10)
     arc = "data" + filename + ".zip"
-    finaldir = "/home/strikes/sik/web/collabs/static/tmp"
+    finaldir = "/home/dpe/tmp"
     if filename:
 	finaldir = str(finaldir) + '/' + str(filename)
 	tmpdir = str(tmpdir) + '/' + str(filename)
 
     pid = "hdl:10622/73BBBI"
     pid = "hdl:10622/4X6NCK"
+    pid = "hdl:10622/JPIRSD"
     try:
 	os.mkdir(tmpdir)
         os.mkdir(finaldir)

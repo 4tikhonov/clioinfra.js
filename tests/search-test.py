@@ -11,7 +11,7 @@ def search(qurl):
     root = "http://dv.sandbox.socialhistoryservices.org"
 
     # Load topics
-    topicurl = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/dataframe100_0.json"
+    topicurl = "http://dpe.sandbox.socialhistoryservices.org/collabs/static/data/dataframe100_0.json"
     topics = loadjson(topicurl)
 
     # Input
@@ -20,6 +20,6 @@ def search(qurl):
     datasets = dataset_search(root, IDS, topics)
     return datasets
 
-qurl = "http://clearance.sandbox.socialhistoryservices.org/api/dataverse?i[83]=11002&i[84]=10&i[85]=1199&i[86]=16002"
+qurl = "http://dpe.sandbox.socialhistoryservices.org/api/dataverse?i[83]=11002&i[84]=10&i[85]=1199&i[86]=16002"
 data = search(qurl)
 print data

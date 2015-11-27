@@ -31,6 +31,7 @@ if onlinetest:
 else:
     handles = []
     handle = "hdl:10622/MRPFJ0"
+    handle = "hdl:10622/DIUBXI"
     handles.append(handle)
     hquery = formdatasetquery(handles,'')
     print hquery
