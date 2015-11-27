@@ -71,15 +71,15 @@ def main():
 	 fullpath = downloadfile(root, path, fileID, key)
 	 print fullpath
 	 (pid, revid, cliohandle, clearpid) = findpid(handle)
-	 jsonfile = ''
+	 (jsonfile, csvfile) =('', '')
 	 #try:
 	 if pid:
 	     handle = pid
 	     try:
-	        (jsonfile, tmptitle, tmpunits) = dataextractor(fullpath, path, pid, fileID)
+	        (jsonfile, csvfile, tmptitle, tmpunits) = dataextractor(fullpath, path, pid, fileID)
 	     except:
 		resultfile = config['tmpdir'] + "/" + fileID
-		(jsonfile, tmptitle, tmpunits) = excelvalidator(config['phantompath'], fullpath, resultfile, config['tmpdir'])
+		(jsonfile, csvfile, tmptitle, tmpunits) = excelvalidator(config['phantompath'], fullpath, resultfile, config['tmpdir'])
 	
 	     if jsonfile:
 		remove = removedata('datasets', 'handle', clearpid)
@@ -88,9 +88,11 @@ def main():
 		    units = str(tmpunits)
 		except:
 		    donothing = 1
-        	datasetadd(jsonfile, clearpid, handle, title, units)
+		print "ADD " + str(jsonfile)
+        	datasetadd(jsonfile, csvfile, clearpid, handle, title, units, datasetID)
                 print handle
         	print clearpid
+		print datasetID
 	 #except:
 	     #print "Dataset " + fullpath + " not extracted..."
 	 #print fullpath

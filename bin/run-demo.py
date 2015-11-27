@@ -7,6 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
 from excel2data import parsehandle, dataextractor, downloadfile, load_api_data, getfiles
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
+from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 
 def main():
     handle = ''
@@ -66,14 +67,20 @@ def main():
 
     for fileID in files: 
 	 fullpath = downloadfile(root, path, fileID, key)
-	 (pid, revid, cliohandle) = findpid(handle)
-	 print pid
+	 print fullpath
+	 (pid, revid, cliohandle, clearpid) = findpid(handle)
 	 #try:
 	 if pid:
-	     dataextractor(fullpath, path, pid, fileID)
+	     handle = pid
+	     jsonfile = dataextractor(fullpath, path, pid, fileID)
+	     if jsonfile:
+		title = 'Test'
+        	datasetadd(jsonfile, clearpid, handle, title)
+                print handle
+        	print clearpid
 	 #except:
 	     #print "Dataset " + fullpath + " not extracted..."
-	 print fullpath
+	 #print fullpath
 
 if __name__ == "__main__":
     main()
