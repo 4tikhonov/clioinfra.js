@@ -91,6 +91,7 @@ This should print /usr/local/bin/ogr2ogr and /usr/local/bin/topojson
 ## Python packages
 ```
 pip install flask
+pip install requests
 pip install twisted
 pip install flask_bootstrap
 pip install flask_appconfig
