@@ -69,7 +69,7 @@ from scales import getcolors, showwarning, buildcategories, getscales, floattode
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 #from statistics import load_api_data
 from paneldata import paneldatafilter, panel2dict, panel2csv
-from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap
+from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder
 
 cpath = "/etc/apache2/strikes.config"
 
@@ -917,28 +917,50 @@ def open():
 def treemapweb():
     config = configuration()
     handle = ''
+    switch = 'modern'
     if request.args.get('handle'):
         handle = request.args.get('handle')
+    if request.args.get('historical'):
+	switch = 'historical'
     config['remote'] = 'on'
     handles = []
-    dataset = ''
+    geodataset = ''
+    # Geocoder
     if config['remote']:
-        (classification, dataset) = loaddataset_fromurl(config['apiroot'], config['geocoderhandle'])
+        (classification, geodataset) = loaddataset_fromurl(config, config['geocoderhandle'])
     else:
-        dataset = loaddataset(handles)
+        geodataset = loaddataset(handles)
 
-    (modern, historical) = loadgeocoder(dataset)
+    (modern, historical) = loadgeocoder(geodataset, 'geocoder')
+
+    if switch == 'modern':
+        activeindex = modern.index
+        coder = modern
+        class1 = switch
+    else:
+        activeindex = historical.index
+        coder = historical
+	class1 = switch
+
+    # Loading dataset in dataframe
     handles = []
     handles.append(handle)
     try:
         if config['remote']:
-            (class1, dataset) = loaddataset_fromurl(config['apiroot'], handle)
+            (class1, dataset) = loaddataset_fromurl(config, handle)
         else:
             dataset = loaddataset(handles)
     except:
 	return 'No dataset ' + handle
 
-    treemapdata = treemap(dataset)
+    (cfilter, notint) = selectint(activeindex.values)
+    (moderndata, historicaldata) = loadgeocoder(dataset, '')
+    if switch == 'modern':
+        maindata = moderndata
+    else:
+        maindata = historicaldata
+
+    treemapdata = treemap(config, maindata, switch, cfilter, coder)
     return Response(treemapdata,  mimetype='application/json')
 
 # Panel data
@@ -1096,6 +1118,15 @@ def webmapper():
 @app.route('/geocoder')
 def geocoder():
     config = configuration()
+    remote = 'on'
+
+    # Geocoder
+    handle = config['geocoderhandle']
+    if remote:
+        (classification, geodataset) = loaddataset_fromurl(config, handle)
+    else:
+        geodataset = loaddataset(handles)
+
     fromyear = 1500
     toyear = 2016
     cfilter = ''
@@ -1105,10 +1136,13 @@ def geocoder():
         cfilter = request.args.get('name')
 
     if fromyear:
-        historical = 1
-        if historical:
+        historical = ''
+        if historical == 'old':
             api = config['apiroot'] + "/collabs/static/data/historical.json"
             (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, cfilter)
+	else:
+	    geocoder = buildgeocoder(geodataset, config, cfilter)
+
     data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
 
