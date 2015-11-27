@@ -20,10 +20,27 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
-def loadgeocoder(dataset):
+# Select int values
+def selectint(cols):
+    (isint, notint) = ([], [])
+    for colname in cols:
+        tmpvar = ''
+        try:
+            tmpvar = int(colname)
+            isint.append(tmpvar)
+        except:
+            notint.append(colname)
+    return (isint, notint)
+
+def loadgeocoder(dataset, action):
     (modern, historical) = ('', '')
-    geocoder = dataset.iloc[:, 1:12]
-    geocoder = geocoder.ix[3:]
+    geocoder = dataset
+    if action == 'geocoder':
+        geocoder = dataset.iloc[:, 1:12]
+    else:
+        geocoder = geocoder.ix[3:]
+    if action == 'test':
+        return (geocoder, geocoder)
     geocoder = geocoder.convert_objects(convert_numeric=True)
     geocoder = geocoder.replace(r'', np.nan, regex=True)
     geocoder = geocoder.replace('NaN', np.nan, regex=True)
@@ -31,8 +48,44 @@ def loadgeocoder(dataset):
         modern = geocoder[pd.notnull(geocoder['ccode'])]
         historical = geocoder[pd.isnull(geocoder['ccode'])]
         modern.index = modern['ccode']
+    else:
+	#geocoder = geocoder.ix[3:]
+	modern = geocoder[pd.notnull(geocoder['Code'])]
+	historical = []
+	modern.index = modern['Code']  
     
     return (modern, historical)
+
+def buildstatistics(config, dataset, classification):
+    stats = {}
+    cols = []
+    newpanel = dataset
+            
+    (iscolumns, deletecolumns) = selectint(newpanel.columns)
+    for colname in deletecolumns:
+        newpanel = newpanel.drop(colname, axis=1)
+        #newpanel = newpanel.ix[3:]
+    #return (newpanel, stats)
+    df = newpanel
+    df = df.convert_objects(convert_numeric=True)
+    df = df.replace(r'', np.nan, regex=True)
+    sum_row = {col: df[col].sum() for col in df}
+    #return (df, stats)
+    codes = df.index
+    cols = df.sum()
+    total = cols.sum()
+    for code in codes:
+        percent = 0
+        try:
+            localsum = df.ix[code].sum()
+            if localsum > 0:
+                percent = (localsum / total) * 100
+        except:
+            skip = 1
+
+        if percent > 0:
+            stats[code] = percent
+    return (df, stats)
 
 def countrystats(config, dataset, classification):
     stats = {}
@@ -154,19 +207,29 @@ def loaddataset_fromurl(config, handle):
         
     return (classtype, df)
 
-def treemap(config, dataset, classification):
+def treemap(config, dataset, classification, ctrfilter, coder):
     jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
-    (df, result) = countrystats(config, dataset, classification)
+    (df, result) = buildstatistics(config, dataset, classification)
     for idc in result:
-        value = result[idc]
-        try:
-	    if classification == 'modern':
-                ctr = dataset.ix[idc][config['moderncountry']]
-	    elif classification == 'historical':
-		ctr = dataset.ix[idc][config['webmappercountry']]
-            jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
-        except:
-            skip = idc
+	active = 'yes'
+	if ctrfilter:
+	    active = 'no'
+	    if int(idc) in ctrfilter:
+	        active = 'yes'
+
+	if active == 'yes':
+            value = result[idc]
+            try:
+		(ctr, ctrID) = ('', 0)
+	        if classification == 'modern':
+		    ctrID = int(idc)
+		else:
+		    ctrID = int(idc)
+	        if ctrID:
+		    ctr = str(coder.ix[ctrID][config['webmappercountry']]) + ' (' + str(int(coder.ix[ctrID]['start year'])) + '-' + str(int(coder.ix[ctrID]['end year'])) + ')'
+                jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
+            except:
+                skip = idc
 
     jsonresult = jsonresult[:-2]
     jsonresult = jsonresult + "\n]}"
