@@ -20,6 +20,33 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
+def buildgeocoder(geocoder, config, query):
+    geodict = []
+    (cfilter, notint) = selectint(geocoder.index)
+    
+    i = 0
+    for cID in cfilter:
+        geoitem = {}
+        countryitem = geocoder.ix[str(cID)]
+        geoitem['id'] = geocoder.ix[str(cID)][config['webmappercode']]
+        geoitem['validfrom'] = geocoder.ix[str(cID)]['start date'] 
+        geoitem['validuntil'] = geocoder.ix[str(cID)]['end date'] 
+        years = '(' + str(int(geocoder.ix[str(cID)]['start year'])) + '-' + str(int(geocoder.ix[str(cID)]['end year'])) + ')'
+        geoitem['label'] = geocoder.ix[str(cID)]['country name'] + ' ' + str(years)
+        geoitem['year'] = str(geocoder.ix[str(cID)][config['webmappercountry']]) + ' ' + years
+        geoitem['name'] = str(geocoder.ix[str(cID)][config['webmappercountry']])
+        
+        if query:
+            result = re.search(query, geoitem['name'], flags=re.IGNORECASE)
+            if result:
+                if geoitem['year']:
+                    geodict.append(geoitem)        
+        else:
+            geodict.append(geoitem)
+        i = i + 1
+        
+    return geodict
+
 # Select int values
 def selectint(cols):
     (isint, notint) = ([], [])
@@ -226,7 +253,9 @@ def treemap(config, dataset, classification, ctrfilter, coder):
 		else:
 		    ctrID = int(idc)
 	        if ctrID:
-		    ctr = str(coder.ix[ctrID][config['webmappercountry']]) + ' (' + str(int(coder.ix[ctrID]['start year'])) + '-' + str(int(coder.ix[ctrID]['end year'])) + ')'
+		    ctr = str(coder.ix[ctrID][config['webmappercountry']])
+		if classification == 'historical':
+		    ctr = str(ctr) + ' (' + str(int(coder.ix[ctrID]['start year'])) + '-' + str(int(coder.ix[ctrID]['end year'])) + ')'
                 jsonresult = jsonresult + "\t{ \"name\": \"" + str(ctr) + "\", \"size\": " + str(value) + " },\n"
             except:
                 skip = idc
