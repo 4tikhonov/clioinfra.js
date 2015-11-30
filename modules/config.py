@@ -7,12 +7,19 @@ import pandas as pd
 import re
 import ConfigParser
 import sys
+from flask import Flask, request, redirect
 
 def configuration():
    config = {}
    cpath = "/etc/apache2/clioinfra.conf"
    cparser = ConfigParser.RawConfigParser()
    cparser.read(cpath)
+
+   # Prevent SQL injections
+   pipes = '[\|;><`()$]'
+   semicolon = re.split(pipes, request.url)
+   if len(semicolon) > 1:
+	return config
  
    path_items = cparser.items( "config" )
    for key, value in path_items:
