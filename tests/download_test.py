@@ -4,16 +4,17 @@ import os
 import sys
 import errno
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules')))
+from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 
 from download import get_papers
 def randomword(length):
    return ''.join(random.choice(string.lowercase) for i in range(length))
 
 def testdownload():
+    config = configuration()
     DEBUG = 0
-    API_TOKEN="73883b6f-ca99-41b9-953a-b9f8be42723d"
-    HOSTNAME="dv.sandbox.socialhistoryservices.org"
-    cmd = "--insecure -u " + API_TOKEN + ": https://" + HOSTNAME + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
+    API_TOKEN=config['key']
+    cmd = "--insecure -u " + API_TOKEN + ": " + config['dataverseroot'] + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
     tmpdir = "/tmp/test"
     filename = randomword(10)
     arc = "data" + filename + ".zip"
@@ -34,7 +35,7 @@ def testdownload():
             raise e
         pass
 
-    zipfile = get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir)
+    zipfile = get_papers(config['dataverseroot'], config['key'], cmd, pid, tmpdir, arc, finaldir)
     print zipfile
     return
 
