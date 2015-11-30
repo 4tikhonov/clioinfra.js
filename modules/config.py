@@ -16,10 +16,14 @@ def configuration():
    cparser.read(cpath)
 
    # Prevent SQL injections
-   pipes = '[\|;><`()$]'
-   semicolon = re.split(pipes, request.url)
-   if len(semicolon) > 1:
-	return config
+   try:
+	# Web params check
+        pipes = '[\|;><`()$]'
+        semicolon = re.split(pipes, request.url)
+        if len(semicolon) > 1:
+	    return config
+   except:
+	cmd = 'on'
  
    path_items = cparser.items( "config" )
    for key, value in path_items:
