@@ -70,27 +70,6 @@ from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
 
-Provinces = ["Groningen","Friesland","Drenthe","Overijssel","Flevoland","Gelderland","Utrecht","Noord-Holland","Zuid-Holland","Zeeland","Noord-Brabant","Limburg"]
-pagelist = ["Home", "Global labor conflicts", "Local labor conflicts", "User Guide", "About"]
-urls = ["/", "/worldmap", "/site?year=1927&code=NLSTR&custom=on", "/developers", "/about"]
-cpath = "/etc/apache2/strikes.config"
-database = 'world_data'
-
-def connect():
-        cparser = ConfigParser.RawConfigParser()
-        cparser.read(cpath)
-
-        conn_string = "host='%s' dbname='%s' user='%s' password='%s'" % (cparser.get('config', 'dbhost'), cparser.get('config', 'dbname'), cparser.get('config', 'dblogin'), cparser.get('config', 'dbpassword'))
-
-        # get a connection, if a connect cannot be made an exception will be raised here
-        conn = psycopg2.connect(conn_string)
-
-        # conn.cursor will return a cursor object, you can use this cursor to perform queries
-        cursor = conn.cursor()
-
-        #(row_count, dataset) = load_regions(cursor, year, datatype, region, debug)
-        return cursor
-
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
     cparser.read(cpath)
@@ -196,52 +175,6 @@ def load_api_data1(apiurl, code, year, custom, scales, catnum):
         dataframe = simplejson.load(f)
     return dataframe
 
-def loadyears(api_years_url, code, year, custom):
-    years = []
-    data = load_api_data(api_years_url, code, '', custom, '', '')
-    apiyears = []
-    indicators = {}
-    for item in data['years']:
-       apiyears.append(item['year'])
-       indicators[item['year']] = item['count']
-
-    if apiyears:
-       apiyears = apiyears
-    else:
-       years.append(year);
-
-    return (apiyears, indicators)
-
-def loadcodes(api_topics_url, code, year, custom):
-    codes = []
-    data = load_api_data(api_topics_url, '', year, custom, '', '')
-    apicodes = []
-    indicators = {}
-    for item in data['codes']:
-       apicodes.append(item['code'])
-       indicators[item['code']] = item['topic_name']
-
-    if apicodes:
-       codes = apicodes
-    else:
-       codes.append(code);
-    return (codes, indicators)
-
-def load_topics(cursor):
-        data = {}
-        sql = "select distinct code, indicator from datasets.data";
-        #sql = sqlfilter(sql)
-
-        # execute
-        cursor.execute(sql)
-
-        # retrieve the records from the database
-        data = cursor.fetchall()
-        jsondata = json_generator(cursor, 'data', data)
-
-        return jsondata
-
-
 app = Flask(__name__)
 
 @app.route('/info')
@@ -253,10 +186,6 @@ def test():
 def slider():
     #return 'slider'
     return render_template('slider.html')
-
-@app.route('/members')
-def members():
-    return render_template('members.html')
 
 @app.route('/graphslider')
 def graphslider():
@@ -376,110 +305,6 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-def upload_file(upload_folder, path):
-    upload_folder = upload_folder + '/custom'
-    if not os.path.exists(upload_folder):
-        os.makedirs(upload_folder)
-    if request.method == 'POST':
-        file = request.files['file']
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(upload_folder, filename))
-	    datafile = upload_folder + '/' + filename
-	    perlbin = "/usr/bin/perl "
-	    cmd = perlbin + path + "/scripts/etl/custom_import.pl " + datafile
-            p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-            result = p.communicate()[0]
-            return datafile 
-    return
-
-@app.route('/site', methods=['GET', 'POST'])
-def d3site(settings=''):
-    selectedcode = {}
-    custom_selectedcode = {}
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    #custom = ''
-    province = ''
-    provinces = Provinces[:]
-    apiurl = '/api/maps?' #year=' + year
-    dataurl = '/api/data?'
-    scaleurl = '/api/scales?'
-    mapscale = 6050
-    dataapiurl = dataurl + 'code=' + code
-    api_topics_url = server + '/api/topics?'
-    upload_file(imagepathloc, path)
-    thiscustom = custom
-    thiscode = code
-    if not custom:
-        thiscustom = ''
-        #thiscode = ''
-
-    (codes, indicators) = loadcodes(api_topics_url, thiscode, year, thiscustom)
-    if thiscode:
-        selectedcode[thiscode] = indicators[thiscode]
-        indicators.pop(thiscode, "none");
-    api_years_url = server + '/api/years?'
-    (years, yearsinfo) = loadyears(api_years_url, code, '', thiscustom)
-
-    # for custom datasets
-    intcustom = 'on'
-    if custom:
-        intcustom = ''
-	#code = ''
-    (custom_codes, custom_indicators) = loadcodes(api_topics_url, code, year, intcustom)
-#    custom_selectedcode[code] = custom_indicators[code]
-    custom_indicators.pop(code, "none");
-    (custom_years, custom_yearsinfo) = loadyears(api_years_url, code, '', intcustom)
-
-    showlegend='true';
-    if request.args.get('nolegend'):
-	showlegend = ''
-    if int(year) < 1812:
-        mapscale = mapscale * 1.5
-	showlegend = ''
-    
-    template = 'site_tabs.html'
-    if custom:
-        template = 'site_tabs_custom.html'
-
-    legendscales = ["100-200","50-99", "10-49", "1-9", "0-1"]
-    # DATAAPI
-    scale = 'calculate'
-    catnum = 8 
-    # Error
-    apiweburl = server + scaleurl
-    thisscale = load_api_data(apiweburl, code, year, thiscustom, scale, catnum)
-    ranges = []
-    if thisscale:
-        ranges = json.loads(thisscale)
-    colors = []
-    legendcolors = []
-    scales = []
-    legendscales = []
-    out = ''
-    for sector in sorted(ranges):
-        dataitem = ranges[sector]
-        colors.append(dataitem['color'])
-        scales.append(dataitem['range'])
-	out = out + ' ' + dataitem['color']
-
-    urlvar = '' #api_years_url + code
-    if thisscale:
-        ranges = thisscale.split(', ')
-    if colors:
-	legendscales = scales
-	legendcolors = colors
-
-    if request.args.get('province'):
-	province = request.args.get('province')
-	provinces.remove(province)
-	mapscale = mapscale * 2
-
-    activepage = 'Map'
-    pages = getindex(activepage)
-    resp = make_response(render_template(template, pages=pages, topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year, codes=codes, indicators=indicators, datarange=datarange, selectedcode=selectedcode, thiscode=code, showlegend=showlegend, allyears=years, custom=custom, custom_indicators=custom_indicators, custom_allyears=custom_years, legendscales=legendscales, legendcolors=legendcolors, urlvar=urlvar, categories=catnum, province=province, provinces=provinces, mapscale=mapscale))
-    return resp
-
 @app.route('/download')
 def download(settings=''):
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
@@ -562,122 +387,6 @@ def download(settings=''):
     if shapefile:
         return "<a href=\"" + shapefile + "\">Download ShapeFile</a>"
     resp = make_response(render_template('download.html', image=fileonweb, svgfile=svgfileout, pdffile=pdffile))
-    return resp
-
-@app.route('/worldmap')
-def worldmap(settings=''):
-    selectedcode = {}
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    code = 'LCI04'
-    showlegend = 'yes'
-    thiscustom = ''
-    scale = '120'
-    catnum = 8
-    scaleurl = '/api/scales?'
-    apiurl = '/api/maps?world=on' #year=' + year
-    # /api/maps?&year=1982&world=on
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    if request.args.get('year'):
-        year = request.args.get('year')
-    if request.args.get('code'):
-        code = request.args.get('code')
-    #codes = loadcodes(api_topics_url, code, year, custom)
-    # Error
-    thiscode = code
-    apiweburl = server + scaleurl
-    apiweburl = apiweburl + '&db=' + database
-    api_topics_url = api_topics_url + '&db=' + database
-    api_years_url = server + '/api/years?' + '&db=' + database
-    thisscale = ''
-    try:
-        thisscale = load_api_data(apiweburl, code, year, thiscustom, scale, catnum)
-        (codes, indicators) = loadcodes(api_topics_url, thiscode, year, thiscustom)
-        (years, yearsinfo) = loadyears(api_years_url, code, '', '')
-
-        if thiscode:
-            selectedcode[thiscode] = indicators[thiscode]
-            indicators.pop(thiscode, "none");
-	#return thisscale
-    except:
-	#return 'Error ' + apiweburl
-	donothing = 1
-    ranges = []
-    if thisscale:
-        ranges = json.loads(thisscale)
-    colors = []
-    legendcolors = []
-    scales = []
-    legendscales = []
-    out = ''
-    for sector in sorted(ranges):
-        dataitem = ranges[sector]
-        colors.append(dataitem['color'])
-        scales.append(dataitem['range'])
-        out = out + ' ' + dataitem['color']
-
-    #urlvar = '' #api_years_url + code
-    if thisscale:
-        ranges = thisscale.split(', ')
-    if colors:
-        legendscales = scales
-        legendcolors = colors
-    if request.args.get('nolegend'):
-        showlegend = ''
-
-    activepage = 'Map'
-    pages = getindex(activepage)
-    resp = make_response(render_template('world/worldmap.html', pages=pages, topojsonurl=apiurl, datayear=year, showlegend=showlegend, legendscales=legendscales, legendcolors=legendcolors, indicators=indicators, selectedcode=selectedcode, code=thiscode, allyears=years, database=database))
-    return resp
-
-@app.route('/history')
-def history(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    apiurl = '/api/maps?' #year=' + year
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    codes = loadcodes(api_topics_url, code, year, custom)
-    resp = make_response(render_template('menu_history.html', topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year, codes=codes, datarange=datarange, selectedcode=code))
-    return resp
-
-@app.route('/tabs')
-def tabs(settings=''):
-    selectedcode = {}
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    #custom = ''
-    apiurl = '/api/maps?' #year=' + year
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    upload_file(imagepathloc, path)
-    (codes, indicators) = loadcodes(api_topics_url, code, year, custom)
-    selectedcode[code] = indicators[code]
-    indicators.pop(code, "none");
-    api_years_url = server + '/api/years?'
-    (years, yearsinfo) = loadyears(api_years_url, code, '', custom)
-
-    showlegend='true';
-    if request.args.get('nolegend'):
-        showlegend = ''
-
-    resp = make_response(render_template('tabs.html', topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year, codes=codes, indicators=indicators, datarange=datarange, selectedcode=selectedcode, thiscode=code, showlegend=showlegend, allyears=years, custom=custom))
-    return resp
-
-@app.route('/developers')
-def developers(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    apiurl = '/api/maps?' #year=' + year
-    dataapiurl = '/api/data?code=' + code
-    api_topics_url = server + '/api/topics?'
-    #codes = loadcodes(api_topics_url, code, year, custom)
-    codes = []
-    activepage = 'User Guide'
-    pages = getindex(activepage)
-    resp = make_response(render_template('menu_developers.html', active=activepage, pages=pages, topojsonurl=apiurl, datajsonurl=dataapiurl, datayear=year, codes=codes, datarange=datarange, selectedcode=code, website=website))
-    return resp
-
-@app.route('/presentation')
-def presentation(settings=''):
-    resp = make_response(render_template('menu_presentation.html'))
     return resp
 
 @app.route('/treemap')
@@ -1155,13 +864,6 @@ def browse(settings=''):
     resp = make_response(render_template('dataverse.html', active=activepage, pages=pages, dataverse=dataverse))
     return resp
 
-@app.route('/about')
-def about(settings=''):
-    activepage = 'About'
-    pages = getindex(activepage)
-    resp = make_response(render_template('world/about.html', active=activepage, pages=pages))
-    return resp
-
 @app.route('/signup')
 def signup(settings=''):
     config = configuration()
@@ -1210,23 +912,6 @@ def boundaries(settings=''):
     dataset = 'dataframe66_'
     jsondataset = getboundaries(root, dataset)
     return Response(json.dumps(jsondataset), mimetype='application/json')
-
-@app.route('/colors')
-def colors(settings=''):
-    activepage = 'Home'
-    pages = getindex(activepage)
-    resp = make_response(render_template('world/colorbrewer.html', active=activepage, pages=pages))
-    return resp
-
-@app.route('/googlemaps')
-def googlemaps(settings=''):
-    activepage = 'About'
-    pages = getindex(activepage)
-    if request.args.get('year'):
-        year = request.args.get('year')
-
-    resp = make_response(render_template('world/googlemaps.html', active=activepage, pages=pages, datayear=year))
-    return resp
 
 @app.route('/get')
 def get(settings=''):
@@ -1285,46 +970,6 @@ def datasets(settings=''):
         f.writerow(datarow) 
     return send_from_directory(imagepathloc, localfile, as_attachment=True)
 
-def getindex(thispage):
-    fulllist = []
-    for i, page in enumerate(pagelist):
-        pages = {}
-        pages['name'] = page
-        pages['url'] = urls[i]
-        if page == thispage:
-            pages['active'] = " class=current"
-        else:
-            pages['active'] = ''
-        fulllist.append(pages)
-
-    return fulllist
-
-@app.route('/index')
-def d3index(settings=''):
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    topicapiurl = website + "/api/topicslist"
-    topicstats = load_api_data(topicapiurl, '', '', '', '', '')
-    topiclist = []
-    thisletter = ''
-    letters = []
-    if topicstats:
-        for code in sorted(topicstats):
-	    topiclist.append(topicstats[code])
-            dataset = topicstats[code]
-	    letter = dataset['letter']
-            url = "/site?code=" + dataset['topic_code'] + "&year=" + str(dataset['startyear'])
-	    topicstats[code]['url'] = url
-	    if thisletter == letter:
-		topicstats[code]['letter'] = ''
-	    else:
-	        thisletter = letter
-		letters.append(letter)
-
-    activepage = 'Index'
-    pages = getindex(activepage)
-    resp = make_response(render_template('datasetlist.html', active=activepage, letters=letters, topiclist=topiclist, pages=pages))
-    return resp
-
 @app.route('/print')
 def printme():
     config = configuration()
@@ -1340,7 +985,7 @@ def printme():
 	    datasetID = item['datasetID']
     except:
 	datasetID = 228
-    root = config['dataverseroot'] + "/api/datasets/" + str(datasetID) + "/versions/?key=73883b6f-ca99-41b9-953a-b9f8be42723d&show_entity_ids=true&q=authorName:*"
+    root = config['dataverseroot'] + "/api/datasets/" + str(datasetID) + "/versions/?key=" + config['key'] + "&show_entity_ids=true&q=authorName:*"
     data = load_api_data(root, 1)
     (title, citation) = get_citation(data['data'])
     uhandle = handle
@@ -1397,35 +1042,6 @@ def advanced(settings=''):
     for name in request.args:
         resp.set_cookie(name, request.args[name])
 
-    return resp
-
-@app.route('/old', methods=['GET', 'POST'])
-def index(year=None,code=None):
-    cmdgeo = ''
-    (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
-    api_topics_url = server + '/api/topics?'
-
-    str = 'Website will be developed to render maps'
-    html_code = '<select name=code>' + '<option value\=' + code + '>' + code + '</option>' '</select>'
-    year_code = '&nbsp;<input type=text name=year value=' + year + '>&nbsp;<input type=submit name="Submit">';
-
-    cmd = viewerpath + ' ' + '""' + ' ' + year + ' ' + imagepathloc + '/' + year + '.png'  
-    #cmd = '/bin/echo test'
-
-    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    #response = json.dumps(p.stdout.read()
-    result = p.communicate()[0]
-    #return cmd
-    html = result + '<form>' + html_code + year_code + '<br>' + '<img width=1024 src=\"' + imagepathweb + '/' + year + '.png\">' + '</form>'
-    image = imagepathweb + '/' + year + '.png';
-    codes = loadcodes(api_topics_url, code, year, custom)
-
-    resp = make_response(render_template('demo.html', codes=codes, year=year, image=image))
-    for name in request.args:
-       resp.set_cookie(name, request.args[name])
-
-    resp.set_cookie('year', year)
-    resp.set_cookie('code', code)
     return resp
 
 if __name__ == '__main__':
