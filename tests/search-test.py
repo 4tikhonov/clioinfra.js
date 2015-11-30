@@ -8,10 +8,11 @@ from search import dataset_search, getindicators, loadjson
 
 def search(qurl):
     # Global settings
-    root = "http://dv.sandbox.socialhistoryservices.org"
+    config = configuration()
+    root = config['dataverseroot']
 
     # Load topics
-    topicurl = "http://dpe.sandbox.socialhistoryservices.org/collabs/static/data/dataframe100_0.json"
+    topicurl = config['apiroot'] + "/collabs/static/data/dataframe100_0.json"
     topics = loadjson(topicurl)
 
     # Input
