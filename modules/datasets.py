@@ -50,7 +50,7 @@ def buildgeocoder(geocoder, config, query):
     return (geodict, geolist)
 
 # Geocoder vocabulary
-def load_geocodes(switch, codes, maindata, geolist):
+def load_geocodes(config, switch, codes, maindata, geolist):
     geocodes = {}
     if switch == 'modern':
         for code in codes[0]:
