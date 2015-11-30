@@ -22,6 +22,7 @@ from sys import argv
 
 def buildgeocoder(geocoder, config, query):
     geodict = []
+    geolist = {}
     (cfilter, notint) = selectint(geocoder.index)
     
     i = 0
@@ -35,6 +36,7 @@ def buildgeocoder(geocoder, config, query):
         geoitem['label'] = geocoder.ix[str(cID)]['country name'] + ' ' + str(years)
         geoitem['year'] = str(geocoder.ix[str(cID)][config['webmappercountry']]) + ' ' + years
         geoitem['name'] = str(geocoder.ix[str(cID)][config['webmappercountry']])
+	geolist[int(geoitem['id'])] = geoitem['label']
         
         if query:
             result = re.search(query, geoitem['name'], flags=re.IGNORECASE)
@@ -45,7 +47,24 @@ def buildgeocoder(geocoder, config, query):
             geodict.append(geoitem)
         i = i + 1
         
-    return geodict
+    return (geodict, geolist)
+
+# Geocoder vocabulary
+def load_geocodes(switch, codes, maindata, geolist):
+    geocodes = {}
+    if switch == 'modern':
+        for code in codes[0]:
+            try:
+                ctr = str(maindata.ix[code][config['webmappercountry']])            
+            except:
+                ctr = str(maindata.ix[code][config['moderncountry']])
+            
+            geocodes[int(code)] = ctr
+    elif switch == 'historical':
+        for code in codes[0]:
+            ctr = geolist[code]            
+            geocodes[int(code)] = ctr        
+    return geocodes
 
 # Select int values
 def selectint(cols):
