@@ -29,7 +29,7 @@ if fromyear:
         hist = countries
 
     (header, panelcells, codes, datahub, data, handle2ind, unit2ind, original) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logflag)
-    f = "panel.xlsx"
+    datafile = "panel.xlsx"
     #(handles, pidslist) = pidfrompanel(pid)
     pidslist = handles
     try:
@@ -38,11 +38,11 @@ if fromyear:
     except:
 	fullmetadata = ''
     # Create panel
-    panel2excel(config['tmpdir'], f, header, panelcells, fullmetadata)
+    panel2excel(config['webtest'], datafile, header, panelcells, fullmetadata)
 
 # Create individual files 
 for pid in handles:
-    testfile = 'test1.xls'    
+    datafile = 'test1.xls'    
     print data[pid]
-    individual_dataset(config['tmpdir'], testfile, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes, fullmetadata)
+    individual_dataset(config['webtest'], datafile, handle2ind[pid], unit2ind[pid], datahub, data[pid], codes, fullmetadata)
 
