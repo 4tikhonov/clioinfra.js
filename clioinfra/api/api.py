@@ -297,7 +297,8 @@ def simplesearch(root, qurl, apiroot):
     return datasets
 
 def load_indicators(filename):
-    csvfile = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/data/" + filename
+    config = configuration()
+    csvfile = config['clearance'] + "/collabs/static/data/" + filename
     ufile = urlopen(csvfile)
     data = pd.read_csv(ufile, delimiter='\t')
     df = data
@@ -682,10 +683,11 @@ def datasets():
 def dialog():
     pid = ''
     root = ''
+    config = configuration()
     if request.args.get('pid'):
         pid = request.args.get('pid')
         zipfile = downloadzip(pid)
-        root = "http://clearance.sandbox.socialhistoryservices.org/collabs/static/tmp/" + zipfile
+        root = config['clearance'] + "/collabs/static/tmp/" + zipfile
 
     resp = make_response(render_template('dialog.html', download=root))
     return resp
