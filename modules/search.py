@@ -64,6 +64,7 @@ def dataverse_search(apiurl):
 
 def dataset_search(root, IDS, topics):
     totalq = ''
+    config = configuration()
     data = []
     for item in topics:
         thisid = str(item['ID'])
@@ -76,7 +77,7 @@ def dataset_search(root, IDS, topics):
         
     if totalq:
         totalq = totalq + '"tttttt"'
-        apiurl = root + "/api/search?q=" + totalq + "&key=73883b6f-ca99-41b9-953a-b9f8be42723d&type=dataset"
+        apiurl = root + "/api/search?q=" + totalq + "&key=" + config['key'] + "&type=dataset"
 	print apiurl
         data = dataverse_search(apiurl)
 
