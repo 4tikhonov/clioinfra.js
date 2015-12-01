@@ -4,6 +4,7 @@ import sys
 import os
 import re
 import simplejson
+import pandas as pd
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
@@ -82,6 +83,8 @@ datasubset = datasetfilter(maindata, datafilter)
 fullpath = config['webtest'] + "/subdata_set.xlsx"
 (yearscolumns, notyears) = selectint(maindata.columns)
 (countryinfo, notcountry) = selectint(maindata.index)
+xset = datasubset
+xrow = datasubset.T
 finalsubset = datasubset.replace(np.nan, '', regex=True)
 icoder = coder.ix[1:]
 if 'start date' in icoder.columns:
@@ -98,14 +101,18 @@ if units:
     metadata['units'] = units
 
 (isdata, nodata) = ([], [])
-xset = finalsubset.replace(r'', np.nan, regex=True)
+#xset = finalsubset.replace(r'', np.nan, regex=True)
+isyear = pd.DataFrame(xset.sum()).T
+isctr = pd.DataFrame(xrow.sum())
+isctr = isctr.dropna()
+(ctrfilter, notint) = selectint(isctr.index)
 for year in yearscolumns:
     try:
         data = xset[year].values
     except:
         nodata.append(year)
 
-datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, nodata)
-#print datafile
+datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
+print datafile
 #yearscolumns
 xset.ix[67][1831]
