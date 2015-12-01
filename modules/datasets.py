@@ -287,3 +287,27 @@ def treemap(config, dataset, classification, ctrfilter, coder):
     jsonresult = jsonresult + "\n]}"
     return jsonresult
 
+def datasetfilter(maindata, datafilter):
+    yearsfilter = []
+    ctrlist = []
+    datasubset = ''
+
+    if datafilter['ctrlist']:
+        for ctrid in re.split(',', datafilter['ctrlist']):
+            ctrlist.append(int(ctrid))
+        if ctrlist:
+            datasubset = maindata.ix[ctrlist]
+    else:
+        datasubset = maindata
+
+    (years, notyears) = selectint(datasubset.columns)
+    if years:
+        datasubset.columns = years
+        for thisyear in years:
+            if thisyear >= int(datafilter['startyear']):
+                if thisyear <= int(datafilter['endyear']):
+                    yearsfilter.append(thisyear)
+
+    if yearsfilter:
+        datasubset = datasubset[yearsfilter]
+    return datasubset
