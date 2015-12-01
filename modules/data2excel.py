@@ -220,7 +220,7 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
                 
             j = j + 1
         for year in yearscolumns:
-            if year not in nodata:
+            if year not in nodatayears:
                 try:
                     c = ws.cell(row=i, column=j)
                     tmpval = dataset.ix[int(idc)][int(year)]
