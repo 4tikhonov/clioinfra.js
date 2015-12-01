@@ -171,7 +171,7 @@ def downloadzip(pid):
         dataset = loaddataset(handles)
 
     #geocoder = buildgeocoder(dataset, config)
-    (modern, historical) = loadgeocoder(dataset, 'geocoder')
+    (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
     for handle in handles:
 	#if remote:
     	#    (class1, dataset) = loaddataset_fromurl(config, handle)
@@ -404,7 +404,7 @@ def treemapweb():
     else:
         geodataset = loaddataset(handles)
 
-    (modern, historical) = loadgeocoder(geodataset, 'geocoder')
+    (modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
 
     if switch == 'modern':
         activeindex = modern.index
@@ -415,6 +415,7 @@ def treemapweb():
         coder = historical
 	class1 = switch
 
+    return 'test'
     # Loading dataset in dataframe
     handles = []
     handles.append(handle)
@@ -427,7 +428,7 @@ def treemapweb():
 	return 'No dataset ' + handle
 
     (cfilter, notint) = selectint(activeindex.values)
-    (moderndata, historicaldata) = loadgeocoder(dataset, '')
+    (moderndata, historicaldata) = loadgeocoder(config, dataset, '')
     if switch == 'modern':
         maindata = moderndata
     else:
