@@ -166,17 +166,17 @@ def downloadzip(pid):
 
     remote = 'on'
     if remote:
-        (classification, dataset) = loaddataset_fromurl(config, config['geocoderhandle'])
+        (classification, dataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
     else:
         dataset = loaddataset(handles)
 
     #geocoder = buildgeocoder(dataset, config)
     (modern, historical) = loadgeocoder(dataset, 'geocoder')
     for handle in handles:
-	if remote:
-    	    (class1, dataset) = loaddataset_fromurl(config, handle)
-	else:
-    	    dataset = loaddataset(handles)
+	#if remote:
+    	#    (class1, dataset) = loaddataset_fromurl(config, handle)
+	#else:
+    	#    dataset = loaddataset(handles)
 
 	#(cfilter, notint) = selectint(activeindex.values)
 	#(moderndata, historicaldata) = loadgeocoder(dataset, '')
@@ -400,7 +400,7 @@ def treemapweb():
     geodataset = ''
     # Geocoder
     if config['remote']:
-        (classification, geodataset) = loaddataset_fromurl(config, config['geocoderhandle'])
+        (classification, geodataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
     else:
         geodataset = loaddataset(handles)
 
@@ -420,7 +420,7 @@ def treemapweb():
     handles.append(handle)
     try:
         if config['remote']:
-            (class1, dataset) = loaddataset_fromurl(config, handle)
+            (class1, dataset, title, units) = loaddataset_fromurl(config, handle)
         else:
             dataset = loaddataset(handles)
     except:
@@ -601,7 +601,7 @@ def geocoder():
     # Geocoder
     handle = config['geocoderhandle']
     if remote:
-        (classification, geodataset) = loaddataset_fromurl(config, handle)
+        (classification, geodataset, title, units) = loaddataset_fromurl(config, handle)
     else:
         geodataset = loaddataset(handles)
 
