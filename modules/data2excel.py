@@ -3,6 +3,9 @@
 import xlsxwriter
 import xlwt
 import sys
+import openpyxl
+from openpyxl.cell import get_column_letter
+import numpy as np
 
 def panel2excel(datadir, filename, header, panelcells, metadata):
     wb = xlwt.Workbook(encoding='utf')
@@ -164,4 +167,69 @@ def individual_dataset(datadir, filename, indicator, units, inputdatahub, data, 
     
     fullpath = datadir + "/" + filename
     wb.save(fullpath)    
+    return fullpath
+
+def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns, dataset, nodatayears):
+    wb = openpyxl.Workbook()
+    ws = wb.get_active_sheet()
+    ws.title = "Data"
+    countryinfo = []
+
+    col_width = 256 * 20
+    # Forming header
+    order = []
+    start = 2
+    c = ws.cell(row=0, column=0)
+    ws.column_dimensions[get_column_letter(1)].width = 20
+    c.value = metadata['title']
+    c.style.font.bold = True
+    c = ws.cell(row=1, column=0)
+    c.value = metadata['units']
+    c.style.font.bold = True
+    i = 0
+    for newcolumn in metacolumns:
+        c = ws.cell(row=start, column=i)
+        c.value = newcolumn
+        c.style.font.bold = True
+        order.append(newcolumn)
+        ws.column_dimensions[get_column_letter(i+1)].width = 15
+        i = i + 1
+    for year in sorted(yearscolumns):
+        c = ws.cell(row=start, column=i)
+        c.value = str(year)
+        c.style.font.bold = True
+        i = i + 1
+
+    i = start
+    for idc in geocoder.index:
+        i = i + 1
+        #metadata = geocoder.ix[int(idc)]
+        j = 0        
+        for columnname in metacolumns:
+            thisvalue = ''
+            c = ws.cell(row=i, column=j)            
+            try:
+                thisvalue = str(geocoder.ix[int(idc)][columnname])                
+            except:
+                skip = 1
+                
+            if thisvalue == '':
+                c.value = '' 
+            else:
+                c.value = thisvalue
+                
+            j = j + 1
+        for year in yearscolumns:
+            if year not in nodata:
+                try:
+                    c = ws.cell(row=i, column=j)
+                    tmpval = dataset.ix[int(idc)][int(year)]
+                    c.value = tmpval
+                except:
+                    skip = 'on'                
+                    #c.value = randint(0,9)
+            j = j + 1
+
+    wb.save(fullpath)
+   
     return fullpath
