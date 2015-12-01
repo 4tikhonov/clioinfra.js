@@ -169,7 +169,7 @@ def individual_dataset(datadir, filename, indicator, units, inputdatahub, data, 
     wb.save(fullpath)    
     return fullpath
 
-def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns, dataset, nodatayears):
+def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns, dataset, datayears, datactr):
     wb = openpyxl.Workbook()
     ws = wb.get_active_sheet()
     ws.title = "Data"
@@ -217,18 +217,27 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
                 c.value = '' 
             else:
                 c.value = thisvalue
-                
             j = j + 1
-        for year in yearscolumns:
-            if year not in nodatayears:
-                try:
-                    c = ws.cell(row=i, column=j)
-                    tmpval = dataset.ix[int(idc)][int(year)]
-                    c.value = tmpval
-                except:
-                    skip = 'on'                
-                    #c.value = randint(0,9)
-            j = j + 1
+
+	# Searching for active countries
+        activectr = ''
+	try:
+	    if int(idc) in datactr:
+	        activectr = 'yes'
+	except:
+	    activectr = ''
+	if activectr == 'yes':
+	    # Checking active years
+	    for year in yearscolumns:
+                if year in datayears:
+                    try:
+                        c = ws.cell(row=i, column=j)
+                        tmpval = dataset.ix[int(idc)][int(year)]
+                        c.value = tmpval
+                    except:
+                        skip = 'on'                
+                        #c.value = randint(0,9)
+                j = j + 1
 
     wb.save(fullpath)
    
