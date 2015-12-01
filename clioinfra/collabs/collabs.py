@@ -735,7 +735,6 @@ def dashboard(settings=''):
     except:
 	donothing = 1
 
-    pages = getindex(activepage)
     valtitle = ''
     if validate:
 	# VALIDATION
@@ -743,6 +742,7 @@ def dashboard(settings=''):
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
 	valtitle = maincontent
+	return 'Dataset updated'
 
     if benforddata:
 	title = benforddata
