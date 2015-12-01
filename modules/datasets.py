@@ -92,7 +92,7 @@ def loadgeocoder(config, dataset, action):
     geocoder = geocoder.replace('NaN', np.nan, regex=True)
     if 'ccode' in geocoder:
         modern = geocoder[pd.notnull(geocoder['ccode'])]
-        historical = geocoder[pd.isnull(geocoder['ccode'])]
+	historical = geocoder
         modern.index = modern['ccode']
 	historical.index = historical[config['webmappercode']]
     else:
@@ -232,6 +232,9 @@ def loaddataset_fromurl(config, handle):
     classtype = 'None'
     maincode = config['moderncode']
     webmappercode = config['webmappercode']
+    # Get title and units
+    title = dataframe.ix[0][1]
+    units = dataframe.ix[0][2]
 
     # Look for code in the column names 
     if maincode in dataframe:
@@ -252,7 +255,7 @@ def loaddataset_fromurl(config, handle):
 	    df = dataframe
             df.index = df[webmappercode]
         
-    return (classtype, df)
+    return (classtype, df, title, units)
 
 def treemap(config, dataset, classification, ctrfilter, coder):
     jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
