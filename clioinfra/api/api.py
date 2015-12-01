@@ -619,7 +619,7 @@ def geocoder():
             api = config['apiroot'] + "/collabs/static/data/historical.json"
             (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, cfilter)
 	else:
-	    geocoder = buildgeocoder(geodataset, config, cfilter)
+	    (geocoder, geolist) = buildgeocoder(geodataset, config, cfilter)
 
     data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
