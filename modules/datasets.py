@@ -78,7 +78,7 @@ def selectint(cols):
             notint.append(colname)
     return (isint, notint)
 
-def loadgeocoder(dataset, action):
+def loadgeocoder(config, dataset, action):
     (modern, historical) = ('', '')
     geocoder = dataset
     if action == 'geocoder':
@@ -94,6 +94,7 @@ def loadgeocoder(dataset, action):
         modern = geocoder[pd.notnull(geocoder['ccode'])]
         historical = geocoder[pd.isnull(geocoder['ccode'])]
         modern.index = modern['ccode']
+	historical.index = historical[config['webmappercode']]
     else:
 	#geocoder = geocoder.ix[3:]
 	modern = geocoder[pd.notnull(geocoder['Code'])]
