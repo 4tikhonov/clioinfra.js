@@ -84,15 +84,6 @@ datasubset = datasetfilter(maindata, datafilter)
 fullpath = config['webtest'] + "/subdata_set.xlsx"
 (yearscolumns, notyears) = selectint(maindata.columns)
 (countryinfo, notcountry) = selectint(maindata.index)
-xset = datasubset
-xrow = datasubset.T
-finalsubset = datasubset.replace(np.nan, '', regex=True)
-icoder = coder.ix[1:]
-if 'start date' in icoder.columns:
-    icoder = icoder.drop('start date', axis=1)
-if 'end date' in icoder.columns:
-    icoder = icoder.drop('end date', axis=1)    
-icoder = icoder.replace(np.nan, '', regex=True)
 metadata = {}
 metadata['title'] = 'testtitle'
 metadata['units'] = 'testunits'
@@ -101,19 +92,8 @@ if title:
 if units:
     metadata['units'] = units
 
-(isdata, nodata) = ([], [])
-#xset = finalsubset.replace(r'', np.nan, regex=True)
-isyear = pd.DataFrame(xset.sum()).T
-isctr = pd.DataFrame(xrow.sum())
-isctr = isctr.dropna()
-(ctrfilter, notint) = selectint(isctr.index)
-for year in yearscolumns:
-    try:
-        data = xset[year].values
-    except:
-        nodata.append(year)
-
 a = datetime.now()
+(finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
 datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
 b = datetime.now()
 d = b - a
