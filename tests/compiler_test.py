@@ -11,6 +11,7 @@ from config import configuration, dataverse2indicators, load_dataverse, findpid,
 from datacompiler import dataframe_compiler
 
 config = configuration()
+config['remote'] = 'on'
 datafilter = {}
 datafilter['startyear'] = '1500'
 datafilter['endyear'] = '2010'
