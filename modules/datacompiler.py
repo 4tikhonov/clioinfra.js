@@ -63,12 +63,16 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
         maindata = maindata.drop(colname, axis=1)
 
     # Apply filters
-    datasubset = datasetfilter(maindata, datafilter)
+    if datafilter:
+        datasubset = datasetfilter(maindata, datafilter)
+    else:
+	datasetset = maindata
 
     # Create Excel file out from dataframe
     (yearscolumns, notyears) = selectint(maindata.columns)
     (countryinfo, notcountry) = selectint(maindata.index)
 
     (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
-    datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
+    if fullpath:
+        datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
     return (fullpath, finalsubset)
