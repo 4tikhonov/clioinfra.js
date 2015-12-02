@@ -29,7 +29,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     else:
         dataset = loaddataset(handles)
 
-    (geocoder, geolist) = buildgeocoder(dataset, config, '')
+    (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
     coderyears = []
     # Default years selection
