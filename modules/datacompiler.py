@@ -33,8 +33,14 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (geocoder, geolist) = buildgeocoder(dataset, config, '')
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
     coderyears = []
-    for i in range(1500, 2015):
+    # Default years selection
+    for i in range(1500, 2016):
         coderyears.append(i)
+    # Years selected
+    if datafilter['startyear']:
+        coderyears = []
+        for i in range(int(datafilter['startyear']), int(datafilter['endyear'])):
+            coderyears.append(i)
 
     # Reading dataset
     if config['remote']:
