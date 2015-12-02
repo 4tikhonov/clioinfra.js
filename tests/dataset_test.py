@@ -21,7 +21,7 @@ if remote:
 else:
     dataset = loaddataset(handles)
 
-geocoder = buildgeocoder(dataset, config)
+(geocoder, geolist, oecdlist) = buildgeocoder(dataset, config)
 print geocoder
 (modern, historical) = loadgeocoder(dataset, 'geocoder') 
 

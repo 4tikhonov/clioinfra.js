@@ -29,7 +29,7 @@ if remote:
 else:
     dataset = loaddataset(handles)
 
-(geocoder, geolist) = buildgeocoder(dataset, config, '')
+(geocoder, geolist, oecd) = buildgeocoder(dataset, config, '')
 (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
 coderyears = []
 for i in range(1500, 2015):
@@ -76,7 +76,7 @@ datafilter = {}
 datafilter['startyear'] = '1500'
 datafilter['endyear'] = '2010'
 datafilter['ctrlist'] = ''
-#datafilter['ctrlist'] = '528,14,18,67'
+datafilter['ctrlist'] = '528,14,18,67'
 datasubset = datasetfilter(maindata, datafilter)
 #print datasubset.to_html
 
@@ -100,4 +100,4 @@ d = b - a
 print "Time: " + str(d.seconds) + " seconds"
 print datafile
 #yearscolumns
-#xset.ix[67][1831]
+print finalsubset.ix[67][1831]
