@@ -5,6 +5,7 @@ import os
 import re
 import simplejson
 import pandas as pd
+from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
@@ -75,7 +76,7 @@ datafilter = {}
 datafilter['startyear'] = '1500'
 datafilter['endyear'] = '2010'
 datafilter['ctrlist'] = ''
-#datafilter['ctrlist'] = '528,14,18,67'
+datafilter['ctrlist'] = '528,14,18,67'
 datasubset = datasetfilter(maindata, datafilter)
 #print datasubset.to_html
 
@@ -112,7 +113,11 @@ for year in yearscolumns:
     except:
         nodata.append(year)
 
+a = datetime.now()
 datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
+b = datetime.now()
+d = b - a
+print "Time: " + str(d.seconds) + " seconds"
 print datafile
 #yearscolumns
 xset.ix[67][1831]
