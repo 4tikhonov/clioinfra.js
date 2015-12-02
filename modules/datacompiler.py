@@ -20,11 +20,10 @@ import numpy as np
 
 def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     handles = []
-    remote = 'on'
 
     # Load Geocoder
     handle = config['geocoderhandle']
-    if remote:
+    if config['remote']:
         (classification, dataset, title, units) = loaddataset_fromurl(config, handle)
     else:
         dataset = loaddataset(handles)
@@ -36,7 +35,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
         coderyears.append(i)
 
     # Reading dataset
-    if remote:
+    if config['remote']:
         (class1, dataset, title, units) = loaddataset_fromurl(config, handle)
     else:
         dataset = loaddataset(handles)
