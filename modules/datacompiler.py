@@ -20,6 +20,7 @@ import numpy as np
 
 def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     handles = []
+    ctrlist = []
 
     # Load Geocoder
     handle = config['geocoderhandle']
@@ -63,7 +64,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 
     # Apply filters
     if datafilter:
-        datasubset = datasetfilter(maindata, datafilter)
+        (datasubset, ctrlist) = datasetfilter(maindata, datafilter)
     else:
 	datasetset = maindata
 
