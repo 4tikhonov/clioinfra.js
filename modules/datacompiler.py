@@ -59,7 +59,21 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     if switch == 'modern':
         maindata = moderndata
     else:
-        maindata = historicaldata
+        # Do conversion to webmapper system if there are no historical data
+        if not historicaldata:
+            maindata = moderndata
+            webmapperindex = []
+            for code in maindata.index:
+                try:
+                    webmappercode = oecd2webmapper[int(code)]
+                except:
+                    webmappercode = 0
+                webmapperindex.append(webmappercode)
+            maindata.index = webmapperindex
+	    # Drop not recognized locations
+            maindata = maindata.drop(maindata.index[[0]])
+        else:
+            maindata = historicaldata
 
     if title:
         metadata['title'] = title
