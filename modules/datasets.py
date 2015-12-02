@@ -23,6 +23,7 @@ from sys import argv
 def buildgeocoder(geocoder, config, query):
     geodict = []
     geolist = {}
+    oecd = {}
     (cfilter, notint) = selectint(geocoder.index)
     
     i = 0
@@ -37,6 +38,10 @@ def buildgeocoder(geocoder, config, query):
         geoitem['year'] = str(geocoder.ix[str(cID)][config['webmappercountry']]) + ' ' + years
         geoitem['name'] = str(geocoder.ix[str(cID)][config['webmappercountry']])
 	geolist[int(geoitem['id'])] = geoitem['label']
+	try:
+	    oecd[int(geocoder.ix[str(cID)][config['webmapperoecd']])] = int(geoitem['id'])
+	except:
+	    ignore = cID
         
         if query:
             result = re.search(query, geoitem['name'], flags=re.IGNORECASE)
@@ -47,7 +52,7 @@ def buildgeocoder(geocoder, config, query):
             geodict.append(geoitem)
         i = i + 1
         
-    return (geodict, geolist)
+    return (geodict, geolist, oecd)
 
 # Geocoder vocabulary
 def load_geocodes(config, switch, codes, maindata, geolist):
