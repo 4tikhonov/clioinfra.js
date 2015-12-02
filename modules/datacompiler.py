@@ -67,11 +67,11 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
                 try:
                     webmappercode = oecd2webmapper[int(code)]
                 except:
-                    webmappercode = 0
+                    webmappercode = -1
                 webmapperindex.append(webmappercode)
             maindata.index = webmapperindex
 	    # Drop not recognized locations
-            maindata = maindata.drop(maindata.index[[0]])
+            maindata = maindata[maindata.index > 0]
         else:
             maindata = historicaldata
 
