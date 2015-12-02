@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, dataset_analyzer
 from data2excel import create_excel_dataset
 from sys import argv
 from historical_data import save_historical_dataset
@@ -76,7 +76,7 @@ datafilter = {}
 datafilter['startyear'] = '1500'
 datafilter['endyear'] = '2010'
 datafilter['ctrlist'] = ''
-datafilter['ctrlist'] = '528,14,18,67'
+#datafilter['ctrlist'] = '528,14,18,67'
 datasubset = datasetfilter(maindata, datafilter)
 #print datasubset.to_html
 
@@ -100,4 +100,4 @@ d = b - a
 print "Time: " + str(d.seconds) + " seconds"
 print datafile
 #yearscolumns
-xset.ix[67][1831]
+#xset.ix[67][1831]
