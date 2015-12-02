@@ -24,9 +24,8 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     metadata = {}
 
     # Load Geocoder
-    handle = config['geocoderhandle']
     if config['remote']:
-        (classification, dataset, title, units) = loaddataset_fromurl(config, handle)
+        (classification, dataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
     else:
         dataset = loaddataset(handles)
 
