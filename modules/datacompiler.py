@@ -21,6 +21,7 @@ import numpy as np
 def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     handles = []
     ctrlist = []
+    metadata = {}
 
     # Load Geocoder
     handle = config['geocoderhandle']
@@ -54,6 +55,16 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
         maindata = moderndata
     else:
         maindata = historicaldata
+
+    if title:
+        metadata['title'] = title
+    else:
+        metadata['title'] = ''
+
+    if units:
+        metadata['units'] = units
+    else:
+        metadata['units'] = ''
 
     (cfilter, notint) = selectint(maindata.columns)
     
