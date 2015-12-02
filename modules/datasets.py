@@ -333,4 +333,4 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
             data = xset[year].values
         except:
             nodata.append(year)
-    return (icoder, isyear, ctrfilter, nodata)
+    return (finalsubset, icoder, isyear, ctrfilter, nodata)
