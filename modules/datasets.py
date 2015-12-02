@@ -316,7 +316,10 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
     xset = datasubset
     xrow = datasubset.T
     finalsubset = datasubset.replace(np.nan, '', regex=True)
-    icoder = coder.ix[1:]
+    try:
+        icoder = coder.ix[1:]
+    except:
+        icoder = coder
     if 'start date' in icoder.columns:
         icoder = icoder.drop('start date', axis=1)
     if 'end date' in icoder.columns:
