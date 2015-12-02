@@ -310,7 +310,7 @@ def datasetfilter(maindata, datafilter):
 
     if yearsfilter:
         datasubset = datasubset[yearsfilter]
-    return datasubset
+    return (datasubset, ctrlist)
 
 def dataset_analyzer(datasubset, coder, yearscolumns):
     xset = datasubset
