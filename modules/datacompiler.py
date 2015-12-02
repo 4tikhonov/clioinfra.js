@@ -73,6 +73,11 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (countryinfo, notcountry) = selectint(maindata.index)
 
     (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
+    # Apply filter to countries
+    if datafilter['ctrlist']:
+        tmpcoder = icoder.ix[ctrlist]
+        icoder = pd.DataFrame(tmpcoder)
+
     if fullpath:
         datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
     return (fullpath, finalsubset)
