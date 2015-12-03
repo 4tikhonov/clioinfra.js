@@ -211,7 +211,9 @@ def adjustdataframe(df):
         df.columns = datacolumns
     return df
 
-def loaddataset(handles):
+def loaddataset(config, handle):
+    handles = []
+    handles.append(handle)
     hquery = formdatasetquery(handles,'')
     d = readdatasets('datasets', json.loads(hquery))
     alldata = ''
@@ -219,12 +221,13 @@ def loaddataset(handles):
     for dataset in d:
         alldata = str(dataset['csvframe'])
 
-    dataframe = pd.read_csv(alldata, sep='\t', dtype='unicode')
+    csvio = StringIO(str(alldata))
+    dataframe = pd.read_csv(csvio, sep='\t', dtype='unicode')
     maincode = 'Code'
     #df = adjustdataframe(dataframe)
     #df.index = df[maincode]
     #print df.index
-    return df
+    return dataframe
 
 def loaddataset_fromurl(config, handle):
     url = str(config['apiroot']) + "/api/datasets?handle=Panel[%27" + handle + "]&format=csv"
@@ -232,7 +235,14 @@ def loaddataset_fromurl(config, handle):
     csvio = StringIO(res.content)
     dataframe = pd.read_csv(csvio, sep='\t', dtype='unicode')
     df = ''
+    return dataframe
     
+def content2dataframe(config, handle):
+    if config['remote']:
+	dataframe = loaddataset_fromurl(config, handle)
+    else:
+	dataframe = loaddataset(config, str(handle))
+	
     # Classification (None|Modern|Historical)
     classtype = 'None'
     maincode = config['moderncode']
