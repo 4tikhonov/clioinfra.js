@@ -68,7 +68,7 @@ from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from paneldata import paneldatafilter, panel2dict, panel2csv
-from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder
+from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, content2dataframe
 from datacompiler import dataframe_compiler
 
 # Function to create json from dict 
@@ -112,6 +112,7 @@ def downloadzip(pid):
     logscale = 0
 
     config = configuration() 
+    config['remote'] = 'on'
     API_TOKEN = config['key']
     HOSTNAME = config['dataverseroot']
     cmd = "--insecure -u " + API_TOKEN + ": " + HOSTNAME + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
@@ -165,11 +166,7 @@ def downloadzip(pid):
 	else:
 	    hist = ''
 
-    remote = 'on'
-    if remote:
-        (classification, dataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
-    else:
-        dataset = loaddataset(handles)
+    (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
     #geocoder = buildgeocoder(dataset, config)
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
@@ -400,10 +397,7 @@ def treemapweb():
     handles = []
     geodataset = ''
     # Geocoder
-    if config['remote']:
-        (classification, geodataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
-    else:
-        geodataset = loaddataset(handles)
+    (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle']) 
 
     (modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
 
@@ -420,10 +414,7 @@ def treemapweb():
     handles = []
     handles.append(handle)
     try:
-        if config['remote']:
-            (class1, dataset, title, units) = loaddataset_fromurl(config, handle)
-        else:
-            dataset = loaddataset(handles)
+	(class1, dataset, title, units) = content2dataframe(config, handle)
     except:
 	return 'No dataset ' + handle
 
@@ -626,14 +617,12 @@ def webmapper():
 @app.route('/geocoder')
 def geocoder():
     config = configuration()
+    config['remote'] = ''
     remote = 'on'
 
     # Geocoder
     handle = config['geocoderhandle']
-    if remote:
-        (classification, geodataset, title, units) = loaddataset_fromurl(config, handle)
-    else:
-        geodataset = loaddataset(handles)
+    (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
     fromyear = 1500
     toyear = 2016
