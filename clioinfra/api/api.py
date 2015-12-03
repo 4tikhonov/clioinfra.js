@@ -69,6 +69,7 @@ from scales import getcolors, showwarning, buildcategories, getscales, floattode
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from paneldata import paneldatafilter, panel2dict, panel2csv
 from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder
+from datacompiler import dataframe_compiler
 
 # Function to create json from dict 
 def json_generator(c, jsondataname, data):
@@ -415,7 +416,6 @@ def treemapweb():
         coder = historical
 	class1 = switch
 
-    return 'test'
     # Loading dataset in dataframe
     handles = []
     handles.append(handle)
@@ -564,15 +564,44 @@ def advanced_statistics():
 @app.route('/download')
 def download():
     (classification, pid, root) = ('', '', '')
+    handle = ''
+    classification = 'modern'
     config = configuration()
+    config['remote'] = 'on'
+    datafilter = {}
+    datafilter['startyear'] = '1500'
+    datafilter['endyear'] = '2010'
+    datafilter['ctrlist'] = ''
 
     if request.args.get('pid'):
         pid = request.args.get('pid')
+        handle = pid
+    if request.args.get('handle'):
+        handle = request.args.get('handle')
     if request.args.get('type[0]') == 'historical':
 	classification = request.args.get('type[0]')	
+    if request.args.get('y[min]'):
+	datafilter['startyear'] = request.args.get('y[min]')
+    if request.args.get('y[max]'):
+	datafilter['endyear'] = request.args.get('y[max]')
+
+    # Select countries
+    customcountrycodes = ''
+    f = request.args
+    for key in f.keys():
+        if is_location(key):
+            for value in sorted(f.getlist(key)):
+                customcountrycodes = str(customcountrycodes) + str(value) + ','
+    if customcountrycodes:
+        customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = customcountrycodes
 
     if classification:
-	return 'historical'
+	outfile = "test1.xlsx"
+	fullpath = config['webtest'] + "/" + str(outfile)
+	(outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
+	return redirect(root, code=301)
     else:
         zipfile = downloadzip(pid)
         # CHANGE
@@ -620,7 +649,7 @@ def geocoder():
             api = config['apiroot'] + "/collabs/static/data/historical.json"
             (regions, countries, ctr2reg, webmapper, geocoder) = histo(api, cfilter)
 	else:
-	    (geocoder, geolist) = buildgeocoder(geodataset, config, cfilter)
+	    (geocoder, geolist, oecd) = buildgeocoder(geodataset, config, cfilter)
 
     data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
