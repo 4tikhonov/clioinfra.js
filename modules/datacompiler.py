@@ -9,7 +9,7 @@ from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, dataset_analyzer
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, dataset_analyzer, content2dataframe
 from data2excel import create_excel_dataset
 from sys import argv
 from historical_data import save_historical_dataset
@@ -24,10 +24,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     metadata = {}
 
     # Load Geocoder
-    if config['remote']:
-        (classification, dataset, title, units) = loaddataset_fromurl(config, config['geocoderhandle'])
-    else:
-        dataset = loaddataset(handles)
+    (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
     (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
@@ -42,10 +39,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
             coderyears.append(i)
 
     # Reading dataset
-    if config['remote']:
-        (class1, dataset, title, units) = loaddataset_fromurl(config, handle)
-    else:
-        dataset = loaddataset(handles)
+    (class1, dataset, title, units) = content2dataframe(config, handle)
 
     if switch == 'modern':
         activeindex = modern.index
