@@ -220,6 +220,9 @@ def loaddataset(config, handle):
 
     for dataset in d:
         alldata = str(dataset['csvframe'])
+	thishandle = dataset['handle']
+	units = dataset['units']
+	title = dataset['title']
 
     csvio = StringIO(str(alldata))
     dataframe = pd.read_csv(csvio, sep='\t', dtype='unicode')
@@ -227,7 +230,7 @@ def loaddataset(config, handle):
     #df = adjustdataframe(dataframe)
     #df.index = df[maincode]
     #print df.index
-    return dataframe
+    return (dataframe, handle, title, units)
 
 def loaddataset_fromurl(config, handle):
     url = str(config['apiroot']) + "/api/datasets?handle=Panel[%27" + handle + "]&format=csv"
@@ -238,18 +241,20 @@ def loaddataset_fromurl(config, handle):
     return dataframe
     
 def content2dataframe(config, handle):
+    (title, units) = ('', '')
     if config['remote']:
 	dataframe = loaddataset_fromurl(config, handle)
     else:
-	dataframe = loaddataset(config, str(handle))
+	(dataframe, handle, title, units) = loaddataset(config, str(handle))
 	
     # Classification (None|Modern|Historical)
     classtype = 'None'
     maincode = config['moderncode']
     webmappercode = config['webmappercode']
     # Get title and units
-    title = dataframe.ix[0][1]
-    units = dataframe.ix[0][2]
+    if not title:
+        title = dataframe.ix[0][1]
+        units = dataframe.ix[0][2]
 
     # Look for code in the column names 
     if maincode in dataframe:
