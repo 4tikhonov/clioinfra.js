@@ -341,10 +341,10 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
         icoder = coder.ix[1:]
     except:
         icoder = coder
-    if 'start date' in icoder.columns:
-        icoder = icoder.drop('start date', axis=1)
-    if 'end date' in icoder.columns:
-        icoder = icoder.drop('end date', axis=1)    
+    removefields = ['start date', 'end date', 'ctr', 'code parent', 'country', 'webmapper code']
+    for colname in removefields:
+        if colname in icoder.columns:
+            icoder = icoder.drop(colname, axis=1)
     icoder = icoder.replace(np.nan, '', regex=True)
 
     (isdata, nodata) = ([], [])
