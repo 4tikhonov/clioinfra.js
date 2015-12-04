@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import urllib2 
+import math
 import simplejson
 import json
 import sys
@@ -415,8 +416,9 @@ def request_geocoder(config):
         coderyears.append(i)
     return (geocoder, geolist, oecd2webmapper, modern, historical)
 
-def dataset2panel(config, totalpanel, geocoder):
+def dataset2panel(config, totalpanel, geocoder, logscale):
     datapanel = []
+    original = {}
     (codes, notcodes) = selectint(totalpanel.index)
     (years, notyears) = selectint(totalpanel.columns)
 
@@ -428,6 +430,24 @@ def dataset2panel(config, totalpanel, geocoder):
             except:
                 country = 'Unknown country'
             value = totalpanel[year][code]
+            if value:
+                origvalue = value
+                if logscale:
+                   try:
+                       if logscale == '2':
+                          value = math.log(value, int(logscale))
+                       elif logscale == '10':
+                          value = math.log10(value)
+                       else:
+                          value = math.log(value)
+                          rvalue = "%.5f" % value
+                   except:
+                       value = 'NaN'
+                       rvalue = 'NaN'
+                       original[str(rvalue)] = origvalue
+                else:
+                   original[origvalue] = origvalue
             dataitem = [country, int(year), value, int(code)]
             datapanel.append(dataitem)
-    return datapanel
+
+    return (datapanel, original)
