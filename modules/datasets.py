@@ -328,7 +328,6 @@ def datasetfilter(maindata, datafilter):
                 if thisyear <= int(datafilter['endyear']):
                     yearsfilter.append(thisyear)
 
-    print str(yearsfilter)
     if yearsfilter:
         datasubset = datasubset[yearsfilter]
     return (datasubset, ctrlist)
@@ -416,7 +415,7 @@ def request_geocoder(config):
         coderyears.append(i)
     return (geocoder, geolist, oecd2webmapper, modern, historical)
 
-def dataset2panel(totalpanel, geocoder, oecd):
+def dataset2panel(config, totalpanel, geocoder):
     datapanel = []
     (codes, notcodes) = selectint(totalpanel.index)
     (years, notyears) = selectint(totalpanel.columns)
@@ -425,7 +424,7 @@ def dataset2panel(totalpanel, geocoder, oecd):
         for year in years:
             # ['France', 1901, 2826.0, 250]
             try:
-                country = str(geocoder.ix[int(code)]['country name'])
+                country = str(geocoder.ix[int(code)][config['webmappercountry']])
             except:
                 country = 'Unknown country'
             value = totalpanel[year][code]
