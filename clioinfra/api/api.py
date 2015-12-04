@@ -68,7 +68,7 @@ from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from paneldata import paneldatafilter, panel2dict, panel2csv
-from datasets import loaddataset, countrystats, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, content2dataframe
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
 from datacompiler import dataframe_compiler
 
 # Function to create json from dict 
@@ -558,7 +558,7 @@ def download():
     handle = ''
     classification = 'modern'
     config = configuration()
-    config['remote'] = 'on'
+    config['remote'] = ''
     datafilter = {}
     datafilter['startyear'] = '1500'
     datafilter['endyear'] = '2010'
@@ -757,7 +757,8 @@ def load_province_data(apiurl, province):
 
 @app.route('/dataapi')
 def dataapi():
-    handles = []
+    (datafilter, handles) = ({}, [])
+    datafilter['ctrlist'] = '' 
     logscale = ''
     config = configuration()
     customyear = ''
@@ -766,12 +767,14 @@ def dataapi():
     categoriesMax = 6
     countriesNum = 200
     geocoder = ''
-    (getrange, colormap, pallette, customcountrycodes) = ('', '', '', '')
+    (getrange, colormap, pallette, customcountrycodes, switch) = ('', '', '', '', 'modern')
 
     if request.args.get('logscale'):
         logscale = request.args.get('logscale')
     if request.args.get('year'):
         customyear = request.args.get('year')
+	datafilter['startyear'] = customyear
+	datafilter['endyear'] = customyear
     if request.args.get('catmax'):
         categoriesMax = int(request.args.get('catmax'))
     if request.args.get('getrange'):
@@ -813,6 +816,19 @@ def dataapi():
 	nothing = 1
 
     (header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+    if not panelcells[0]:
+        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config)
+        (origdata, maindata) = request_datasets(config, switch, modern, historical, handles, geolist)
+        (subsets, panel) = ({}, [])
+    
+        for handle in handles:
+            (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+            if not datasubset.empty:
+	        datasubset = datasubset.dropna(how='all')
+                panel.append(datasubset)
+                subsets[handle] = datasubset
+        (panelcells, originalvalues) = dataset2panel(config, subsets[handles[0]], modern, logscale)
+    #(header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
     modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
