@@ -49,10 +49,15 @@ if fromyear:
 #print result
 
 datafilter = {}
+logscale = ''
 datafilter['startyear'] = '1950'
 datafilter['endyear'] = '2010'
 datafilter['ctrlist'] = '528,14,18,67'
-#datafilter['ctrlist'] = '523'
+datafilter['ctrlist'] = '528'
+selectedyear = '1960'
+if int(selectedyear) > 0:
+    datafilter['startyear'] = selectedyear
+    datafilter['endyear'] = selectedyear  
 #datafilter['ctrlist'] = '1523'
 #datafilter['ctrlist'] = ''
 (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config)
@@ -65,7 +70,8 @@ for handle in handles:
     datasubset['handle'] = handle
     if not datasubset.empty:
         panel.append(datasubset)
-    
-    subsets[handle] = datasubset    
-datapanel = dataset2panel(subsets[handle], geocoder, oecd2webmapper)
-print datapanel
+        subsets[handle] = datasubset    
+
+logscale = '10'
+(datacells, original) = dataset2panel(config, subsets[handles[0]], modern, logscale)
+print datacells
