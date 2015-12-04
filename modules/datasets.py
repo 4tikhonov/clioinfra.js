@@ -328,6 +328,7 @@ def datasetfilter(maindata, datafilter):
                 if thisyear <= int(datafilter['endyear']):
                     yearsfilter.append(thisyear)
 
+    print str(yearsfilter)
     if yearsfilter:
         datasubset = datasubset[yearsfilter]
     return (datasubset, ctrlist)
@@ -423,7 +424,10 @@ def dataset2panel(totalpanel, geocoder, oecd):
     for code in codes:
         for year in years:
             # ['France', 1901, 2826.0, 250]
-            country = int(code)
+            try:
+                country = str(geocoder.ix[int(code)]['country name'])
+            except:
+                country = 'Unknown country'
             value = totalpanel[year][code]
             dataitem = [country, int(year), value, int(code)]
             datapanel.append(dataitem)
