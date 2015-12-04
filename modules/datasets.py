@@ -357,3 +357,74 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
         except:
             nodata.append(year)
     return (finalsubset, icoder, isyear, ctrfilter, nodata)
+
+def request_datasets(config, switch, modern, historical, handles, geolist):
+    (ispanel, dataframe) = ('', {})    
+
+    for handle in handles:
+        (class1, dataset, title, units) = content2dataframe(config, handle)
+
+        if switch == 'modern':
+            activeindex = modern.index
+            coder = modern
+            class1 = switch
+        else:
+            activeindex = historical.index
+            coder = historical
+
+        (moderndata, historicaldata) = loadgeocoder(config, dataset, '')
+        if switch == 'modern':
+            maindata = moderndata
+        else:
+            # Do conversion to webmapper system
+            if not historicaldata:
+                maindata = moderndata
+                webmapperindex = []
+                for code in maindata.index:
+                    try:
+                        webmappercode = oecd2webmapper[int(code)]
+                    except:
+                        webmappercode = -1
+                    webmapperindex.append(webmappercode)
+                maindata.index = webmapperindex
+                maindata = maindata[maindata.index > 0]
+            else:
+                maindata = historicaldata
+    
+        (cfilter, notint) = selectint(maindata.columns)
+    
+        codes = selectint(maindata.index)
+        geo = load_geocodes(config, switch, codes, maindata, geolist)
+        for colname in notint:
+            maindata = maindata.drop(colname, axis=1)       
+        # Drop num if in dataframe
+        if '1' in maindata.columns:
+            maindata = maindata.drop('1', axis=1)
+        dataframe[handle] = maindata
+    
+    return (dataset, dataframe)
+
+def request_geocoder(config):
+    # Geocoder
+    (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
+
+    (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
+    (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
+    coderyears = []
+    for i in range(1500, 2015):
+        coderyears.append(i)
+    return (geocoder, geolist, oecd2webmapper, modern, historical)
+
+def dataset2panel(totalpanel, geocoder, oecd):
+    datapanel = []
+    (codes, notcodes) = selectint(totalpanel.index)
+    (years, notyears) = selectint(totalpanel.columns)
+
+    for code in codes:
+        for year in years:
+            # ['France', 1901, 2826.0, 250]
+            country = int(code)
+            value = totalpanel[year][code]
+            dataitem = [country, int(year), value, int(code)]
+            datapanel.append(dataitem)
+    return datapanel
