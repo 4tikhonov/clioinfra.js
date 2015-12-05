@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import urllib2 
+import math
 import simplejson
 import json
 import sys
@@ -343,10 +344,10 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
         icoder = coder.ix[1:]
     except:
         icoder = coder
-    if 'start date' in icoder.columns:
-        icoder = icoder.drop('start date', axis=1)
-    if 'end date' in icoder.columns:
-        icoder = icoder.drop('end date', axis=1)    
+    removefields = ['start date', 'end date', 'ctr', 'code parent', 'country', 'webmapper code']
+    for colname in removefields:
+        if colname in icoder.columns:
+            icoder = icoder.drop(colname, axis=1)
     icoder = icoder.replace(np.nan, '', regex=True)
 
     (isdata, nodata) = ([], [])
@@ -360,3 +361,96 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
         except:
             nodata.append(year)
     return (finalsubset, icoder, isyear, ctrfilter, nodata)
+
+def request_datasets(config, switch, modern, historical, handles, geolist):
+    (ispanel, dataframe) = ('', {})    
+
+    for handle in handles:
+        (class1, dataset, title, units) = content2dataframe(config, handle)
+
+        if switch == 'modern':
+            activeindex = modern.index
+            coder = modern
+            class1 = switch
+        else:
+            activeindex = historical.index
+            coder = historical
+
+        (moderndata, historicaldata) = loadgeocoder(config, dataset, '')
+        if switch == 'modern':
+            maindata = moderndata
+        else:
+            # Do conversion to webmapper system
+            if not historicaldata:
+                maindata = moderndata
+                webmapperindex = []
+                for code in maindata.index:
+                    try:
+                        webmappercode = oecd2webmapper[int(code)]
+                    except:
+                        webmappercode = -1
+                    webmapperindex.append(webmappercode)
+                maindata.index = webmapperindex
+                maindata = maindata[maindata.index > 0]
+            else:
+                maindata = historicaldata
+    
+        (cfilter, notint) = selectint(maindata.columns)
+    
+        codes = selectint(maindata.index)
+        geo = load_geocodes(config, switch, codes, maindata, geolist)
+        for colname in notint:
+            maindata = maindata.drop(colname, axis=1)       
+        # Drop num if in dataframe
+        if '1' in maindata.columns:
+            maindata = maindata.drop('1', axis=1)
+        dataframe[handle] = maindata
+    
+    return (dataset, dataframe)
+
+def request_geocoder(config):
+    # Geocoder
+    (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
+
+    (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
+    (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
+    coderyears = []
+    for i in range(1500, 2015):
+        coderyears.append(i)
+    return (geocoder, geolist, oecd2webmapper, modern, historical)
+
+def dataset2panel(config, totalpanel, geocoder, logscale):
+    datapanel = []
+    original = {}
+    (codes, notcodes) = selectint(totalpanel.index)
+    (years, notyears) = selectint(totalpanel.columns)
+
+    for code in codes:
+        for year in years:
+            # ['France', 1901, 2826.0, 250]
+            try:
+                country = str(geocoder.ix[int(code)][config['webmappercountry']])
+            except:
+                country = 'Unknown country'
+            value = totalpanel[year][code]
+            if value:
+                origvalue = value
+                if logscale:
+                   try:
+                       if logscale == '2':
+                          value = math.log(value, int(logscale))
+                       elif logscale == '10':
+                          value = math.log10(value)
+                       else:
+                          value = math.log(value)
+                          rvalue = "%.5f" % value
+                   except:
+                       value = 'NaN'
+                       rvalue = 'NaN'
+                       original[str(rvalue)] = origvalue
+                else:
+                   original[origvalue] = origvalue
+            dataitem = [country, int(year), value, int(code)]
+            datapanel.append(dataitem)
+
+    return (datapanel, original)
