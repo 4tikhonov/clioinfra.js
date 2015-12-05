@@ -30,19 +30,16 @@ def buildgeocoder(geocoder, config, query):
     i = 0
     for cID in cfilter:
         geoitem = {}
-        countryitem = geocoder.ix[cID]
-        geoitem['id'] = geocoder.ix[cID][config['webmappercode']]
-        geoitem['validfrom'] = geocoder.ix[cID]['start year'] 
-        geoitem['validuntil'] = geocoder.ix[cID]['end year'] 
-        try:
-            years = '(' + str(int(geocoder.ix[cID]['start year'])) + '-' + str(int(geocoder.ix[cID]['end year'])) + ')'
-  	except:
-	    years = '(unknown)'
-        geoitem['label'] = geocoder.ix[cID]['country name'] + ' ' + str(years)
-        geoitem['year'] = str(geocoder.ix[cID][config['webmappercountry']]) + ' ' + years
-        geoitem['name'] = str(geocoder.ix[cID][config['webmappercountry']])
-	geolist[int(geoitem['id'])] = geoitem['label']
 	try:
+            countryitem = geocoder.ix[cID]
+            geoitem['id'] = geocoder.ix[cID][config['webmappercode']]
+            geoitem['validfrom'] = geocoder.ix[cID]['start year'] 
+            geoitem['validuntil'] = geocoder.ix[cID]['end year'] 
+            years = '(' + str(int(geocoder.ix[cID]['start year'])) + '-' + str(int(geocoder.ix[cID]['end year'])) + ')'
+            geoitem['label'] = geocoder.ix[cID]['country name'] + ' ' + str(years)
+            geoitem['year'] = str(geocoder.ix[cID][config['webmappercountry']]) + ' ' + years
+            geoitem['name'] = str(geocoder.ix[cID][config['webmappercountry']])
+	    geolist[int(geoitem['id'])] = geoitem['label']
 	    oecd[int(geocoder.ix[cID][config['webmapperoecd']])] = int(geoitem['id'])
 	except:
 	    ignore = cID
@@ -245,7 +242,7 @@ def loaddataset_fromurl(config, handle):
     return dataframe
     
 def content2dataframe(config, handle):
-    (title, units) = ('', '')
+    (title, units, df) = ('', '', '')
     if config['remote']:
 	dataframe = loaddataset_fromurl(config, handle)
     else:
@@ -274,9 +271,10 @@ def content2dataframe(config, handle):
             df.index = df[maincode]    
 
     if classtype == 'None':
-        if webmappercode in dataframe:
+        if webmappercode in dataframe[:2].values:
 	    classtype = 'historical'
 	    df = dataframe
+	    df.columns = df.ix[1]
             df.index = df[webmappercode]
         
     return (classtype, df, title, units)
@@ -408,15 +406,15 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
     
     return (dataset, dataframe)
 
-def request_geocoder(config):
+def request_geocoder(config, buildvocabulary):
     # Geocoder
+    (geocoder, geolist, oecd2webmapper) = ('', '', '')
     (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
-    (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
+    dataset = dataset[1:]
+    if buildvocabulary:
+        (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
-    coderyears = []
-    for i in range(1500, 2015):
-        coderyears.append(i)
     return (geocoder, geolist, oecd2webmapper, modern, historical)
 
 def dataset2panel(config, totalpanel, geocoder, logscale):
