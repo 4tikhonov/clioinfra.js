@@ -30,9 +30,11 @@ def buildgeocoder(geocoder, config, query):
     i = 0
     for cID in cfilter:
         geoitem = {}
+        geoitem['id'] = ''
 	try:
             countryitem = geocoder.ix[cID]
-            geoitem['id'] = geocoder.ix[cID][config['webmappercode']]
+	    mainID = int(geocoder.ix[cID][config['webmappercode']])
+	    geoitem['id'] = geocoder.ix[cID][config['webmappercode']]
             geoitem['validfrom'] = geocoder.ix[cID]['start year'] 
             geoitem['validuntil'] = geocoder.ix[cID]['end year'] 
             years = '(' + str(int(geocoder.ix[cID]['start year'])) + '-' + str(int(geocoder.ix[cID]['end year'])) + ')'
@@ -50,7 +52,8 @@ def buildgeocoder(geocoder, config, query):
                 if geoitem['year']:
                     geodict.append(geoitem)        
         else:
-            geodict.append(geoitem)
+	    if geoitem['id']:
+                geodict.append(geoitem)
         i = i + 1
         
     return (geodict, geolist, oecd)
