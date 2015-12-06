@@ -260,14 +260,14 @@ def dataset_to_csv(config, dataset, geocoder):
         for code in countries:
             try:
                 ctr = geocoder.ix[code][config['webmappercountry']]
-                datastring = datastring + str(ctr) + '\t'
+                datastring = str(datastring) + str(ctr) + "\t"
             except:
                 ctr = str(code)
     datastring = datastring + "\n"
     
     for year in years:
         dataframe = dataset[year]
-        datastring = datastring + str(year) + '\t'
+        datastring = datastring + str(year) + "\t"
         
         for code in countries:
             country = ''
@@ -278,7 +278,9 @@ def dataset_to_csv(config, dataset, geocoder):
                 value = ''
                     
             if value:
-                datastring = datastring + ' ' + str(value) + '\t'
+		if str(value) == 'nan':
+		    value = 'NaN'
+                datastring = str(datastring) + str(value) + "\t"
                 foundloc = 1
                 try:
                     aggr[year] = aggr[year] + value
@@ -286,11 +288,11 @@ def dataset_to_csv(config, dataset, geocoder):
                     aggr[year] = value
             else:
                 value = 'NaN'
-                datastring = datastring + ' ' + str(value) + '\t'
-        datastring = datastring + '\n'
+                datastring = str(datastring) + str(value) + "\t"
+        datastring = str(datastring) + "\n"
 
     for year in sorted(aggr):
-        aggrstring = aggrstring + str(year) + ',' + str(aggr[year]) + '\n'
+        aggrstring = aggrstring + str(year) + ',' + str(aggr[year]) + "\n"
         
     return (datastring, aggrstring)
 
