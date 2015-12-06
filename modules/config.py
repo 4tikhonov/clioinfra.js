@@ -29,6 +29,7 @@ def configuration():
    for key, value in path_items:
 	config[key] = value
 
+   config['remote'] = ''
    return config
 
 def loadjson(apiurl):
@@ -203,7 +204,7 @@ def dataverse2indicators(branch):
 def graphlinks(handle):
     links = {}
     links['chartlib'] = "/collabs/chartlib?start=on" + handle + "&logscale="
-    links['barlib'] = "/collabs/graphlib?start=on" + handle
+    links['barlib'] = "/collabs/graphlib?start=on&arr=on" + handle
     links['panellib'] = '/collabs/panel?start=on&aggr=on&hist=' + handle
     links['treemaplib'] = '/collabs/treemap'
 
