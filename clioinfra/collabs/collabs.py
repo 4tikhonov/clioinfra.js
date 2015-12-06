@@ -431,8 +431,17 @@ def panel(settings=''):
     return resp
 
 @app.route('/chartlib')
-def chartlib(settings=''):
-    (apilink, ctrlist) = ('', '')
+def chartlib():
+    (thismapurl, apilink, ctrlist, title, units, switch) = ('', '', '', 'Title', 'Units', 'modern')
+    handleface = []
+    config = configuration()
+    urlmatch = re.search(r'(.+)\&face', request.url)
+    try:
+        if urlmatch.group(0):
+            thismapurl = urlmatch.group(1)
+    except:
+        thismapurl = request.url
+    handles = []
     showpanel = 'yes'
     try:
         if request.args.get('print'):
@@ -452,15 +461,38 @@ def chartlib(settings=''):
         handledataset = request.args.get('handle')
         try:
             (pids, pidslist) = pidfrompanel(handledataset)
+	    handles.append(pids[0])
         except:
+	    handles.append(handledataset)
             nopanel = 'yes'
 	if pids[0]:
 	    apilink = "/api/tabledata?handle=" + str(pids[0])
 	    if ctrlist:
 	        apilink = apilink + '&ctrlist=' + ctrlist
-    links = graphlinks(handle)
 
-    resp = make_response(render_template('chartlib.html', apilink=apilink, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
+    if request.args.get('face'):
+        handles = []
+        handleface = request.args.get('face')
+        handles.append(handleface)
+        if handleface:
+	    apilink = "/api/tabledata?handle=" + str(handleface)
+            if ctrlist:
+                apilink = apilink + '&ctrlist=' + ctrlist
+        try:
+            pids.remove(handleface)
+        except:
+            nothing = 1
+
+    links = graphlinks(handle)
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    try:
+	title = metadata[handles[0]]['title']
+	units = metadata[handles[0]]['units']
+    except:
+	skip = 0
+
+    resp = make_response(render_template('chartlib.html', thismapurl=thismapurl, indicators=pids, apilink=apilink, title=title, units=units, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
     return resp
 
 @app.route('/graphlib')
