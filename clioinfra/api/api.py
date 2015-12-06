@@ -815,10 +815,13 @@ def dataapi():
     except:
 	nothing = 1
 
-    (header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
-    if not panelcells[0]:
-        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config)
-        (origdata, maindata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    # Old version of panel data 
+    #(header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
+    panelcells = []
+    # New version is fast
+    if config:
+        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
         (subsets, panel) = ({}, [])
     
         for handle in handles:
