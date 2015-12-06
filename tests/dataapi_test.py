@@ -5,6 +5,7 @@ import sys
 import os
 import json
 import simplejson
+from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
@@ -60,8 +61,18 @@ if int(selectedyear) > 0:
     datafilter['endyear'] = selectedyear  
 #datafilter['ctrlist'] = '1523'
 #datafilter['ctrlist'] = ''
-(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config)
-(origdata, maindata) = request_datasets(config, switch, modern, historical, handles, geolist)
+
+a = datetime.now()
+(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+b = datetime.now()
+d = b - a
+print "Geocoder time: " + str(d.seconds) + " seconds"
+
+a = datetime.now()
+(origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+b = datetime.now()
+d = b - a
+print "Dataset load time: " + str(d.seconds) + " seconds"
 
 (subsets, panel) = ({}, [])
 for handle in handles:
