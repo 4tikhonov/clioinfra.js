@@ -13,6 +13,7 @@ import math
 from pandas.io.json import json_normalize
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
+from datasets import selectint
 
 def load_api_data(apiurl, fileID):
     jsondataurl = apiurl
@@ -243,6 +244,55 @@ def createframe(indicator, loccodes, dataframe, customyear, fromY, toY, customct
     
     sortyears = sorted(allyears)
     return (cframe, sortyears, values, dates, original)
+
+def dataset_to_csv(config, dataset, geocoder):
+    datastring = ''
+    aggrstring = 'date,value\n'
+    aggrvalue = 0
+    aggr = {}
+    # Plot header
+    datastring = 'date\t'
+    dataset = dataset.dropna(how='all')
+    (years, notyears) = selectint(dataset.columns)
+    (countries, notcountries) = selectint(dataset.index)
+
+    if datastring:
+        for code in countries:
+            try:
+                ctr = geocoder.ix[code][config['webmappercountry']]
+                datastring = datastring + str(ctr) + '\t'
+            except:
+                ctr = str(code)
+    datastring = datastring + "\n"
+    
+    for year in years:
+        dataframe = dataset[year]
+        datastring = datastring + str(year) + '\t'
+        
+        for code in countries:
+            country = ''
+            foundloc = 0
+            try:
+                value = dataset.ix[code][year]
+            except:
+                value = ''
+                    
+            if value:
+                datastring = datastring + ' ' + str(value) + '\t'
+                foundloc = 1
+                try:
+                    aggr[year] = aggr[year] + value
+                except:
+                    aggr[year] = value
+            else:
+                value = 'NaN'
+                datastring = datastring + ' ' + str(value) + '\t'
+        datastring = datastring + '\n'
+
+    for year in sorted(aggr):
+        aggrstring = aggrstring + str(year) + ',' + str(aggr[year]) + '\n'
+        
+    return (datastring, aggrstring)
 
 def combinedata(countries, dataset, code2loc):
     datastring = ''
