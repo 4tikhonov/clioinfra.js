@@ -69,6 +69,7 @@ from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -777,7 +778,11 @@ def dashboard(settings=''):
 
 @app.route('/statistics')
 def statistics(settings=''):
+    datafilter = {}
     (yearmin, yearmax, ctrlist) = (1500, 2020, '')
+    datafilter['startyear'] = yearmin
+    datafilter['endyear'] = yearmax
+    datafilter['ctrlist'] = ''
     config = configuration()
     handles = []
 
@@ -785,6 +790,7 @@ def statistics(settings=''):
         handledataset = request.args.get('handle')
         handledataset = handledataset.replace(" ", '')
 	panelcheck = re.search(r'Panel', handledataset)
+	handles.append(handledataset)
 	if not panelcheck:
             handledataset = "Panel[" + handledataset + "]"
 
@@ -794,15 +800,40 @@ def statistics(settings=''):
 
     if request.args.get('yearmin'):
         yearmin = request.args.get('yearmin')
+	datafilter['startyear'] = yearmin
     if request.args.get('yearmax'):
         yearmax = request.args.get('yearmax')
+	datafilter['endyear'] = yearmax
     if request.args.get('ctrlist'):
         ctrlist = request.args.get('ctrlist')
 
-    modern = moderncodes(config['modernnames'], config['apiroot'])
-    jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
+    old = ''
+    (names, cleanedpanel) = ({}, [])
+    for handle in handles:
+        names[handle] = str(handle)
 
-    (panel, cleanedpanel, names) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    if old:
+        modern = moderncodes(config['modernnames'], config['apiroot'])
+        jsonapi = config['apiroot'] + '/api/datasets?handle=' + str(handledataset)
+
+        (panel, cleanedpanel, names) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
+    else:
+        switch = 'modern'
+	geolist = {}
+	(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+        (subsets, panel) = ({}, [])
+	for handle in handles:
+            (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+            datasubset['handle'] = handle
+	    meta = metadata[handle]
+	    names[handle] = meta['title'] 
+            if not datasubset.empty:
+                panel.append(datasubset)
+    
+            subsets[handle] = datasubset
+	cleanedpanel = pd.concat(panel)
+
     (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
 
     ctrlimit = 200
