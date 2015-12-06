@@ -37,6 +37,9 @@ body {
 
 </style>
 <body>
+<center>
+<h2>{{ title }}</h2>
+</center>
 {% if indicators %}
   <select name="handles" class="right" onchange="mapswitch($(this).val())">
      <option value="{{ handle }}" selected>{{ title }}</option>
@@ -90,7 +93,7 @@ function vizswitch(viztype) {
 
 var margin = {top: 20, right: 80, bottom: 30, left: 50},
     width = 900 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 350 - margin.top - margin.bottom;
 
 var parseDate = d3.time.format("%Y").parse;
 
