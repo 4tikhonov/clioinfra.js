@@ -372,10 +372,13 @@ def dataset_analyzer(datasubset, coder, yearscolumns):
     return (finalsubset, icoder, isyear, ctrfilter, nodata)
 
 def request_datasets(config, switch, modern, historical, handles, geolist):
-    (ispanel, dataframe) = ('', {})    
+    (ispanel, dataframe, metadata) = ('', {}, {})    
 
     for handle in handles:
+        metadataitem = {}
         (class1, dataset, title, units) = content2dataframe(config, handle)
+	metadataitem['title'] = title
+	metadataitem['units'] = units
 
         if switch == 'modern':
             activeindex = modern.index
@@ -414,8 +417,9 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
         if '1' in maindata.columns:
             maindata = maindata.drop('1', axis=1)
         dataframe[handle] = maindata
+	metadata[handle] = metadataitem
     
-    return (dataset, dataframe)
+    return (dataset, dataframe, metadata)
 
 def request_geocoder(config, buildvocabulary):
     # Geocoder
