@@ -464,6 +464,8 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
                 else:
                    original[origvalue] = origvalue
             dataitem = [country, int(year), value, int(code)]
-            datapanel.append(dataitem)
+	    # Ignore missing data
+	    if str(value) != 'nan':
+                datapanel.append(dataitem)
 
     return (datapanel, original)
