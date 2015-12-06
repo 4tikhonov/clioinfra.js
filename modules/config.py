@@ -206,6 +206,6 @@ def graphlinks(handle):
     links['chartlib'] = "/collabs/chartlib?start=on" + handle + "&logscale="
     links['barlib'] = "/collabs/graphlib?start=on&arr=on" + handle
     links['panellib'] = '/collabs/panel?start=on&aggr=on&hist=' + handle
-    links['treemaplib'] = '/collabs/treemap'
+    links['treemaplib'] = '/collabs/treemap?' + handle
 
     return links
