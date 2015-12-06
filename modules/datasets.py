@@ -25,35 +25,43 @@ def buildgeocoder(geocoder, config, query):
     geodict = []
     geolist = {}
     oecd = {}
+    geocoder = geocoder.convert_objects(convert_numeric=True)
+    geocoder.index = geocoder[config['webmappercode']]
     (cfilter, notint) = selectint(geocoder.index)
     
     i = 0
     for cID in cfilter:
         geoitem = {}
         geoitem['id'] = ''
+	ignore = 0
 	try:
             countryitem = geocoder.ix[cID]
 	    mainID = int(geocoder.ix[cID][config['webmappercode']])
-	    geoitem['id'] = geocoder.ix[cID][config['webmappercode']]
-            geoitem['validfrom'] = geocoder.ix[cID]['start year'] 
-            geoitem['validuntil'] = geocoder.ix[cID]['end year'] 
+	    geoitem['id'] = int(geocoder.ix[cID][config['webmappercode']])
+            geoitem['validfrom'] = int(geocoder.ix[cID]['start year']) 
+            geoitem['validuntil'] = int(geocoder.ix[cID]['end year']) 
             years = '(' + str(int(geocoder.ix[cID]['start year'])) + '-' + str(int(geocoder.ix[cID]['end year'])) + ')'
-            geoitem['label'] = geocoder.ix[cID]['country name'] + ' ' + str(years)
+            geoitem['label'] = geocoder.ix[cID][config['webmappercountry']] + ' ' + str(years)
             geoitem['year'] = str(geocoder.ix[cID][config['webmappercountry']]) + ' ' + years
             geoitem['name'] = str(geocoder.ix[cID][config['webmappercountry']])
 	    geolist[int(geoitem['id'])] = geoitem['label']
-	    oecd[int(geocoder.ix[cID][config['webmapperoecd']])] = int(geoitem['id'])
+	    try:
+	        oecd[int(geocoder.ix[cID][config['webmapperoecd']])] = int(geoitem['id'])
+		#oecd[cID] = cID
+	    except:
+		skipoecd = 'on'
 	except:
 	    ignore = cID
         
-        if query:
-            result = re.search(query, geoitem['name'], flags=re.IGNORECASE)
-            if result:
-                if geoitem['year']:
-                    geodict.append(geoitem)        
-        else:
-	    if geoitem['id']:
-                geodict.append(geoitem)
+        if ignore == 0:
+	    if query:
+                result = re.search(query, geoitem['name'], flags=re.IGNORECASE)
+                if result:
+                    if geoitem['name']:
+                        geodict.append(geoitem)        
+            else:
+	        if geoitem['id']:
+                    geodict.append(geoitem)
         i = i + 1
         
     return (geodict, geolist, oecd)
