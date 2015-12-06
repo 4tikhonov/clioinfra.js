@@ -9,6 +9,7 @@ var logscale = '';
 myurl = myurl + '&'
 var colors = '';
 var histo = '';
+var copyrights = 'Shapes @ CShapes';
 
 if (myurl.indexOf("start=") > 0) {
     handle=myurl.substring(myurl.indexOf("start=")+8);

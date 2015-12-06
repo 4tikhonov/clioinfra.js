@@ -1,4 +1,4 @@
-function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, logscale, histo) {
+function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, logscale, histo, copyrights) {
     var rightdiv = document.getElementById("#showmap");
     var margin = {top: -120, right: 20, bottom: 40, left: 40};
     var margin = {top: -80, right: 0, bottom: 40, left: 0};
@@ -14,7 +14,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     }
     else
     {
-        mapapi = "http://clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
+        mapapi = "//clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
         countryindex = 'AREA';
         idindex = 'AREA';
     }
@@ -33,6 +33,11 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     .precision(.1);
 
     var path = d3.geo.path().projection(projection);
+
+    d3.select("#showmap").append("text")
+    .style("font-size","12px")
+    .attr("text-anchor", "middle")
+    .text(copyrights);
 
     d3.select("svg")
        .transition().duration(0).style("opacity", 0).remove();
@@ -168,7 +173,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 
   verticalLegend = d3.svg.legend(legendValues, COLORS).labelFormat("none").cellPadding(5).orientation("vertical").units("Legend").cellWidth(25).cellHeight(18).inputScale(sampleOrdinal).cellStepping(10);
 
-  d3.select("svg").append("g").attr("transform", "translate(20,250)").attr("class", "legend").style("font-size","12px").call(verticalLegend);
+  d3.select("svg").append("g").attr("transform", "translate(20,220)").attr("class", "legend").style("font-size","12px").call(verticalLegend);
    })
 
   }
