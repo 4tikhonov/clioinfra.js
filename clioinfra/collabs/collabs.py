@@ -393,9 +393,17 @@ def download(settings=''):
 @app.route('/treemap')
 def treemap(settings=''):
     showpanel = 'yes'
-    (historical, handle) = ('', '')
+    (historical, handle, handles) = ('', '', [])
     if request.args.get('handle'):
-        handle = request.args.get('handle')
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+	    handle = pids[0]
+            handles.append(handle)
+        except:
+            handles.append(handledataset)
+	    handle = handledataset
+            nopanel = 'yes'
     if request.args.get('historical'):
         historical = request.args.get('historical')
     mainlink = '&handle=' + str(handle)
@@ -483,7 +491,7 @@ def chartlib():
         except:
             nothing = 1
 
-    links = graphlinks(handle)
+    links = graphlinks('&face=' + str(handles[0]))
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
     try:
