@@ -37,7 +37,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     d3.select("#showmap").append("text")
     .style("font-size","12px")
     .attr("text-anchor", "middle")
-    .text(copyrights);
+    .text(function() { return copyrights; })
 
     d3.select("svg")
        .transition().duration(0).style("opacity", 0).remove();
