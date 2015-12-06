@@ -790,9 +790,11 @@ def statistics(settings=''):
         handledataset = request.args.get('handle')
         handledataset = handledataset.replace(" ", '')
 	panelcheck = re.search(r'Panel', handledataset)
-	handles.append(handledataset)
 	if not panelcheck:
+	    handles.append(handledataset)
             handledataset = "Panel[" + handledataset + "]"
+	else:
+	    (handles, pidslist) = pidfrompanel(handledataset)
 
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
