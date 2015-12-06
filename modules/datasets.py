@@ -448,6 +448,7 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
             value = totalpanel[year][code]
             if value:
                 origvalue = value
+		rvalue = "%.1f" % value
                 if logscale:
                    try:
                        if logscale == '2':
@@ -463,6 +464,7 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
                        original[str(rvalue)] = origvalue
                 else:
                    original[origvalue] = origvalue
+	    original[str(value)] = origvalue
             dataitem = [country, int(year), value, int(code)]
 	    # Ignore missing data
 	    if str(value) != 'nan':
