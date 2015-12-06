@@ -252,7 +252,6 @@ def dataset_to_csv(config, dataset, geocoder):
     aggr = {}
     # Plot header
     datastring = 'date\t'
-    dataset = dataset.dropna(how='all')
     (years, notyears) = selectint(dataset.columns)
     (countries, notcountries) = selectint(dataset.index)
 
@@ -263,11 +262,13 @@ def dataset_to_csv(config, dataset, geocoder):
                 datastring = str(datastring) + str(ctr) + "\t"
             except:
                 ctr = str(code)
+    datastring = datastring[:-1]
     datastring = datastring + "\n"
     
     for year in years:
         dataframe = dataset[year]
-        datastring = datastring + str(year) + "\t"
+        datastringitem = str(year) + "\t"
+	isvalue = ''
         
         for code in countries:
             country = ''
@@ -280,7 +281,9 @@ def dataset_to_csv(config, dataset, geocoder):
             if value:
 		if str(value) == 'nan':
 		    value = 'NaN'
-                datastring = str(datastring) + str(value) + "\t"
+		else:
+		    isvalue = 'yes'
+                datastringitem = str(datastringitem) + str(value) + "\t"
                 foundloc = 1
                 try:
                     aggr[year] = aggr[year] + value
@@ -288,8 +291,11 @@ def dataset_to_csv(config, dataset, geocoder):
                     aggr[year] = value
             else:
                 value = 'NaN'
-                datastring = str(datastring) + str(value) + "\t"
-        datastring = str(datastring) + "\n"
+                datastringitem = str(datastringitem) + str(value) + "\t"
+  	datastringitem = datastringitem[:-1]
+	# Include lines with values
+	if isvalue:
+            datastring = datastring + str(datastringitem) + "\n"
 
     for year in sorted(aggr):
         aggrstring = aggrstring + str(year) + ',' + str(aggr[year]) + "\n"
