@@ -59,7 +59,7 @@ from advancedstatistics import loadpanel, statistics2table, handle2statistics, d
 from search import dataset_search, getindicators, dataverse_search, loadjson
 import random, string
 from download import get_papers, dataset2zip, compile2zip
-from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
+from tabulardata import loadcodes, dataset_to_csv, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, load_fullmetadata, pidfrompanel
 import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
@@ -219,11 +219,16 @@ def downloadzip(pid):
 def tableapi():
     # years in filter
     config = configuration()
+    switch = 'modern'
+    datafilter = {}
+    datafilter['ctrlist'] = ''
     customyear = ''
     fromyear = '1500'
+    datafilter['startyear'] = fromyear
     toyear = '2012'
+    datafilter['endyear'] = toyear
     customcountrycodes = ''
-    (aggr, logscale, dataset) = ('',0,'')
+    (aggr, logscale, dataset, handles) = ('','','',[])
 
     # Select countries
     f = request.args
@@ -235,11 +240,16 @@ def tableapi():
     if customcountrycodes:
         customcountrycodes = customcountrycodes[:-1]
 
-    handle = "F16UDU"
+    #handle = "F16UDU"
     # HANDLE
     if request.args.get('handle'):
-        handle = request.args.get('handle')
-	(dataset, revid, cliohandle, clearpid) = findpid(handle)
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+            handles.append(pids[0])
+        except:
+            handles.append(handledataset)
+            nopanel = 'yes'
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
@@ -250,13 +260,16 @@ def tableapi():
 	   if ids:
 	       customcountrycodes = str(customcountrycodes) + str(ids) + ','
 	customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = customcountrycodes
 
     if not customcountrycodes:
 	customcountrycodes = '528'
     if request.args.get('yearmin'):
 	fromyear = request.args.get('yearmin')
+	datafilter['startyear'] = fromyear
     if request.args.get('yearmax'):
 	toyear = request.args.get('yearmax')
+	datafilter['endyear'] = toyear
     if request.args.get('aggr'):
         aggr = request.args.get('aggr')
     # Log scales switch
@@ -264,16 +277,31 @@ def tableapi():
         logscale = request.args.get('logscale')
     DEBUG = 0
 
-    apifile = str(dataset) + ".json"
-    jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
-    dataframe = load_api_data(jsonapi, '')
-    loccodes = loadcodes(dataframe)
-    (ctr, header) = countryset(customcountrycodes, loccodes)
-    indicator = ''
-    (frame, years, values, dates, original) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
-    names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
+    old = ''
+    if old:
+        apifile = str(dataset) + ".json"
+        jsonapi = config['apiroot'] + "/collabs/static/data/" + apifile
+        dataframe = load_api_data(jsonapi, '')
+        loccodes = loadcodes(dataframe)
+        (ctr, header) = countryset(customcountrycodes, loccodes)
+        indicator = ''
+        (frame, years, values, dates, original) = createframe(indicator, loccodes, dataframe, customyear, fromyear, toyear, ctr, logscale, DEBUG)
+        names = ['indicator', 'm', 'ctrcode', 'country', 'year', 'intcode', 'value', 'id']
+	(csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
+    # New version is fast
+    else:
+        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+        (subsets, panel) = ({}, [])
+   
+        for handle in handles:
+            (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+            if not datasubset.empty:
+                datasubset = datasubset.dropna(how='all')
+                panel.append(datasubset)
+                subsets[handle] = datasubset
+        (csvdata, aggrdata) = dataset_to_csv(config, subsets[handles[0]], modern)
 
-    (csvdata, aggrdata) = combinedata(ctr, frame, loccodes)
     if aggr:
         csvdata = aggrdata
 
