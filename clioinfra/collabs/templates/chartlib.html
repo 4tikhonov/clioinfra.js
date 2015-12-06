@@ -38,13 +38,13 @@ body {
 </style>
 <body>
 <center>
-<h2>{{ title }}</h2>
+<h3>{{ title }}</h3>
 </center>
 {% if indicators %}
   <select name="handles" class="right" onchange="mapswitch($(this).val())">
      <option value="{{ handle }}" selected>{{ title }}</option>
-     {% for handle in indicators %}
-     <option value="{{ handle }}">{{ handledict[handle] }}</option>
+     {% for nexthandle in indicators %}
+     <option value="{{ nexthandle }}">{{ nexthandle }}</option>
      {% endfor %}
   </select>
   </div>
@@ -199,6 +199,9 @@ d3.tsv(apilink, function(error, data) {
       .text(function(d) { return d.name; });
 });
 
+function mapswitch(newhandle) {
+   window.location = "{{ thismapurl|safe }}&face=" + newhandle;
+}
 </script>
 {% if showpanel %}
 <p align="left">
