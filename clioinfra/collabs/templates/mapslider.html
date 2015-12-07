@@ -144,7 +144,7 @@ function historical() {
     {
         histo = '';
     }
-    document.getElementById('worldmap').src = starturl + '&colors=' + colors + '&logscale=' + logscale + '&histo=' + histo;
+    document.getElementById('worldmap').src = mapurl + '&year=' + $( "#yearslider option:selected" ).text() + '&lasty={{ lastyear }}' + '&colors=' + colors + '&logscale=' + logscale + '&histo=' + histo;
 }
 
 function ingrey() {
