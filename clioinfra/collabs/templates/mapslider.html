@@ -70,8 +70,12 @@
         if ($('#greyscale').is(':checked')) {
             colors = 'greyscale';
         }
-	document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text() + '&logscale=' + logscale;
-	document.getElementById('print').href = printurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
+        if ($('#histo').is(':checked')) {
+            histo = 'on';
+        }
+
+	document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text() + '&logscale=' + logscale + '&histo=' + histo;
+	document.getElementById('print').href = printurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text() + '&histo=' + histo;
         sliderTooltip(event, ui, 1);
       }
     });
@@ -82,7 +86,7 @@
       $('.ui-slider-handle').html(tooltip);
         $('.slider-time2').html($( "#yearslider option:selected" ).text());
         $("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
-      document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text();
+      document.getElementById('worldmap').src = '' + mapurl + '&colors=' + colors + '&year=' + $( "#yearslider option:selected" ).text() + '&histo=' + $( "#histo:checked" ).length;
     });
   });
   </script>
