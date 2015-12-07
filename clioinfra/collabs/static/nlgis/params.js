@@ -9,7 +9,9 @@ var logscale = '';
 myurl = myurl + '&'
 var colors = '';
 var histo = '';
-var copyrights = 'Shapes @ CShapes';
+var copyrights_cshapes = 'Shapes @ CShapes';
+var copyrights_geacron = 'Shapes @ Geacron';
+var copyrights = copyrights_cshapes;
 
 if (myurl.indexOf("start=") > 0) {
     handle=myurl.substring(myurl.indexOf("start=")+8);
@@ -101,3 +103,11 @@ if (myurl.indexOf("catmax=") > 0) {
       catmax=catstr.substring(0,cindex);
     };
 };
+
+if (histo.length > 0)
+{
+    if (parseInt(year) < 1946)
+    {
+	copyrights = copyrights_geacron;
+    }
+}
