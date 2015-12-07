@@ -38,7 +38,7 @@ body {
 </style>
 <body>
 <center>
-<h3>{{ title }}</h3>
+<h2>{{ title }}</h2>
 </center>
 {% if indicators %}
   <select name="handles" class="right" onchange="mapswitch($(this).val())">
@@ -91,7 +91,7 @@ function vizswitch(viztype) {
 }
 
 
-var margin = {top: 20, right: 80, bottom: 30, left: 50},
+var margin = {top: 20, right: 80, bottom: 30, left: 80},
     width = 900 - margin.left - margin.right,
     height = 350 - margin.top - margin.bottom;
 
@@ -174,8 +174,9 @@ d3.tsv(apilink, function(error, data) {
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
+      .attr("transform", "rotate(0)")
+      .attr("y", 0)
+      .attr("x", 220)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text('{{ units }}');
