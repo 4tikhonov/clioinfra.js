@@ -54,7 +54,14 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
         maindata = moderndata
     else:
         # Do conversion to webmapper system if there are no historical data
-        if not historicaldata:
+        isdata = ''
+        try:
+            if not historicaldata.empty:
+                isdata = 'yes'
+        except:
+            isdata = 'no'
+
+        if isdata == 'no':
             maindata = moderndata
             webmapperindex = []
             for code in maindata.index:
