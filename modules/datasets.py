@@ -265,8 +265,8 @@ def content2dataframe(config, handle):
     webmappercode = config['webmappercode']
     # Get title and units
     if not title:
-        title = dataframe.ix[0][1]
-        units = dataframe.ix[0][2]
+        title = dataframe.columns[1]
+        units = dataframe.ix[0][1]
 
     # Look for code in the column names 
     if maincode in dataframe:
