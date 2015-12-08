@@ -88,11 +88,13 @@ def selectint(cols):
     (isint, notint) = ([], [])
     for colname in cols:
         tmpvar = ''
-        try:
-            tmpvar = int(colname)
-            isint.append(tmpvar)
-        except:
-            notint.append(colname)
+	if str(colname) != 'nan':
+	    colname = re.sub(r'(\d+)\.0', r'\1', str(colname))
+	    try:
+                tmpvar = int(str(colname))
+                isint.append(tmpvar)
+            except:
+                notint.append(colname)
     return (isint, notint)
 
 def loadgeocoder(config, dataset, action):
@@ -101,7 +103,9 @@ def loadgeocoder(config, dataset, action):
     if action == 'geocoder':
         geocoder = dataset.iloc[:, 1:10]
     else:
-        geocoder = geocoder.ix[3:]
+        #geocoder = geocoder.ix[3:]
+	skip = 1
+	#geocoder = geocoder[3:]
     if action == 'test':
         return (geocoder, geocoder)
     geocoder = geocoder.convert_objects(convert_numeric=True)
@@ -287,7 +291,13 @@ def content2dataframe(config, handle):
 	    df = dataframe
 	    df.columns = df.ix[1]
             df.index = df[webmappercode]
-        
+
+    if classtype == 'None':
+        if config['webmappercode'] in dataframe.columns:
+            classtype = 'historical'
+            df = dataframe
+            df.index = df[webmappercode]
+
     return (classtype, df, title, units)
 
 def treemap(config, dataset, classification, ctrfilter, coder):
@@ -393,7 +403,16 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
             maindata = moderndata
         else:
             # Do conversion to webmapper system
-            if not historicaldata:
+	    isdata = ''
+	    try:
+                if not historicaldata.empty:
+		    isdata = 'yes'
+	    except:
+		isdata = 'no'
+
+	    if isdata == 'yes': 
+	        maindata = historicaldata
+	    else:
                 maindata = moderndata
                 webmapperindex = []
                 for code in maindata.index:
@@ -404,8 +423,6 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
                     webmapperindex.append(webmappercode)
                 maindata.index = webmapperindex
                 maindata = maindata[maindata.index > 0]
-            else:
-                maindata = historicaldata
     
         (cfilter, notint) = selectint(maindata.columns)
     
