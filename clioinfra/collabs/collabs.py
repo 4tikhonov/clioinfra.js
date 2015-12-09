@@ -178,16 +178,6 @@ def load_api_data1(apiurl, code, year, custom, scales, catnum):
 
 app = Flask(__name__)
 
-@app.route('/info')
-def test():
-    description = 'nlgis2 API Service v.0.1<br>/api/maps (map polygons)<br>/api/data (data services)<br>/demo web demo<br>'
-    return description
-
-@app.route('/slider')
-def slider():
-    #return 'slider'
-    return render_template('slider.html')
-
 @app.route('/graphslider')
 def graphslider():
     params = "handle=Panel['hdl%3A10622/4X6NCK'%2C 'hdl%3A10622/I0YK5M']&ctrlist=840%2C804%2C40%2C56%2C276%2C528%2C36&yearmin=1500&yearmax=2013"
@@ -309,6 +299,7 @@ def allowed_file(filename):
 @app.route('/download')
 def download(settings=''):
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
+    config = configuration()
     year = str(year)
     format = 'png'
     svgfileout = ''
@@ -393,6 +384,10 @@ def download(settings=''):
 @app.route('/treemap')
 def treemap(settings=''):
     showpanel = 'yes'
+    config = configuration()
+    if config['error']:
+        return config['error'] 
+
     (historical, handle, handles) = ('', '', [])
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
@@ -418,6 +413,9 @@ def treemap(settings=''):
 def panel(settings=''):
     showpanel = ''
     config = configuration()
+    if config['error']:
+        return config['error']
+
     f = request.args
     handle = ''
     for q in f:
@@ -443,6 +441,9 @@ def chartlib():
     (thismapurl, apilink, ctrlist, title, units, switch) = ('', '', '', 'Title', 'Units', 'modern')
     handleface = []
     config = configuration()
+    if config['error']:
+        return config['error']
+
     urlmatch = re.search(r'(.+)\&face', request.url)
     try:
         if urlmatch.group(0):
@@ -526,6 +527,9 @@ def graphlib(settings=''):
 @app.route('/datasetspace')
 def datasetspace(settings=''):
     config = configuration()
+    if config['error']:
+        return config['error']
+
     root = config['apiroot']
     dataverse = 'global'
     if request.args.get('dv'):
@@ -564,6 +568,9 @@ def datasetspace(settings=''):
 def start(settings=''):
     activepage = 'Home'
     config = configuration()
+    if config['error']:
+        return config['error']
+
     path = config['path']
     pages = getindex(activepage)
     perlbin = "/usr/bin/perl "
@@ -659,6 +666,9 @@ def is_location(param):
 def dashboard(settings=''):
     activepage = 'Dashboard'
     config = configuration()
+    if config['error']:
+        return config['error']
+
     apiroot = config['apiroot']
     dataverseroot = config['dataverseroot']
     key = config['key']
@@ -824,6 +834,9 @@ def statistics(settings=''):
     datafilter['endyear'] = yearmax
     datafilter['ctrlist'] = ''
     config = configuration()
+    if config['error']:
+        return config['error']
+
     handles = []
 
     if request.args.get('handle'):
@@ -888,6 +901,9 @@ def statistics(settings=''):
 @app.route('/totalstatistics')
 def totalstatistics(settings=''):
     config = configuration()
+    if config['error']:
+        return config['error']
+
     handles = []
 
     if request.args.get('handle'):
@@ -918,6 +934,9 @@ def totalstatistics(settings=''):
 @app.route('/export')
 def export(settings=''):
     config = configuration()
+    if config['error']:
+        return config['error']
+
     activepage = 'Dashboard'
     config = configuration()
     perlbin = "/usr/bin/perl "
@@ -926,7 +945,7 @@ def export(settings=''):
     varbase = request.args.get('base')
     dataset = request.args.get('dataset')
     fileID = request.args.get('fileID')
-    maincontent = 'Something went wrong...'
+    maincontent = config['error']
     cmd = "/bin/cat " + path + fileID + '.csv'
     docheck = re.match(r'.*[;|\/\:\(\)]', cmd)
     if not docheck:
@@ -938,6 +957,9 @@ def export(settings=''):
 def browse(settings=''):
     activepage = 'Dashboard'
     config = configuration()
+    if config['error']:
+        return config['error']
+
     pages = getindex(activepage)
     dataverse = config['dataverseroot']
     resp = make_response(render_template('dataverse.html', active=activepage, pages=pages, dataverse=dataverse))
@@ -946,6 +968,9 @@ def browse(settings=''):
 @app.route('/signup')
 def signup(settings=''):
     config = configuration()
+    if config['error']:
+        return config['error']
+
     (admin, user) = ('','')
     fields = {}
     checkboxes = {}
@@ -987,6 +1012,9 @@ def signup(settings=''):
 @app.route('/boundaries')
 def boundaries(settings=''):
     config = configuration()
+    if config['error']:
+        return config['error']
+
     root = config['apiroot']
     dataset = 'dataframe66_'
     jsondataset = getboundaries(root, dataset)
@@ -994,6 +1022,10 @@ def boundaries(settings=''):
 
 @app.route('/get')
 def get(settings=''):
+    config = configuration()
+    if config['error']:
+        return config['error']
+
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
     image = request.args.get('image')
     gzip = request.args.get('nlgis')
@@ -1022,6 +1054,10 @@ def get(settings=''):
 
 @app.route('/datasets')
 def datasets(settings=''):
+    config = configuration()
+    if config['error']:
+        return config['error']
+
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
     topicapiurl = website + "/api/topicslist"
     topicstats = load_api_data(topicapiurl, '', '', '', '', '')
@@ -1052,6 +1088,9 @@ def datasets(settings=''):
 @app.route('/print')
 def printme():
     config = configuration()
+    if config['error']:
+        return config['error']
+
     year = request.args.get("year")
     handle = request.args.get("handle")
     handles = []
@@ -1079,6 +1118,9 @@ def printme():
 @app.route('/printall')
 def printall():
     config = configuration()
+    if config['error']:
+        return config['error']
+
     colors = ''# 'greyscale'
     root = request.url
     urigroup = re.search('\?(.+)', root)
@@ -1096,6 +1138,10 @@ def printall():
 
 @app.route('/advanced')
 def advanced(settings=''):
+    config = configuration()
+    if config['error']:
+        return config['error']
+
     (year, code, website, server, imagepathloc, imagepathweb, viewerpath, path, geojson, datarange, custom) = readglobalvars()
 
     for name in request.cookies:
