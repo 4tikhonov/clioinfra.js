@@ -190,6 +190,9 @@ def graphslider():
 @app.route('/mapslider')
 def mapslider():
     (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    config = configuration()
+    if config['error']:
+	return config['error']
     handleface = ''
     urlmatch = re.search(r'(.+)\&face', request.url)
     try:
@@ -263,6 +266,13 @@ def mapslider():
 	    nothing = 1
 
     historical = 0
+
+    #if config:
+	#switch = 'modern'
+        #(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, 'geocoder')
+        #(origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+ 	#return str(maindata[handles[0]].index)
+	#return str(handles[0])
 
     try:
         (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
@@ -501,7 +511,19 @@ def chartlib():
     except:
 	skip = 0
 
-    resp = make_response(render_template('chartlib.html', thismapurl=thismapurl, indicators=pids, apilink=apilink, title=title, units=units, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
+    handledict = {}
+    if pids:
+	try:
+	    pids.remove(handles[0])
+	except:
+	    skip = 1
+        hquery = formdatasetquery(pids,'')
+        d = readdatasets('datasets', json.loads(hquery))
+        for x in d:
+            thishandle = x['handle']
+            handledict[thishandle] = x['title']
+
+    resp = make_response(render_template('chartlib.html', thismapurl=thismapurl, indicators=handledict, apilink=apilink, title=title, units=units, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
     return resp
 
 @app.route('/graphlib')
@@ -829,7 +851,7 @@ def dashboard(settings=''):
 @app.route('/statistics')
 def statistics(settings=''):
     datafilter = {}
-    (yearmin, yearmax, ctrlist) = (1500, 2020, '')
+    (yearmin, yearmax, ctrlist, histo) = ('1500', '2020', '', '')
     datafilter['startyear'] = yearmin
     datafilter['endyear'] = yearmax
     datafilter['ctrlist'] = ''
@@ -853,6 +875,8 @@ def statistics(settings=''):
         dataset = request.args.get('dataset')
         handles.append(dataset)
 
+    if request.args.get('hist'):
+	histo = 'on'
     if request.args.get('yearmin'):
         yearmin = request.args.get('yearmin')
 	datafilter['startyear'] = yearmin
@@ -874,9 +898,15 @@ def statistics(settings=''):
 
         (panel, cleanedpanel, names) = loadpanel(jsonapi, yearmin, yearmax, ctrlist)
     else:
-        switch = 'modern'
+	if histo:
+	    switch = 'historical'
+	    loadgeo = 'geocoder'
+	else:
+            switch = 'modern'
+	    loadgeo = ''
+
 	geolist = {}
-	(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, 'geocoder')
+	(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, loadgeo)
         (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
         (subsets, panel) = ({}, [])
 	for handle in handles:
@@ -885,13 +915,15 @@ def statistics(settings=''):
 	    meta = metadata[handle]
 	    names[handle] = meta['title'] 
             if not datasubset.empty:
+		datasubset['handle'] = handle
                 panel.append(datasubset)
     
             subsets[handle] = datasubset
 	cleanedpanel = pd.concat(panel)
 
-    #return cleanedpanel.to_html()
-    (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
+    #(header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
+    #data = advpanel2dict(cleanedpanel)
+    #return data.to_html()
 
     ctrlimit = 200
     data = handle2statistics(handles, cleanedpanel, names)
@@ -951,6 +983,8 @@ def export(settings=''):
     if not docheck:
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
+    else:
+	maincontent = 'Something went wrong..'
     return maincontent
 
 @app.route('/browse')
