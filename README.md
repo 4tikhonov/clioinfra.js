@@ -77,6 +77,7 @@ sudo apt-get install python-matplotlib
 sudo apt-get install python-bs4
 sudo apt-get install zip
 apt-get install python-pymongo
+sudo apt-get install libxml2-dev libxslt-dev python-dev lib32z1-dev
 apt-get install catdoc
 sudo a2enmod headers
 sudo npm install -g topojson
@@ -103,6 +104,7 @@ pip install brewer2mpl
 pip install vincent
 pip install palettable
 pip install xlsxwriter
+pip install lxml 
 ```
 
 ### Change default encoding:
