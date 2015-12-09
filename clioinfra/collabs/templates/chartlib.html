@@ -44,7 +44,7 @@ body {
   <select name="handles" class="right" onchange="mapswitch($(this).val())">
      <option value="{{ handle }}" selected>{{ title }}</option>
      {% for nexthandle in indicators %}
-     <option value="{{ nexthandle }}">{{ nexthandle }}</option>
+     <option value="{{ nexthandle }}">{{ indicators[nexthandle] }}</option>
      {% endfor %}
   </select>
   </div>
