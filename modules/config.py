@@ -11,6 +11,7 @@ from flask import Flask, request, redirect
 
 def configuration():
    config = {}
+   config['error'] = ''
    cpath = "/etc/apache2/clioinfra.conf"
    cparser = ConfigParser.RawConfigParser()
    cparser.read(cpath)
@@ -18,9 +19,12 @@ def configuration():
    # Prevent SQL injections
    try:
 	# Web params check
-        pipes = '[\|;><`()$]'
+        pipes = '[\|;><`()$\\]'
         semicolon = re.split(pipes, request.url)
-        if len(semicolon) > 1:
+        if len(semicolon) <= 1:
+	    cmd = 'on'
+	else:
+	    config['error'] = "Something went wrong..."
 	    return config
    except:
 	cmd = 'on'
