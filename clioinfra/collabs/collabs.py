@@ -928,7 +928,7 @@ def export(settings=''):
     fileID = request.args.get('fileID')
     maincontent = 'Something went wrong...'
     cmd = "/bin/cat " + path + fileID + '.csv'
-    docheck = re.match(r'.*;', cmd)
+    docheck = re.match(r'.*[;|\/\:\(\)]', cmd)
     if not docheck:
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
