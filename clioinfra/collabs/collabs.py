@@ -433,8 +433,16 @@ def panel(settings=''):
 	if value:
 	    handle = str(handle) + '&' + str(q) + '=' + str(f[q])
     # Default countris
-    if not f['ctrlist']:
-	handle = str(handle) + '&ctrlist=' + config['ctrlist'] 
+    try:
+        if not f['yearmin']:
+	    handle = str(handle) + '&yearmin=1500&yearmax=2013'
+    except:
+	handle = str(handle) + '&yearmin=1500&yearmax=2013'
+    try:
+        if not f['ctrlist']:
+	    handle = str(handle) + '&ctrlist=' + config['ctrlist'] 
+    except:
+	handle = str(handle) + '&ctrlist=' + config['ctrlist']
     try:
 	if f['print']:
 	    showpanel = ''
