@@ -9,6 +9,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     if (histo == 'on')
     {
         mapapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/fetch?format=topojson&year=" + year;
+	//mapapi = "//www-acc.socialhistory.org/services/geo/fetch?format=topojson&year=" + year;
         countryindex = 'country';
         idindex = 'id';
     }
@@ -37,7 +38,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     d3.select("#showmap").append("text")
     .style("font-size","12px")
     .attr("text-anchor", "middle")
-    .text(function() { return copyrights; })
+    .html(function() { return copyrights; })
 
     d3.select("svg")
        .transition().duration(0).style("opacity", 0).remove();
@@ -84,7 +85,6 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 
    if (histo == 'on')
    {
-    contapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/static/basemap.topojson";
     contapi = "http://dpe.sandbox.socialhistoryservices.org/collabs/static/world.topojson"
     d3.json(contapi, function(error, data) {
       svg.append('path')
