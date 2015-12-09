@@ -848,6 +848,7 @@ def statistics(settings=''):
 	datafilter['endyear'] = yearmax
     if request.args.get('ctrlist'):
         ctrlist = request.args.get('ctrlist')
+	datafilter['ctrlist'] = ctrlist	
 
     old = ''
     (names, cleanedpanel) = ({}, [])
@@ -862,12 +863,12 @@ def statistics(settings=''):
     else:
         switch = 'modern'
 	geolist = {}
-	(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+	(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, 'geocoder')
         (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
         (subsets, panel) = ({}, [])
 	for handle in handles:
             (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
-            datasubset['handle'] = handle
+            #datasubset['handle'] = handle
 	    meta = metadata[handle]
 	    names[handle] = meta['title'] 
             if not datasubset.empty:
@@ -876,6 +877,7 @@ def statistics(settings=''):
             subsets[handle] = datasubset
 	cleanedpanel = pd.concat(panel)
 
+    #return cleanedpanel.to_html()
     (header, data, countries, handles, vhandles) = advpanel2dict(cleanedpanel)
 
     ctrlimit = 200
@@ -915,6 +917,7 @@ def totalstatistics(settings=''):
 
 @app.route('/export')
 def export(settings=''):
+    config = configuration()
     activepage = 'Dashboard'
     config = configuration()
     perlbin = "/usr/bin/perl "
@@ -923,9 +926,12 @@ def export(settings=''):
     varbase = request.args.get('base')
     dataset = request.args.get('dataset')
     fileID = request.args.get('fileID')
+    maincontent = 'Something went wrong...'
     cmd = "/bin/cat " + path + fileID + '.csv'
-    p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    maincontent = p.communicate()[0]
+    docheck = re.match(r'.*;', cmd)
+    if not docheck:
+        p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        maincontent = p.communicate()[0]
     return maincontent
 
 @app.route('/browse')
