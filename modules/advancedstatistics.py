@@ -200,7 +200,8 @@ def statistics_tojson(maindataframe, modern):
 
 def advpanel2dict(cleanedpanel):
     data = cleanedpanel.reset_index().to_dict()
-    codes = data['Code']
+    if 'Code' in data.columns:
+        codes = data['Code']
     handlesdata = data['handle']
     handles = {}
     vhandles = {}
