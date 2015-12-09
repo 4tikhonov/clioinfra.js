@@ -60,8 +60,6 @@ sudo apt-get install build-essential
 ```
 ## Installation instructions
 ```
-apt-get install postgresql-8.4
-apt-get install postgresql-server-dev-8.4
 apt-get install mongodb
 apt-get install apache2
 apt-get install libapache2-mod-wsgi
@@ -131,4 +129,19 @@ modernnames = F16UDU
 tmpdir = /tmp/test
 imagepath = /home/somepath/clioinfra.js/clioinfra/collabs/static
 phantompath = /home/somepath/clioinfra.js/node_modules
+defaulthandle = hdl:10622/4X6NCK
+ctrlist = 380,528,276,250,724,56,756
+geocoderapi = http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/ids
+# Standard codes
+moderncode = Code
+webmapperoecd = ccode
+webmappercode = Webmapper numeric code
+webmapperstartyear = 1500
+webmappercountry = country name
+moderncountry = Continent, Region, Country
+# Copyrights
+geacron_copyright = Map Polygons Source: Provided by <a href=\"http://www.geacron.com\">Geacron</a>
+gecron_shortcopyright = Shapes (C) Geacron
+cshapes_copyright = Map Polygons Source: Weidmann, Nils B., Doreen Kuse, and Kristian Skrede Gleditsch. 2010.<br> The Geography of the International System: <a href=\"http://nils.weidmann.ws/projects/cshapes.html\">The CShapes Dataset. International Interactions 36 (1)</a>
+cshapes_shortcopyright = Shapes (C) CShapes
 ```
