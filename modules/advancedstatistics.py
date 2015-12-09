@@ -49,10 +49,12 @@ def handle2statistics(handles, cleanedpanel, names):
     maindataframe = []
     for handle in handles:
         newpanel = cleanedpanel[cleanedpanel['handle'] == handle]
-        newpanel = newpanel.drop('handle', axis=1)
+	if 'handle' in newpanel:
+            newpanel = newpanel.drop('handle', axis=1)
         ypanel = newpanel.columns
         newpanel = newpanel.reset_index()
-        newpanel = newpanel.drop('Code', axis=1)
+	if 'Code' in newpanel:
+            newpanel = newpanel.drop('Code', axis=1)
         cdataframe = {}
         if handle:
             data = {}
