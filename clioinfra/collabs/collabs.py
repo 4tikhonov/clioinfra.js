@@ -522,7 +522,8 @@ def chartlib():
     handledict = {}
     if pids:
 	try:
-	    pids.remove(handles[0])
+	    if handles[1]:
+	        pids.remove(handles[0])
 	except:
 	    skip = 1
         hquery = formdatasetquery(pids,'')
