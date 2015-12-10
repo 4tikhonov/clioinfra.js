@@ -16,10 +16,10 @@ def configuration():
    cparser = ConfigParser.RawConfigParser()
    cparser.read(cpath)
 
-   # Prevent SQL injections
+   # Prevent SQL and shell injections
    try:
 	# Web params check
-        pipes = '[\|;><`()$\\]'
+        pipes = '[\|\;><`()$]'
         semicolon = re.split(pipes, request.url)
         if len(semicolon) <= 1:
 	    cmd = 'on'
@@ -28,7 +28,17 @@ def configuration():
 	    return config
    except:
 	cmd = 'on'
+   
+   # Check for vocabulary words in exploits
+   try:
+       threat = re.search(r'(curl|bash|mail|ping|sleep|passwd|cat\s+|certificate|wget|usr|bin)', request.url)
+   except:
+       threat = ''
  
+   if threat:
+       config['error'] = "Something definitely went wrong..."
+       return config
+
    path_items = cparser.items( "config" )
    for key, value in path_items:
 	config[key] = value
