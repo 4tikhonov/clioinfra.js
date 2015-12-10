@@ -9,8 +9,8 @@ var logscale = '';
 myurl = myurl + '&'
 var colors = '';
 var histo = '';
-var copyrights_cshapes = '<a href="http://nils.weidmann.ws/projects/cshapes.html">Shapes @ CShapes</a>';
-var copyrights_geacron = '<a href="http://www.geacron.com">Shapes @ Geacron</a>';
+var copyrights_cshapes = '<a href="http://nils.weidmann.ws/projects/cshapes.html">Borders (C) CShapes</a>';
+var copyrights_geacron = '<a href="http://www.geacron.com">Borders (C) Geacron</a>';
 var copyrights = copyrights_cshapes;
 
 if (myurl.indexOf("start=") > 0) {
