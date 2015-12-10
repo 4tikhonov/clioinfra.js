@@ -31,7 +31,7 @@ def configuration():
    
    # Check for vocabulary words in exploits
    try:
-       threat = re.search(r'(curl|bash|mail|ping|sleep|passwd|cat\s+|certificate|wget|usr|bin)', request.url)
+       threat = re.search(r'(curl|bash|mail|ping|sleep|passwd|cat\s+|cp\s+|mv\s+certificate|wget|usr|bin)', request.url)
    except:
        threat = ''
  
