@@ -92,7 +92,7 @@ def get_normal_scale(catmax, valarray):
     ranges.append(imax)
     return ranges
 
-def getscales(config, data, colors, catnum, geocoder, original, logscale):
+def getscales(config, data, colors, catnum, geocoder, original, histclass, logscale):
     values = []
     finalcatnum = 0   
     (webmapper, geoison) = ({}, '')
@@ -182,6 +182,11 @@ def getscales(config, data, colors, catnum, geocoder, original, logscale):
 		mainindex = str(row[0])
 		if geoison:
 		    mainindex = str(row[3])
+		    if histclass == 'modern':
+			try:
+			    mainindex = int(webmapper.ix[row[3]][config['webmappercode']])
+			except:
+			    mainindex = str(row[3])
 
 		dataset[mainindex] = dataitem
             #except:
