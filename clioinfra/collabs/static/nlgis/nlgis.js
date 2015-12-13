@@ -6,9 +6,11 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     width = 920 - margin.left - margin.right,
     height = 420 - margin.top - margin.bottom;
 
+    var host = "//dpe.sandbox.socialhistoryservices.org";
     if (histo == 'on')
     {
         mapapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/fetch?format=topojson&year=" + year;
+	mapapi = "/collabs/static/topojson/" + year + '.json';
 	//mapapi = "//www-acc.socialhistory.org/services/geo/fetch?format=topojson&year=" + year;
         countryindex = 'country';
         idindex = 'id';
@@ -62,7 +64,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 	var country;
 	if (histo)
 	{
-	    cID = d.properties[idindex];
+	    cID = parseInt(d.properties[idindex]);
 	    country = d.properties['name'];
 	}
 	else
@@ -85,7 +87,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 
    if (histo == 'on')
    {
-    contapi = "http://dpe.sandbox.socialhistoryservices.org/collabs/static/world.topojson"
+    contapi = host + "/collabs/static/world.topojson"
     d3.json(contapi, function(error, data) {
       svg.append('path')
         .datum(topojson.feature(data, data.objects['land']))
@@ -110,7 +112,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 	datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist + '&logscale=' + logscale;
         if (histo)
 	{
-	    datapi = datapi + "&geocoder='on'";
+	    datapi = datapi + "&geocoder=historical";
 	}
 	d3.json(datapi, function (error, data) {
 
@@ -133,7 +135,16 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 		    .attr("stroke", "#848482")
                     .attr("stroke-width", 0.5)
                     .style('fill', function (d) {
-                        var color = locations[d.properties[idindex]] && locations[d.properties[idindex]].color;
+			var color;
+			if (histo == 'on')
+			{
+			   var tmpId = d.properties[idindex];
+			   color = locations[d.properties[idindex]] && locations[d.properties[idindex]].color;
+		        }
+			else
+			{
+                           color = locations[d.properties[idindex]] && locations[d.properties[idindex]].color;
+			}
                         return color || '#ffffff';
                     })
 
@@ -151,12 +162,12 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
   sampleNumerical = [1,2.5,5,10,20];
   var legendValues=[{color: "green", stop: [0,1]},{color: "green", stop: [1,2]},{color: "purple", stop: [2,3]},{color: "yellow", stop: [3,4]},{color: "black", stop: [4,5]}];
 
-  datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
+  datapi = host + "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
   datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist;
   datapi = datapi + '&getrange=yes' + '&logscale=' + logscale;
   if (histo)
   {
-      datapi = datapi + "&geocoder='on'";
+      datapi = datapi + "&geocoder=historical";
   }
 
   d3.json(datapi, function (error, rangedata) {
