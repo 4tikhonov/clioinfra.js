@@ -92,15 +92,20 @@ def get_normal_scale(catmax, valarray):
     ranges.append(imax)
     return ranges
 
-def getscales(data, colors, catnum, geocoder, original, logscale):
+def getscales(config, data, colors, catnum, geocoder, original, logscale):
     values = []
     finalcatnum = 0   
-    webmapper = {}
+    (webmapper, geoison) = ({}, '')
     dataset = {}
-    if geocoder:
-        webmapper = webmapper_geocoder()
+    try: 
+        if not geocoder.empty:
+            webmapper = geocoder #webmapper_geocoder()
+	    geoison = 'on'
+    except:
+	geoison = ''
     
     try:
+    #if data:
         # Fill values for dataframe
         for row in data:          
             value = row[2]
@@ -144,7 +149,8 @@ def getscales(data, colors, catnum, geocoder, original, logscale):
         for row in data:
             value = row[2]
             dataitem = {}
-            try:
+            #try:
+	    if value:
                 if value != 'NA':
                     dataitem['value'] = value                    
                     colorID = 0
@@ -154,35 +160,35 @@ def getscales(data, colors, catnum, geocoder, original, logscale):
                         if dataitem['value'] > validx:
                             dataitem['range'] = validx
                             dataitem['color'] = colors[colorID]
-			    if geocoder:
-			        dataitem['country'] = row[0]
-				dataitem['id'] = webmapper[row[3]]
+			    if geoison:
+				try:
+			            dataitem['country'] = webmapper.ix[row[3]][config['webmappercountry']]
+				except:
+				    dataitem['country'] = row[0] + ' problem'
+				dataitem['id'] = str(row[3])
                         colorID = colorID + 1        
 
 		    # Check if round required
 		    rlen = len(str(value))
+		    rvalue = value
 		    if rlen > 10:
-		        rvalue = "%.5f" % value
+		        rvalue = "%.2f" % value
 			#rvalue = value
 			try:
 			    uvalue = original[str(rvalue)]
 			except:
 			    uvalue = ''
-		        dataitem['value'] = uvalue
-		mainindex = row[0]
-		if geocoder:
-		    try:
-		        webmapperindex = webmapper[row[3]]
-		    except:
-		        webmapperindex = mainindex
-
-		    if webmapperindex:
-		        mainindex = webmapperindex
+		    dataitem['value'] = rvalue
+		mainindex = str(row[0])
+		if geoison:
+		    mainindex = str(row[3])
 
 		dataset[mainindex] = dataitem
-            except:
+            #except:
+	    else:
                 showwarning("can't calculate scales")
     except:
+    #else:
         # No scales
         showwarning('not possible to calculate scales')
         
