@@ -267,24 +267,17 @@ def mapslider():
 
     historical = 0
 
-    #if config:
-	#switch = 'modern'
-        #(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, 'geocoder')
-        #(origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
- 	#return str(maindata[handles[0]].index)
-	#return str(handles[0])
-
-    try:
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
-	for dataitem in handle2ind:
-	    title = handle2ind[dataitem]
-    except:
-	datahub = {}
-	#warning = logging.exception()
+    hubyears = []
+    if config:
+	switch = 'modern'
+        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+	(hubyears, notyears) = selectint(origdata.columns)
+	title = metadata[handles[0]]['title'] 
 
     validyears = []
     lastyear = ''
-    for year in sorted(datahub):
+    for year in sorted(hubyears):
 	validyears.append(year)
 	lastyear = year
 	steps = steps + 1
