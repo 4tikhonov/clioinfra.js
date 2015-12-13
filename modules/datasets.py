@@ -79,8 +79,12 @@ def load_geocodes(config, switch, codes, maindata, geolist):
             geocodes[int(code)] = ctr
     elif switch == 'historical':
         for code in codes[0]:
-            ctr = geolist[code]            
-            geocodes[int(code)] = ctr        
+	    try:
+                ctr = geolist[code]            
+                geocodes[int(code)] = ctr        
+	    except:
+		ctr = 0	
+		geocodes[0] = str(ctr)
     return geocodes
 
 # Select int values
@@ -440,7 +444,7 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
 
 def request_geocoder(config, buildvocabulary):
     # Geocoder
-    (geocoder, geolist, oecd2webmapper) = ('', '', '')
+    (geocoder, geolist, oecd2webmapper) = ('', {}, '')
     (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
     dataset = dataset[1:]
