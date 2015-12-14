@@ -22,7 +22,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     handles = []
     ctrlist = []
     metadata = {}
-    switch = 'historical'
+    #switch = 'historical'
 
     # Load Geocoder
     (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
