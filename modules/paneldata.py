@@ -12,9 +12,7 @@ from pandas.io.json import json_normalize
 from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
 from data2excel import panel2excel
 
-def build_panel(config, handles, startyear, endyear, ctrlist):
-    switch = 'modern'
-    switch = 'historical'
+def build_panel(config, switch, handles, startyear, endyear, ctrlist):
 
     datafilter = {}
     datafilter['ctrlist'] = ctrlist
@@ -43,10 +41,16 @@ def build_panel(config, handles, startyear, endyear, ctrlist):
             (panelcells, originalvalues) = dataset2panel(config, subsets[handle], historical, logscale)
         
     totalpanel = pd.concat(panel)
-    if np.nan in totalpanel.index:
-        totalpanel = totalpanel.drop(np.nan, axis=0)
+    try:
+        if np.nan in totalpanel.index:
+            totalpanel = totalpanel.drop(np.nan, axis=0)
+    except: 
+	skip = 'yes'
 
-    geocoder = historical
+    if switch == 'historical':
+        geocoder = historical
+    else:
+        geocoder = modern
     (allyears, nyears) = selectint(totalpanel.columns)
     panels = []
     known = {}
