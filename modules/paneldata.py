@@ -9,7 +9,75 @@ import vincent
 import numpy as np
 import ast
 from pandas.io.json import json_normalize
-from datasets import selectint
+from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
+from data2excel import panel2excel
+
+def build_panel(config, handles, startyear, endyear, ctrlist):
+    switch = 'modern'
+    switch = 'historical'
+
+    datafilter = {}
+    datafilter['ctrlist'] = ctrlist
+    datafilter['startyear'] = startyear
+    datafilter['endyear'] = endyear
+            
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, panel) = ({}, [])
+    logscale = ''
+    for handle in handles:    
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+            try:
+                if np.nan in datasubset.index:
+                    datasubset = datasubset.drop(np.nan, axis=0)
+            except:
+                skip = 'yes'
+
+            datasubset['handle'] = handle
+            metadata['url'] = 0
+            panel.append(datasubset)
+            subsets[handle] = datasubset 
+            (panelcells, originalvalues) = dataset2panel(config, subsets[handle], historical, logscale)
+        
+    totalpanel = pd.concat(panel)
+    if np.nan in totalpanel.index:
+        totalpanel = totalpanel.drop(np.nan, axis=0)
+
+    geocoder = historical
+    (allyears, nyears) = selectint(totalpanel.columns)
+    panels = []
+    known = {}
+    for code in totalpanel.index:
+        country = geocoder.ix[int(code)][config['webmappercountry']]
+        #print country
+
+        for thisyear in allyears:
+            thiskey = str(int(code)) + str(thisyear)
+            
+            if thiskey not in known:
+                dataitem = [country]
+                dataitem.append(thisyear)
+                known[thiskey] = thisyear
+        
+                for handle in handles:
+                    tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
+                    try:
+                        thisval = tmpframe.ix[int(code)][thisyear]
+                    except:
+                        thisval = ''
+                    dataitem.append(thisval)
+                    
+                panels.append(dataitem)
+
+    # Build header
+    header = ['Country', 'Year']
+    for handle in handles:
+        header.append(metadata[handle]['title'])
+    
+    return (header, panels, metadata, totalpanel)
 
 def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):        
     years = dataframe[1]    
