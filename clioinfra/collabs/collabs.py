@@ -189,8 +189,12 @@ def graphslider():
 
 @app.route('/mapslider')
 def mapslider():
-    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax, histo) = ('', 0, '', '1500', '2012', '', 6, '') 
     config = configuration()
+    datafilter = {}
+    datafilter['ctrlist'] = ''
+    datafilter['startyear'] = fromyear
+    datafilter['endyear'] = toyear
     if config['error']:
 	return config['error']
     handleface = ''
@@ -217,6 +221,7 @@ def mapslider():
            if ids:
                customcountrycodes = str(customcountrycodes) + str(ids) + ','
         customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = customcountrycodes
 
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
@@ -248,12 +253,15 @@ def mapslider():
 	catmax = request.args.get('catmax')
     if request.args.get('yearmin'):
         fromyear = request.args.get('yearmin')
+	datafilter['startyear'] = fromyear
     if request.args.get('yearmax'):
         toyear = request.args.get('yearmax')
+	datafilter['endyear'] = toyear
     if request.args.get('geocoder'):
         geocoder = request.args.get('geocoder')
     if request.args.get('hist'):
         geocoder = request.args.get('hist') 
+	histo = 'on'
     if request.args.get('face'):
         handleface = request.args.get('face')
     if handleface:
@@ -270,10 +278,23 @@ def mapslider():
     hubyears = []
     if config:
 	switch = 'modern'
+	if histo:
+	    switch = 'historical'
         (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
         (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
 	(hubyears, notyears) = selectint(origdata.columns)
 	title = metadata[handles[0]]['title'] 
+
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        datasubset['handle'] = handle
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+	    (allyears, notyears) = selectint(datasubset.columns)
+	    for year in datasubset:
+		if datasubset[year].count() == 0:
+		    datasubset = datasubset.drop(year, axis=1)
+	    (hubyears, notyears) = selectint(datasubset.columns)
 
     validyears = []
     lastyear = ''
