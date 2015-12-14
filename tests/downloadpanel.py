@@ -8,14 +8,19 @@ from paneldata import build_panel
 from data2excel import panel2excel
 
 config = configuration()
-handles = ['hdl:10622/2XMLW5', 'hdl:10622/SMIOST']
-ctrlist = '1523,1525'
-startyear = '1929'
-endyear = '1955'
-(header, panelcells, metadata, totalpanel) = build_panel(config, handles, startyear, endyear, ctrlist)
-datadir = "/home/dpe/tmp"
-filename = "paneltest.xlsx"
-metadata = []
-outfile = panel2excel(datadir, filename, header, panelcells, metadata)
-print outfile
-panelcells
+if config:
+    handles = ['hdl:10622/2XMLW5', 'hdl:10622/SMIOST']
+    handles = ['hdl:10622/4X6NCK'] #, 'hdl:10622/6FCHEF', 'hdl:10622/ZWRBOY']
+    if handles[0]:
+	ctrlist = '1523,1525'
+ 	ctrlist = '528'
+	startyear = '1929'
+	endyear = '1955'
+	switch = 'modern'
+	(header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, startyear, endyear, ctrlist)
+	datadir = "/home/dpe/tmp"
+	filename = "paneltest.xlsx"
+	metadata = []
+	outfile = panel2excel(datadir, filename, header, panelcells, metadata)
+	print outfile
+	print str(panelcells)
