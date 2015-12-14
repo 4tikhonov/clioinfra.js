@@ -204,6 +204,8 @@ def mapslider():
             thismapurl = urlmatch.group(1)
     except:
 	thismapurl = request.url
+    thismapurl = thismapurl.replace('http://', 'https://')
+
     geocoder = ''
     pids = []
     handledataset = ''
