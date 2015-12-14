@@ -459,9 +459,13 @@ def treemapweb():
 # Panel data
 @app.route('/panel')
 def panel():
-    (handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ('', '1500', '2020', 1950, '', 2010)
+    (datafilter, handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ({}, '', '1500', '2020', 1950, '', 2010)
     config = configuration()
-    modern = moderncodes(config['modernnames'], config['apiroot'])
+    datafilter['startyear'] = '1500'
+    datafilter['endyear'] = '2010'
+    datafilter['ctrlist'] = ''
+
+    #modern = moderncodes(config['modernnames'], config['apiroot'])
     if request.args.get('handle'):
         handle = str(request.args.get('handle'))
 	handle = handle.replace(" ", "")
@@ -474,8 +478,24 @@ def panel():
     if request.args.get('year'):
         thisyear = request.args.get('year')
 
-    jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
-    dataframe = load_api_data(jsonapi, '')
+    switch = 'modern'
+    switch = 'historical'
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    handles = ["hdl:10622/SMIOST"]
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, panel) = ({}, [])
+    
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        datasubset['handle'] = handle
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+            panel.append(datasubset)
+            subsets[handle] = datasubset    
+
+    #jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
+    #dataframe = load_api_data(jsonapi, '')
+    dataframe = subsets
     
     result = ''
     ctrlimit = 10
@@ -484,26 +504,28 @@ def panel():
     panel = []
     names = {}
 
-    for dataitem in dataframe:
-        handle = dataitem['handle']
+    for handle in dataframe:
+	#return dataframe[handle].to_html()
 	try:
-	    names[handle] = dataitem['title']
+	    names[handle] = metadata[handle]['title']
 	except:
 	    names[handle] = 'title'
 	try:
-            (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
+            #(dataset, codes) = paneldatafilter(dataframe[handle], int(yearmin), int(yearmax), ctrlist, handle)
+	    dataset = dataframe[handle]
 	    if not dataset.empty:
                 panel.append(dataset)
 	except:
 	    nodata = 0
 	
-    #return str(panel)
     if panel:
         totalpanel = pd.concat(panel)
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
 
-        (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel, names)  
+	#return 'test'
+        (header, data, countries, handles, vhandles) = panel2dict(config, cleanedpanel, names)  
+	return str(data)
 	years = []
 	for year in sorted(data):
             try:
@@ -812,7 +834,9 @@ def dataapi():
     if request.args.get('colormap'):
         colormap = request.args.get('colormap')
     if request.args.get('geocoder'):
-        geocoder = request.args.get('geocoder')
+        switch = request.args.get('geocoder')
+	if switch == 'on':
+	    switch = 'modern'
     if request.args.get('handle'):
         handlestring = request.args.get('handle')
 	ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
@@ -861,12 +885,18 @@ def dataapi():
         (panelcells, originalvalues) = dataset2panel(config, subsets[handles[0]], modern, logscale)
     #(header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
-    modern = moderncodes(config['modernnames'], config['apiroot'])
+    #modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
     # SCALES
+    if switch:
+        if switch == 'historical':
+            geocoder = historical
+        else:
+            geocoder = modern
+    #geocoder = ''
     (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
-    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder, originalvalues, logscale)
+    (catlimit, ranges, dataset) = getscales(config, panelcells, colors, categoriesMax, geocoder, originalvalues, switch, logscale)
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
