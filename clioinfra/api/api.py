@@ -621,7 +621,7 @@ def advanced_statistics():
 # Dataverse API
 @app.route('/download')
 def download():
-    (classification, pid, root) = ('', '', '')
+    (classification, pid, root) = ('modern', '', '')
     handle = ''
     classification = 'modern'
     config = configuration()
