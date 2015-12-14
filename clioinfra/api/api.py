@@ -460,16 +460,23 @@ def treemapweb():
 @app.route('/panel')
 def panel():
     (datafilter, handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ({}, '', '1500', '2020', 1950, '', 2010)
+    handles = []
     config = configuration()
-    datafilter['startyear'] = '1500'
-    datafilter['endyear'] = '2010'
-    datafilter['ctrlist'] = ''
+    datafilter['startyear'] = yearmin
+    datafilter['endyear'] = lastyear
+    datafilter['ctrlist'] = config['ctrlist']
 
     #modern = moderncodes(config['modernnames'], config['apiroot'])
     if request.args.get('handle'):
         handle = str(request.args.get('handle'))
 	handle = handle.replace(" ", "")
 	handle = handle.replace("'", "")
+        try:
+            (pids, pidslist) = pidfrompanel(handle)
+	    handles = pids
+        except:
+            nopanel = 'yes'
+	    handles.append(handle)
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
@@ -484,11 +491,12 @@ def panel():
     if request.args.get('yearmax'):
         toyear = request.args.get('yearmax')
         datafilter['endyear'] = toyear
+    if request.args.get('hist'):
+	switch = 'historical'
+    else:
+	switch = 'modern'
 
-    switch = 'modern'
-    switch = 'historical'
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
-    handles = ["hdl:10622/SMIOST"]
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
     (subsets, panel) = ({}, [])
     
@@ -497,6 +505,12 @@ def panel():
         datasubset['handle'] = handle
         if not datasubset.empty:
             datasubset = datasubset.dropna(how='all')
+	    try:
+	        if np.nan in datasubset.index:
+	            datasubset = datasubset.drop(np.nan, axis=0)
+	    except:
+		skip = 'yes'
+
             for year in datasubset:
                 if datasubset[year].count() == 0:
                     datasubset = datasubset.drop(year, axis=1)
@@ -504,11 +518,7 @@ def panel():
             panel.append(datasubset)
             subsets[handle] = datasubset    
 
-    #jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
-    #dataframe = load_api_data(jsonapi, '')
     dataframe = subsets
-    
-    result = ''
     ctrlimit = 10
 
     allcodes = {}
@@ -516,7 +526,6 @@ def panel():
     names = {}
 
     for handle in dataframe:
-	#return dataframe[handle].to_html()
 	try:
 	    names[handle] = metadata[handle]['title']
 	except:
@@ -534,7 +543,32 @@ def panel():
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
 
-	#return 'test'
+	#return str(cleanedpanel.to_html())
+    totalpanel = cleanedpanel
+    thisyear = totalpanel.columns[-2]
+    result = ''
+    if thisyear:
+	if switch == 'historical':
+	    geocoder = historical
+	else:
+	    geocoder = modern
+        result = 'Country,'
+        for handle in handles:
+            result = result + str(metadata[handle]['title']) + ','
+	result = result[:-1]
+    
+        known = {}
+        for code in totalpanel.index:
+            if str(code) not in known:
+                result = result + '\n' + str(geocoder.ix[int(code)][config['webmappercountry']])
+                for handle in handles:
+                    tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
+                    thisval = tmpframe.ix[code][thisyear]
+                    result = result + ',' + str(thisval)
+                known[str(code)] = code
+
+	return Response(result,  mimetype='text/plain')
+
 	(allyears, notyears) = selectint(cleanedpanel.columns)
 	(codes, notcodes) = selectint(cleanedpanel.index)
 	cleanedpanel.index = codes
@@ -542,7 +576,7 @@ def panel():
 	#return str(data)
 	#thisyear = 1882
 	#return str(countries)
-	return str(countries)
+	#return str(countries)
 	years = []
 	for year in sorted(data):
             try:
@@ -561,7 +595,8 @@ def panel():
 	    return Response(yearsjson,  mimetype='application/json')
 
 	# Show dataframe in CSV
-        result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
+        #result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
+	#result = 'Country,title1,title2\nNLD,1111,2012\nNLD,1112,2013\n'
 
     return Response(result,  mimetype='text/plain')
 
