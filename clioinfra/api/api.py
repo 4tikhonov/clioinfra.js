@@ -475,8 +475,15 @@ def panel():
     if request.args.get('ctrlist'):
         customcountrycodes = ''
         ctrlist = request.args.get('ctrlist')
+	datafilter['ctrlist'] = ctrlist
     if request.args.get('year'):
         thisyear = request.args.get('year')
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+        datafilter['startyear'] = fromyear
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
+        datafilter['endyear'] = toyear
 
     switch = 'modern'
     switch = 'historical'
@@ -490,6 +497,10 @@ def panel():
         datasubset['handle'] = handle
         if not datasubset.empty:
             datasubset = datasubset.dropna(how='all')
+            for year in datasubset:
+                if datasubset[year].count() == 0:
+                    datasubset = datasubset.drop(year, axis=1)
+
             panel.append(datasubset)
             subsets[handle] = datasubset    
 
@@ -524,8 +535,14 @@ def panel():
         cleanedpanel = totalpanel
 
 	#return 'test'
+	(allyears, notyears) = selectint(cleanedpanel.columns)
+	(codes, notcodes) = selectint(cleanedpanel.index)
+	cleanedpanel.index = codes
         (header, data, countries, handles, vhandles) = panel2dict(config, cleanedpanel, names)  
-	return str(data)
+	#return str(data)
+	#thisyear = 1882
+	#return str(countries)
+	return str(countries)
 	years = []
 	for year in sorted(data):
             try:
@@ -641,6 +658,7 @@ def download():
 	outfile = "test1.xlsx"
 	fullpath = config['webtest'] + "/" + str(outfile)
 	(outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	#return outfilefinal
 	root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
 	return redirect(root, code=301)
     else:
