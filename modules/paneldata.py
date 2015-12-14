@@ -9,6 +9,7 @@ import vincent
 import numpy as np
 import ast
 from pandas.io.json import json_normalize
+from datasets import selectint
 
 def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):        
     years = dataframe[1]    
@@ -82,9 +83,17 @@ def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):
             
     return (data, codes)    
 
-def panel2dict(cleanedpaneldata, names):
-    data = cleanedpaneldata.reset_index().to_dict()
-    codes = data['Code']
+def panel2dict(config, cleanedpaneldata, names):
+    #data = cleanedpaneldata.reset_index().to_dict()
+    #codes = data['Code']
+    data = cleanedpaneldata.to_dict()
+    codes = []
+    if 'Code' in cleanedpaneldata.columns:
+        codes = data['Code']
+    if config['webmappercode'] in cleanedpaneldata.columns:
+        #(codes, notcodes) = selectint(cleanedpaneldata[config['webmappercode']])
+	(codes, ncodes) = selectint(cleanedpaneldata.index)
+
     handlesdata = data['handle']
     handles = {}
     vhandles = {}
