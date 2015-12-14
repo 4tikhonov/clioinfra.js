@@ -22,6 +22,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     handles = []
     ctrlist = []
     metadata = {}
+    switch = 'historical'
 
     # Load Geocoder
     (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
@@ -40,6 +41,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 
     # Reading dataset
     (class1, dataset, title, units) = content2dataframe(config, handle)
+    #return ('test', 'test')
 
     if switch == 'modern':
         activeindex = modern.index
@@ -109,6 +111,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
         tmpcoder = icoder.ix[ctrlist]
         icoder = pd.DataFrame(tmpcoder)
 
+    #return (finalsubset.to_html(), 'test')
     if fullpath:
         datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
     return (fullpath, finalsubset)
