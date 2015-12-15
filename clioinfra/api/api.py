@@ -653,20 +653,40 @@ def advanced_statistics():
 # Dataverse API
 @app.route('/download')
 def download():
-    (classification, pid, root) = ('modern', '', '')
+    (classification, pid, root, switch) = ('modern', '', '', 'modern')
     handle = ''
     classification = 'modern'
     config = configuration()
+    cmd = "--insecure -u " + config['key'] + ": " + config['dataverseroot'] + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
+
     config['remote'] = ''
     datafilter = {}
     datafilter['startyear'] = '1500'
     datafilter['endyear'] = '2010'
     datafilter['ctrlist'] = ''
 
+    tmpdir = config['tmpdir']
+    filerandom = randomword(10)
+    #filerandom = '12345'
+    arc = "data" + filerandom + ".zip"
+    filename = filerandom
+    finaldir = config['path'] + '/static/tmp'
+    # ToDO
+    if filename:
+        finaldir = str(finaldir) + '/' + str(filename)
+        tmpdir = str(tmpdir) + '/' + str(filename)
+
+    try:
+        os.mkdir(tmpdir)
+        os.mkdir(finaldir)
+    except:
+        donothing = 'ok'
+
     if request.args.get('handle'):
         handle = request.args.get('handle')
     if request.args.get('type[0]') == 'historical':
         classification = request.args.get('type[0]')
+	switch = classification
     if request.args.get('y[min]'):
         datafilter['startyear'] = request.args.get('y[min]')
     if request.args.get('y[max]'):
@@ -701,21 +721,31 @@ def download():
 	    handle = pids[0]
 	    
 	if ispanel:
-            switch = 'modern'
+	    dirforzip = ''
+	    for handle in handles:
+	        dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
+
             (header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, datafilter)
-            filename = "paneltest.xlsx"
+            filename = "paneldata.xlsx"
             metadata = []
 	    datadir = config['webtest']
-            localoutfile = panel2excel(datadir, filename, header, panelcells, metadata)
-            root = config['apiroot'] + "/collabs/static/tmp/" + str(filename)
+            localoutfile = panel2excel(dirforzip, filename, header, panelcells, metadata)
+	    arc = 'dataarchive.zip'
+	    compile2zip(dirforzip, arc)
+	    root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
             return redirect(root, code=301)
 
     if classification:
-	outfile = "test1.xlsx"
+	outfile = "clioinfra.xlsx"
+	dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
 	fullpath = config['webtest'] + "/" + str(outfile)
+	fullpath = dirforzip + "/" + str(outfile)
 	(outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
 	#return outfilefinal
-	root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
+        arc = 'dataarchive.zip'
+        compile2zip(dirforzip, arc)
+        root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
+	#root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
 	return redirect(root, code=301)
     else:
         zipfile = downloadzip(pid)
