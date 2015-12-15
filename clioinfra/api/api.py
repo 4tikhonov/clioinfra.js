@@ -35,6 +35,7 @@ import glob
 import csv
 import xlwt
 import os
+import shutil
 import sys
 import psycopg2
 import psycopg2.extras
@@ -740,7 +741,13 @@ def download():
 	dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
 	fullpath = config['webtest'] + "/" + str(outfile)
 	fullpath = dirforzip + "/" + str(outfile)
-	(outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	if datafilter['startyear'] != '1500':
+	    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	else:
+	    source = os.listdir(tmpdir)
+	    for excelfile in source:
+        	shutil.copy(tmpdir + '/' + excelfile, dirforzip)
+
 	#return outfilefinal
         arc = 'dataarchive.zip'
         compile2zip(dirforzip, arc)
