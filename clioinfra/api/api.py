@@ -741,9 +741,17 @@ def download():
 	dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
 	fullpath = config['webtest'] + "/" + str(outfile)
 	fullpath = dirforzip + "/" + str(outfile)
-	if datafilter['startyear'] != '1500':
+
+	# Check selection
+	isselection = 'yes'
+	if datafilter['startyear'] == '1500':
+	    if datafilter['ctrlist'] = '':
+		isselection = ''
+
+	if isselection:
 	    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
 	else:
+	    # Copy original dataset
 	    source = os.listdir(tmpdir)
 	    for excelfile in source:
         	shutil.copy(tmpdir + '/' + excelfile, dirforzip)
