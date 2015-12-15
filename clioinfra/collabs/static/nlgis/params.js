@@ -30,6 +30,14 @@ if (myurl.indexOf("histo=") > 0) {
     };
 };
 
+if (myurl.indexOf("hist=") > 0) {
+    histostr=myurl.substring(myurl.indexOf("hist=")+5);
+    cindex=histostr.indexOf("&");
+    if (cindex > 0) {
+      histo=histostr.substring(0,cindex);
+    };
+};
+
 if (myurl.indexOf("dataset=") > 0) {
     handlestr=myurl.substring(myurl.indexOf("dataset=")+8);
     cindex=handlestr.indexOf("&");
