@@ -67,9 +67,10 @@ from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from paneldata import paneldatafilter, panel2dict, panel2csv
+from paneldata import build_panel, paneldatafilter, panel2dict, panel2csv
 from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
 from datacompiler import dataframe_compiler
+from data2excel import panel2excel
 
 # Function to create json from dict 
 def json_generator(c, jsondataname, data):
@@ -594,10 +595,6 @@ def panel():
 	    yearsjson = json.dumps(yearsdata, ensure_ascii=False, sort_keys=True, indent=4)
 	    return Response(yearsjson,  mimetype='application/json')
 
-	# Show dataframe in CSV
-        #result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
-	#result = 'Country,title1,title2\nNLD,1111,2012\nNLD,1112,2013\n'
-
     return Response(result,  mimetype='text/plain')
 
 # Collabs
@@ -666,17 +663,14 @@ def download():
     datafilter['endyear'] = '2010'
     datafilter['ctrlist'] = ''
 
-    if request.args.get('pid'):
-        pid = request.args.get('pid')
-        handle = pid
     if request.args.get('handle'):
         handle = request.args.get('handle')
     if request.args.get('type[0]') == 'historical':
-	classification = request.args.get('type[0]')	
+        classification = request.args.get('type[0]')
     if request.args.get('y[min]'):
-	datafilter['startyear'] = request.args.get('y[min]')
+        datafilter['startyear'] = request.args.get('y[min]')
     if request.args.get('y[max]'):
-	datafilter['endyear'] = request.args.get('y[max]')
+        datafilter['endyear'] = request.args.get('y[max]')
 
     # Select countries
     customcountrycodes = ''
@@ -687,7 +681,28 @@ def download():
                 customcountrycodes = str(customcountrycodes) + str(value) + ','
     if customcountrycodes:
         customcountrycodes = customcountrycodes[:-1]
-	datafilter['ctrlist'] = customcountrycodes
+        datafilter['ctrlist'] = customcountrycodes
+
+    if request.args.get('ctrlist'):
+	datafilter['ctrlist'] = request.args.get('ctrlist')
+
+    if request.args.get('pid'):
+        pid = request.args.get('pid')
+	try:
+	    (pids, pidslist) = pidfrompanel(pid)
+	    handles = pids
+	except:
+	    handles = [pid]
+	    
+        handle = pid
+        switch = 'modern'
+        (header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, datafilter)
+        filename = "paneltest.xlsx"
+        metadata = []
+	datadir = config['webtest']
+        localoutfile = panel2excel(datadir, filename, header, panelcells, metadata)
+        root = config['apiroot'] + "/collabs/static/tmp/" + str(filename)
+        return redirect(root, code=301)
 
     if classification:
 	outfile = "test1.xlsx"
@@ -908,6 +923,7 @@ def dataapi():
            if ids:
                customcountrycodes = str(customcountrycodes) + str(ids) + ','
         customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = tmpcustomcountrycodes
 
     hist = {}
     config = configuration()
