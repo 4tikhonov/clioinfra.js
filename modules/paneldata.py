@@ -12,13 +12,8 @@ from pandas.io.json import json_normalize
 from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
 from data2excel import panel2excel
 
-def build_panel(config, switch, handles, startyear, endyear, ctrlist):
+def build_panel(config, switch, handles, datafilter):
 
-    datafilter = {}
-    datafilter['ctrlist'] = ctrlist
-    datafilter['startyear'] = startyear
-    datafilter['endyear'] = endyear
-            
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
     
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
@@ -54,9 +49,13 @@ def build_panel(config, switch, handles, startyear, endyear, ctrlist):
     (allyears, nyears) = selectint(totalpanel.columns)
     panels = []
     known = {}
+    matrix = {}
+    #return (str(totalpanel.to_html()), '', '', '')
     for code in totalpanel.index:
-        country = geocoder.ix[int(code)][config['webmappercountry']]
-        #print country
+	try:
+            country = geocoder.ix[int(code)][config['webmappercountry']]
+	except:
+	    country = ''
 
         for thisyear in allyears:
             thiskey = str(int(code)) + str(thisyear)
@@ -65,16 +64,20 @@ def build_panel(config, switch, handles, startyear, endyear, ctrlist):
                 dataitem = [country]
                 dataitem.append(thisyear)
                 known[thiskey] = thisyear
+		matrix[thiskey] = ''
         
                 for handle in handles:
                     tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
                     try:
                         thisval = tmpframe.ix[int(code)][thisyear]
+			matrix[thiskey] = thisval
                     except:
                         thisval = ''
                     dataitem.append(thisval)
                     
-                panels.append(dataitem)
+		if country:
+		    if matrix[thiskey]:
+                        panels.append(dataitem)
 
     # Build header
     header = ['Country', 'Year']
