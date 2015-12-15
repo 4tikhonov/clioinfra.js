@@ -55,7 +55,8 @@ def panel2excel(datadir, filename, header, panelcells, metadata):
         dataonly.append(dataitem[1])
         # Skip all country codes
 	for j in range(2, len(dataitem)):
-	    if (j/2)*2 == j:
+	    #if (j/2)*2 == j:
+	    if j:
 	        dataonly.append(dataitem[j])
 
 	dataitem = dataonly
