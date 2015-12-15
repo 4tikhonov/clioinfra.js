@@ -688,21 +688,27 @@ def download():
 
     if request.args.get('pid'):
         pid = request.args.get('pid')
+	ispanel = ''
 	try:
 	    (pids, pidslist) = pidfrompanel(pid)
 	    handles = pids
+	    handle = pids[0]
+   	    match = re.match(r'Panel\[(.+)\]', pid)
+    	    if match:
+	        ispanel = 'yes'
 	except:
-	    handles = [pid]
+	    handles = pid
+	    handle = pids[0]
 	    
-        handle = pid
-        switch = 'modern'
-        (header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, datafilter)
-        filename = "paneltest.xlsx"
-        metadata = []
-	datadir = config['webtest']
-        localoutfile = panel2excel(datadir, filename, header, panelcells, metadata)
-        root = config['apiroot'] + "/collabs/static/tmp/" + str(filename)
-        return redirect(root, code=301)
+	if ispanel:
+            switch = 'modern'
+            (header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, datafilter)
+            filename = "paneltest.xlsx"
+            metadata = []
+	    datadir = config['webtest']
+            localoutfile = panel2excel(datadir, filename, header, panelcells, metadata)
+            root = config['apiroot'] + "/collabs/static/tmp/" + str(filename)
+            return redirect(root, code=301)
 
     if classification:
 	outfile = "test1.xlsx"
