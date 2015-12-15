@@ -21,6 +21,15 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
+def topicscoder(config):
+    topicnames = {}
+    if config:
+        (dataset, handle, title, units) = loaddataset(config, config['topicindex'])
+        dataset.index = dataset['ID']
+        for uid in dataset.index:
+            topicnames[str(dataset.ix[uid]['Name'])] = str(dataset.ix[uid]['parent name'])
+        return topicnames
+
 def buildgeocoder(geocoder, config, query):
     geodict = []
     geolist = {}
