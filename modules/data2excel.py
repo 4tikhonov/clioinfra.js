@@ -64,7 +64,8 @@ def panel2excel(datadir, filename, header, panelcells, metadata):
             value = dataitem[j]
             if value == 'NaN':
                 value = ''
-            ws.write(i, j, value)
+	    if value > -1000000000000:
+                ws.write(i, j, value)
 
     fullpath = datadir + "/" + filename
     wb.save(fullpath)
