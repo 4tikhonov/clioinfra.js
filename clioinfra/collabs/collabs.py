@@ -348,7 +348,7 @@ def download(settings=''):
     if format == 'shapefile':
 	year = year
     else:
-        cmd = path + "/node_modules/phantomjs/lib/phantom/bin/phantomjs " + path + "/web/demo/static/renderHTML.js '" + website + page + year + "&code=" + code + "&province=" + province + "&custom=" + custom + "'"
+        cmd = path + "/node_modules/phantomjs/lib/phantom/bin/phantomjs " + path + "/collabs/static/renderHTML.js '" + website + page + year + "&code=" + code + "&province=" + province + "&custom=" + custom + "'"
         #cmd = '/bin/echo test'
 
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
@@ -467,7 +467,7 @@ def panel(settings=''):
 
     links = graphlinks(handle)
 
-    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
+    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, title='Panel data'))
     return resp
 
 @app.route('/chartlib')
@@ -836,6 +836,7 @@ def dashboard(settings=''):
     valtitle = ''
     if validate:
 	# VALIDATION
+	return 'Dataset not updated'
 	cmd = path + "/../../bin/import.py -d '" + dataverseroot + "' -H '" + dataset + "'"
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
