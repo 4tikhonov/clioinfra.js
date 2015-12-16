@@ -7,6 +7,7 @@ import numpy as np
 import brewer2mpl
 from config import webmapper_geocoder
 import math
+import re
 
 def getcolors(catnum, pallete, newcolormap):
     nodatacolor = '#ffffff'
@@ -221,6 +222,17 @@ def floattodec(s):
     except ValueError:
         return s
 
+def roundme(thisval):
+    toround = 3
+    strval = str(thisval)
+    dots = re.search(r'\.(.+)', strval)
+    afterdots = 0
+    if dots:
+        afterdots = len(dots.group(1))
+    if afterdots > toround:
+        thisval = round(thisval, toround)
+    return thisval
+
 # Combine all ranges to show on map    
 def combinerange(map):
     rangestr = ''
@@ -228,10 +240,10 @@ def combinerange(map):
     for i in reversed(range(len(map))):
         if i > 0:
             id = i - 1
-            min = map[id]
-            max = map[i]
-            rangestr = rangestr + str(min) + ' - ' + str(max) + ', '
-            rangearr.append(str(floattodec(min)) + ' - ' + str(floattodec(max)))
+            imin = str(roundme(floattodec(map[id])))
+            imax = str(roundme(floattodec(map[i])))
+            rangestr = rangestr + str(imin) + ' - ' + str(imax) + ', '
+            rangearr.append(str(imin) + ' - ' + str(imax))
     rangestr = rangestr[:-2]
     return (rangearr, rangestr)
 
