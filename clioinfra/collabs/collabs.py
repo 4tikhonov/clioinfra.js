@@ -69,7 +69,7 @@ from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
+from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel, dpemetadata
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -428,11 +428,16 @@ def treemap(settings=''):
     if request.args.get('historical'):
         historical = request.args.get('historical')
     mainlink = '&handle=' + str(handle)
+    try:
+        (title, units, years) = dpemetadata(config, handle)
+    except:
+        (title, units, years) = ('Panel Data', '', [])
+
     if historical:
 	mainlink = str(mainlink) + '&historical=on'
     links = graphlinks(mainlink)
 
-    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical))
+    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical, title=title))
     return resp
 
 @app.route('/panel')
@@ -465,9 +470,13 @@ def panel(settings=''):
     except:
 	showpanel = 'yes'
 
+    try:
+        (title, units, years) = dpemetadata(config, handle)
+    except:
+	(title, units, years) = ('Panel Data', '', [])
     links = graphlinks(handle)
 
-    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, title='Panel data'))
+    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, title=title))
     return resp
 
 @app.route('/chartlib')
