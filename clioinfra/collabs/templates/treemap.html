@@ -7,7 +7,7 @@
 <style>
 
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 10px sans-serif;
   margin: auto;
   position: relative;
   width: 900px;
@@ -29,6 +29,9 @@ form {
 }
 
 </style>
+<center>
+<div class="indicators"><h1>{{ title }}<label id="yearlab"> {{ lastyear }}</label></h1>
+</center>
   <select name="viz" class="alright" onchange="vizswitch($(this).val())">
      <option value="4" selected>Treemap</option>
      <option value="1">Panel Bar</option>
@@ -64,7 +67,7 @@ function vizswitch(viztype) {
 
 var margin = {top: 40, right: 0, bottom: 10, left: 0},
     width = 900 - margin.left - margin.right,
-    height = 420 - margin.top - margin.bottom;
+    height = 360 - margin.top - margin.bottom;
 
 var color = d3.scale.category20c();
 
