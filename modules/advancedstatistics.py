@@ -16,6 +16,7 @@ from tabulardata import loadcodes, load_api_data, countryset, json_dict, createf
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata, load_fullmetadata
 from historical import load_historical, histo
 from paneldata import panel2dict, paneldatafilter, panel2csv
+from scales import roundme
 
 def loadpanel(jsonapi, yearmin, yearmax, ctrlist):
     cleanedpanel = ''
@@ -64,19 +65,23 @@ def handle2statistics(handles, cleanedpanel, names):
             data['Handle'] = names[handle]
             # Mean
             tmpframe = ctrdata.mean()
-            data['Mean'] = tmpframe.mean()
+            data['Mean'] = roundme(tmpframe.mean())
             # Min
             tmpframe = ctrdata.min()
-            data['Min'] = tmpframe.min()
+            data['Min'] = roundme(tmpframe.min())
             # Max
             tmpframe = ctrdata.max()
-            data['Max'] = tmpframe.max()
+            data['Max'] = roundme(tmpframe.max())
             # Std
             tmpframe = ctrdata.std()
-            data['Std'] = tmpframe.std()
+            data['Std'] = roundme(tmpframe.std())
             # Count
             tmpframe = ctrdata.count()
-            data['N'] = tmpframe.count()
+	    total = 0
+	    for ctr in ctrdata:
+		total = total + ctrdata[ctr].count()
+            data['N'] = total
+	    #tmpframe.count()
             # Yearmin 
             ymin = min(ypanel)
             # Min
