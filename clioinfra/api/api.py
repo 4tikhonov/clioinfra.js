@@ -495,6 +495,8 @@ def panel():
         datafilter['endyear'] = toyear
     if request.args.get('hist'):
 	switch = 'historical'
+	if datafilter['ctrlist'] == '':
+	    datafilter['ctrlist'] = config['histctrlist']
     else:
 	switch = 'modern'
 
@@ -551,6 +553,8 @@ def panel():
     result = ''
     if thisyear:
 	if switch == 'historical':
+	    geocoder = historical
+	if switch == 'hist':
 	    geocoder = historical
 	else:
 	    geocoder = modern
@@ -745,7 +749,7 @@ def download():
 	# Check selection
 	isselection = 'yes'
 	if datafilter['startyear'] == '1500':
-	    if datafilter['ctrlist'] = '':
+	    if datafilter['ctrlist'] == '':
 		isselection = ''
 
 	if isselection:
