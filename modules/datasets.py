@@ -21,6 +21,22 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
+def dpemetadata(config, handle):
+    topicnames = {}
+    if config:
+        (dataset, handle, title, units) = loaddataset(config, handle)
+        allyears = []
+        try:
+            dataset.columns = dataset.ix[1]
+            print dataset.columns
+            if str(1) in dataset.columns:
+                dataset = dataset.drop(str(1), axis=1)
+            (allyears, notyears) = selectint(dataset.columns)
+        except:
+            allyears = []
+
+        return (title, units, allyears)
+
 def topicscoder(config):
     topicnames = {}
     if config:
