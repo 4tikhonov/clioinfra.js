@@ -40,8 +40,6 @@ import urllib2
 import glob
 import csv
 import sys
-import psycopg2
-import psycopg2.extras
 import pprint
 import getopt
 import ConfigParser
