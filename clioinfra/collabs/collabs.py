@@ -427,6 +427,8 @@ def treemap(settings=''):
             nopanel = 'yes'
     if request.args.get('historical'):
         historical = request.args.get('historical')
+    if request.args.get('hist'):
+        historical = request.args.get('hist')
     mainlink = '&handle=' + str(handle)
     try:
         (title, units, years) = dpemetadata(config, handle)
@@ -484,6 +486,7 @@ def chartlib():
     (thismapurl, apilink, ctrlist, title, units, switch) = ('', '', '', 'Title', 'Units', 'modern')
     handleface = []
     config = configuration()
+    ctrlist = config['ctrlist']
     if config['error']:
         return config['error']
 
@@ -1202,7 +1205,7 @@ def printall():
     fileformat = 'png'
     year = '1982'
     code = '4X6NCK'
-    imagefile = chartonprint(webpage, fileformat, year, code)
+    imagefile = chartonprint(webpage, fileformat, year, code, config['proxy'])
     return redirect(imagefile, code=301)
 
 @app.route('/advanced')
