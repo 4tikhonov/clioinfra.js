@@ -7,19 +7,32 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
     height = 420 - margin.top - margin.bottom;
 
     var host = "//dpe.sandbox.socialhistoryservices.org";
+    var geoinfra = 'yes';
+
     if (histo == 'on')
     {
-        mapapi = "http://geo-proxy.sandbox.socialhistoryservices.org/iisg/new/fetch?format=topojson&year=" + year;
-	mapapi = "/collabs/static/topojson/" + year + '.json';
-	//mapapi = "//www-acc.socialhistory.org/services/geo/fetch?format=topojson&year=" + year;
+	mapapi = "//data.socialhistory.org/services/geo/fetch?format=topojson&year=" + year;
         countryindex = 'country';
         idindex = 'id';
     }
     else
     {
+	// old version to test map
         mapapi = "//clearance.sandbox.socialhistoryservices.org/api/maps?world=on&year=" + mapyear;
         countryindex = 'AREA';
         idindex = 'AREA';
+    }
+
+    if (geoinfra)
+    {
+	mapyear = '2010';
+	if (histo)
+	{
+	    mapyear = year;
+	}
+	mapapi = "//data.socialhistory.org/services/geo/fetch?format=topojson&year=" + mapyear;
+        countryindex = 'country';
+        idindex = 'id';
     }
 
     var zoom = d3.behavior.zoom()
@@ -62,7 +75,7 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 	
 	var cID;
 	var country;
-	if (histo)
+	if (geoinfra)
 	{
 	    cID = parseInt(d.properties[idindex]);
 	    country = d.properties['name'];
@@ -85,16 +98,16 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 	}
   	})
 
-   if (histo == 'on')
+   if (geoinfra)
    {
-    contapi = host + "/collabs/static/world.topojson"
+    contapi = "/collabs/static/world.topojson"
     d3.json(contapi, function(error, data) {
       svg.append('path')
         .datum(topojson.feature(data, data.objects['land']))
         .attr('d', path)
         .style("fill", "none")
         .style("stroke", "black")
-        .attr("stroke-width", 0.5)
+        .attr("stroke-width", 0.2)
     });
     };
 
@@ -110,9 +123,16 @@ function showmap(datayear, mapyear, handle, varname, colors, catnum, ctrlist, lo
 
 	datapi = "/api/dataapi?handle=" + handle + "&year=" + datayear + "&catmax=" + catnum + "&datarange=calculate";
 	datapi = datapi + '&colors=' + colors + '&ctrlist=' + ctrlist + '&logscale=' + logscale;
-        if (histo)
+        if (geoinfra)
 	{
-	    datapi = datapi + "&geocoder=historical";
+	    if (histo)
+	    {
+		datapi = datapi + "&geocoder=historical";
+	    }
+	    else
+	    {
+	        datapi = datapi + "&geocoder=modern";
+	    }
 	}
 	d3.json(datapi, function (error, data) {
 
