@@ -117,7 +117,7 @@ def load_dataverse(apiurl):
         datasets['url'] = item['url']
         datasets['pid'] = item['global_id']
         datasets['name'] = item['name']
-        datasets['topic'] = item['description']
+        datasets['topic'] = item['description'] 
         datasets['citation'] = item['citation']
         info.append(datasets)
     

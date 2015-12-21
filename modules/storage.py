@@ -46,13 +46,14 @@ def datasetadd(filename, csvfile, handle, dataset, title, units, fileID):
     data['title'] = title
     data['units'] = units
     data['datasetID'] = fileID
-    datasettext = str(txt.read())
-    datasetjson = json.loads(datasettext)
-    data['data'] = datasetjson
-    data['len'] = sys.getsizeof(datasetjson)
+    #datasettext = str(txt.read())
+    #datasetjson = json.loads(datasettext)
+    data['data'] = '' # datasetjson
+    #data['len'] = sys.getsizeof(datasetjson)
     if csvfile:
 	csvtxt = open(csvfile)
 	datasettext = str(csvtxt.read())
+	data['len'] = sys.getsizeof(datasettext)
 	data['csvframe'] = datasettext
 
     result = data2store(dbname, data)

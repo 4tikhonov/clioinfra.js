@@ -57,7 +57,9 @@ def parsehandle(handle):
 def downloadfile(root, path, fileID, key):
     fullpath = path + str(fileID)
     if key:
-        cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&show_entity_ids=true&q=authorName:*\" -O " + fullpath + " --no-check-certificate"
+        cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&show_entity_ids=true&q=authorName:*&format=original\" -O " + fullpath + " --no-check-certificate"
+	cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&show_entity_ids=true&q=authorName:*\" -O " + fullpath + " --no-check-certificate"
+	print cmd
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         response = p.stdout.read()
     return fullpath
@@ -117,8 +119,10 @@ def excelvalidator(path, filename, resultfile, tmpdir):
         ]
 
         jsondatafile = resultfile + '.json'
-        with open(jsondatafile, 'w') as filej:
-            filej.write(json.dumps(d))
+	contents = json.dumps(d)
+	contents = ''
+        #with open(jsondatafile, 'w') as filej:
+            #filej.write(contents)
 
     return (jsondatafile, csvfile, title, units)
 
