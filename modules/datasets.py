@@ -485,12 +485,19 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
     (years, notyears) = selectint(totalpanel.columns)
 
     for code in codes:
+        # ['France', 1901, 2826.0, 250]
+        try:
+            country = str(geocoder.ix[int(code)][config['webmappercountry']])
+            #country = 'xxx'
+        except:
+            country = 'Unknown country'
+
         for year in years:
             # ['France', 1901, 2826.0, 250]
-            try:
-                country = str(geocoder.ix[int(code)][config['webmappercountry']])
-            except:
-                country = 'Unknown country'
+            #try:
+                #country = str(geocoder.ix[int(code)][config['webmappercountry']])
+            #except:
+                #country = 'Unknown country'
             value = totalpanel[year][code]
             if value:
                 origvalue = value
