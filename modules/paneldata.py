@@ -46,7 +46,14 @@ def build_panel(config, switch, handles, datafilter):
         geocoder = historical
     else:
         geocoder = modern
+    # Remove columns with empty years
+
+    for colyear in totalpanel.columns:
+        if totalpanel[colyear].count() == 0:
+            totalpanel = totalpanel.drop(colyear, axis=1)
+
     (allyears, nyears) = selectint(totalpanel.columns)
+    print totalpanel.index
     panels = []
     known = {}
     matrix = {}
@@ -75,9 +82,11 @@ def build_panel(config, switch, handles, datafilter):
                         thisval = ''
                     dataitem.append(thisval)
                     
-		if country:
-		    if matrix[thiskey]:
-                        panels.append(dataitem)
+		# Filter out np.NaN
+		if str(thisval) != 'nan':
+		    if country:
+		        if matrix[thiskey]:
+                            panels.append(dataitem)
 
     # Build header
     header = ['Country', 'Year']
