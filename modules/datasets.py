@@ -382,6 +382,11 @@ def datasetfilter(maindata, datafilter):
 
     if yearsfilter:
         datasubset = datasubset[yearsfilter]
+    # Remove columns with empty years
+    for colyear in datasubset.columns:
+        if datasubset[colyear].count() == 0:
+            datasubset = datasubset.drop(colyear, axis=1)
+
     return (datasubset, ctrlist)
 
 def dataset_analyzer(datasubset, coder, yearscolumns):
