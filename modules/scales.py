@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import math
 import pandas as pd
 import random
 from random import randint
@@ -8,6 +9,32 @@ import brewer2mpl
 from config import webmapper_geocoder
 import math
 import re
+
+def value2scale(value, logscale, original):
+    convertedvalue = 0
+    if logscale:
+        origvalue = value
+        rvalue = "%.1f" % value
+        if logscale:
+            try:
+                if logscale == '2':
+                    value = math.log(value, int(logscale))
+                elif logscale == '10':
+                    value = math.log10(value)
+                else:
+                    value = math.log(value)
+                    rvalue = "%.5f" % value
+		convertedvalue = value
+            except:
+                value = 'NaN'
+                rvalue = 'NaN'
+                original[str(rvalue)] = origvalue
+        else:
+            original[origvalue] = origvalue
+    else:
+	convertedvalue = value
+
+    return (convertedvalue, original)
 
 def getcolors(catnum, pallete, newcolormap):
     nodatacolor = '#ffffff'
