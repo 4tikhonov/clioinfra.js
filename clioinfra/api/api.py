@@ -64,7 +64,7 @@ import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
-from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
+from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales, value2scale
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from paneldata import build_panel, paneldatafilter, panel2dict, panel2csv
 from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
@@ -419,6 +419,9 @@ def treemapweb():
     switch = 'modern'
     if request.args.get('handle'):
         handle = request.args.get('handle')
+    if request.args.get('face'):
+        handle = request.args.get('face')
+
     if request.args.get('historical'):
 	switch = 'historical'
     config['remote'] = 'on'
@@ -459,7 +462,7 @@ def treemapweb():
 # Panel data
 @app.route('/panel')
 def panel():
-    (datafilter, handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ({}, '', '1500', '2020', 1950, '', 2010)
+    (thisyear, datafilter, handle, yearmin, yearmax, thisyear, ctrlist, lastyear, logscale) = (0, {}, '', '1500', '2020', 1950, '', 2010, '')
     handles = []
     config = configuration()
     datafilter['startyear'] = yearmin
@@ -477,14 +480,22 @@ def panel():
         except:
             nopanel = 'yes'
 	    handles.append(handle)
+    if request.args.get('face'):
+	facehandle = request.args.get('face')
+	if facehandle not in handles:
+	    handles.append(facehandle)
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
         customcountrycodes = ''
         ctrlist = request.args.get('ctrlist')
 	datafilter['ctrlist'] = ctrlist
+    if request.args.get('logscale'):
+        logscale = request.args.get('logscale')
     if request.args.get('year'):
         thisyear = request.args.get('year')
+        datafilter['startyear'] = int(thisyear)
+        datafilter['endyear'] = int(thisyear)
     if request.args.get('yearmin'):
         fromyear = request.args.get('yearmin')
         datafilter['startyear'] = fromyear
@@ -500,7 +511,7 @@ def panel():
 
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
-    (subsets, panel) = ({}, [])
+    (subsets, subsetyears, panel) = ({}, [], [])
     
     for handle in handles:
         (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
@@ -517,11 +528,23 @@ def panel():
                 if datasubset[year].count() == 0:
                     datasubset = datasubset.drop(year, axis=1)
 
+	    (datayears, notyears) = selectint(datasubset.columns)
             panel.append(datasubset)
             subsets[handle] = datasubset    
+	    subsetyears.append(datayears)
 
     dataframe = subsets
     ctrlimit = 10
+
+    # Trying to find the best year with most filled data values
+    try:
+        bestyearlist = subsetyears[0]
+        for i in range(1,len(subsetyears)):
+	    bestyearlist = list(set(bestyearlist) & set(subsetyears[i]))
+	#bestyearlist = bestyearlist.sort()
+	thisyear = bestyearlist[0]
+    except:
+	bestyearlist = []
 
     allcodes = {}
     panel = []
@@ -547,8 +570,10 @@ def panel():
 
 	#return str(cleanedpanel.to_html())
     totalpanel = cleanedpanel
-    thisyear = totalpanel.columns[-2]
+    if int(thisyear) <= 0:
+        thisyear = totalpanel.columns[-2]
     result = ''
+    original = {}
     if thisyear:
 	if switch == 'historical':
 	    geocoder = historical
@@ -567,7 +592,10 @@ def panel():
                 result = result + '\n' + str(geocoder.ix[int(code)][config['webmappercountry']])
                 for handle in handles:
                     tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
-                    thisval = tmpframe.ix[code][thisyear]
+		    try:
+                        (thisval, original) = value2scale(tmpframe.ix[code][thisyear], logscale, original)
+		    except:
+			thisval = 'NaN'
                     result = result + ',' + str(thisval)
                 known[str(code)] = code
 
