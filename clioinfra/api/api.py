@@ -65,9 +65,9 @@ from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
 from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales, value2scale
-from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
+from storage import *
 from paneldata import build_panel, paneldatafilter, panel2dict, panel2csv
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
+from datasets import *
 from datacompiler import dataframe_compiler
 from data2excel import panel2excel
 
@@ -414,23 +414,43 @@ def open():
 
 @app.route('/treemap')
 def treemapweb():
+    (thisyear, datafilter, yearmin, lastyear, handles) = (0, {}, 1500, 2010, [])
     config = configuration()
+    datafilter['startyear'] = yearmin
+    datafilter['endyear'] = lastyear
+    datafilter['ctrlist'] = ''
+
     handle = ''
     switch = 'modern'
     if request.args.get('handle'):
-        handle = request.args.get('handle')
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+	    handle = pids[0]
+            handles.append(handle)
+        except:
+            handles.append(handledataset)
+            nopanel = 'yes'
+
     if request.args.get('face'):
         handle = request.args.get('face')
+	handles.append(handle)
+    if request.args.get('year'):
+        thisyear = request.args.get('year')
+
+    if int(thisyear) > 0:
+	datafilter['startyear'] = int(thisyear)
+	datafilter['endyear'] = int(thisyear)
 
     if request.args.get('historical'):
 	switch = 'historical'
-    config['remote'] = 'on'
-    handles = []
+    #config['remote'] = 'on'
     geodataset = ''
     # Geocoder
     (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle']) 
 
-    (modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
+    #(modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
 
     if switch == 'modern':
         activeindex = modern.index
@@ -442,21 +462,26 @@ def treemapweb():
 	class1 = switch
 
     # Loading dataset in dataframe
-    handles = []
-    handles.append(handle)
     try:
 	(class1, dataset, title, units) = content2dataframe(config, handle)
     except:
 	return 'No dataset ' + handle
 
     (cfilter, notint) = selectint(activeindex.values)
-    (moderndata, historicaldata) = loadgeocoder(config, dataset, '')
-    if switch == 'modern':
-        maindata = moderndata
-    else:
-        maindata = historicaldata
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, panel) = ({}, [])
 
-    treemapdata = treemap(config, maindata, switch, cfilter, coder)
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        if not datasubset.empty:
+            #datasubset = datasubset.dropna(how='all')
+	    if np.nan in datasubset.index:
+		datasubset = datasubset.drop(np.nan, axis=0)
+            panel.append(datasubset)
+            subsets[handle] = datasubset
+
+    maindata = subsets[handles[0]]
+    treemapdata = buildtreemap(config, maindata, switch, cfilter, coder)
     return Response(treemapdata,  mimetype='application/json')
 
 # Panel data
