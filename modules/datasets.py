@@ -167,7 +167,7 @@ def buildstatistics(config, dataset, classification):
     df = df.convert_objects(convert_numeric=True)
     df = df.replace(r'', np.nan, regex=True)
     sum_row = {col: df[col].sum() for col in df}
-    #return (df, stats)
+    # TREEMAP
     codes = df.index
     cols = df.sum()
     total = cols.sum()
@@ -329,7 +329,7 @@ def content2dataframe(config, handle):
 
     return (classtype, df, title, units)
 
-def treemap(config, dataset, classification, ctrfilter, coder):
+def buildtreemap(config, dataset, classification, ctrfilter, coder):
     jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
     (df, result) = buildstatistics(config, dataset, classification)
     for idc in result:

@@ -9,7 +9,7 @@ import vincent
 import numpy as np
 import ast
 from pandas.io.json import json_normalize
-from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
+from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, buildtreemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
 from data2excel import panel2excel
 
 def build_panel(config, switch, handles, datafilter):
