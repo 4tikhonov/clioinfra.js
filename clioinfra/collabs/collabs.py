@@ -67,7 +67,7 @@ from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel, dpemetadata
+from datasets import *
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -413,6 +413,12 @@ def treemap(settings=''):
         return config['error'] 
 
     (historical, handle, handles) = ('', '', [])
+    if request.args.get('face'):
+        facehandle = request.args.get('face')
+        if facehandle not in handles:
+            handles.append(facehandle)
+	    handle = facehandle
+
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         try:
@@ -440,15 +446,36 @@ def treemap(settings=''):
     resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical, title=title))
     return resp
 
+# Visualize
+@app.route('/visualize')
+def visualize():
+    config = configuration()
+    resp = 'visualize'
+    view = 'panel'
+    if request.args.get('view'):
+	view = request.args.get('view')
+
+    if config['error']:
+        return config['error']
+
+    if view == 'panel':
+        resp = panel()
+    elif view == 'time-series':
+	resp = chartlib()
+    elif view == 'treemap':
+	resp = treemap()
+    return resp
+
 @app.route('/panel')
 def panel(settings=''):
     showpanel = ''
+    handle = ''
+    handler = ''
     config = configuration()
     if config['error']:
         return config['error']
 
     f = request.args
-    handle = ''
     for q in f:
 	value = f[q]
 	if value:
