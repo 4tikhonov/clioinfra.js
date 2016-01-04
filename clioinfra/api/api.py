@@ -1,4 +1,4 @@
-# Copyright (C) 2015 International Institute of Social History.
+# Copyright (C) 2015-2016 International Institute of Social History.
 # @author Vyacheslav Tykhonov <vty@iisg.nl>
 #
 # This program is free software: you can redistribute it and/or  modify
@@ -415,13 +415,13 @@ def open():
 @app.route('/treemap')
 def treemapweb():
     (thisyear, datafilter, yearmin, lastyear, handles) = (0, {}, 1500, 2010, [])
+    (action, switch, geodataset) = ('', 'modern', '')
     config = configuration()
     datafilter['startyear'] = yearmin
     datafilter['endyear'] = lastyear
     datafilter['ctrlist'] = ''
 
     handle = ''
-    switch = 'modern'
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         try:
@@ -437,6 +437,8 @@ def treemapweb():
 	handles.append(handle)
     if request.args.get('year'):
         thisyear = request.args.get('year')
+    if request.args.get('action'):
+        action = request.args.get('action')
 
     if int(thisyear) > 0:
 	datafilter['startyear'] = int(thisyear)
@@ -444,8 +446,6 @@ def treemapweb():
 
     if request.args.get('historical'):
 	switch = 'historical'
-    #config['remote'] = 'on'
-    geodataset = ''
     # Geocoder
     (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle']) 
 
@@ -471,6 +471,21 @@ def treemapweb():
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
     (subsets, panel) = ({}, [])
 
+    # Show only available years
+    if action == 'showyears':
+	datasubset = maindata[handles[0]]
+	# Remove years without any values
+        if np.nan in datasubset.index:
+            datasubset = datasubset.drop(np.nan, axis=0)
+        for colyear in datasubset.columns:
+            if datasubset[colyear].count() == 0:
+                datasubset = datasubset.drop(colyear, axis=1)
+
+	(years, notyears) = selectint(datasubset.columns)
+	# YEARS
+	return Response(json.dumps(years),  mimetype='application/json')
+
+    # Process all indicators
     for handle in handles:
         (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
         if not datasubset.empty:
