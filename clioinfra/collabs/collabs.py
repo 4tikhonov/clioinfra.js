@@ -407,7 +407,7 @@ def download(settings=''):
 
 @app.route('/treemap')
 def treemap(settings=''):
-    years = []
+    (years, ctrlist) = ([], '')
     showpanel = 'yes'
     config = configuration()
     if config['error']:
@@ -436,6 +436,9 @@ def treemap(settings=''):
         thisyear = request.args.get('year')
     if request.args.get('hist'):
         historical = request.args.get('hist')
+    if request.args.get('ctrlist'):
+	ctrlist = request.args.get('ctrlist')
+
     mainlink = '&handle=' + str(handle)
     try:
         (title, units, years) = dpemetadata(config, handle)
@@ -446,13 +449,16 @@ def treemap(settings=''):
 	mainlink = str(mainlink) + '&historical=on'
     if thisyear:
 	mainlink = str(mainlink) + '&year=' + str(thisyear)
+    if ctrlist:
+	mainlink = str(mainlink) + '&ctrlist=' + str(ctrlist)
+
     links = graphlinks(mainlink)
-    apitreemap = config['apiroot'] + "/api/treemap?action=showyears&handle=" + str(handles[0])
+    apitreemap = config['apiroot'] + "/api/treemap?action=showyears&handle=" + str(handles[0]) + "&ctrlist=" + str(ctrlist)
     years = load_api_data(apitreemap, 1)
     total = len(years)
     lastyear = years[-1]
 
-    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical, title=title, thisyear=thisyear, years=years, total=total, lastyear=lastyear))
+    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical, title=title, thisyear=thisyear, years=years, total=total, lastyear=lastyear, ctrlist=ctrlist))
     return resp
 
 # Visualize
