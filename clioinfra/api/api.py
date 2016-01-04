@@ -439,6 +439,8 @@ def treemapweb():
         thisyear = request.args.get('year')
     if request.args.get('action'):
         action = request.args.get('action')
+    if request.args.get('ctrlist'):
+	datafilter['ctrlist'] = request.args.get('ctrlist')
 
     if int(thisyear) > 0:
 	datafilter['startyear'] = int(thisyear)
@@ -473,25 +475,30 @@ def treemapweb():
 
     # Show only available years
     if action == 'showyears':
-	datasubset = maindata[handles[0]]
-	# Remove years without any values
-        if np.nan in datasubset.index:
-            datasubset = datasubset.drop(np.nan, axis=0)
+	years = []
+        datafilter['startyear'] = yearmin
+        datafilter['endyear'] = lastyear
+        (datasubset, ctrlist) = datasetfilter(maindata[handles[0]], datafilter)
+        # Remove years without any values
+	if not datafilter['ctrlist']:
+            if np.nan in datasubset.index:
+                datasubset = datasubset.drop(np.nan, axis=0)
         for colyear in datasubset.columns:
             if datasubset[colyear].count() == 0:
                 datasubset = datasubset.drop(colyear, axis=1)
 
-	(years, notyears) = selectint(datasubset.columns)
-	# YEARS
-	return Response(json.dumps(years),  mimetype='application/json')
+        (years, notyears) = selectint(datasubset.columns)
+        # YEARS
+        return Response(json.dumps(years),  mimetype='application/json')
 
     # Process all indicators
     for handle in handles:
         (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
         if not datasubset.empty:
             #datasubset = datasubset.dropna(how='all')
-	    if np.nan in datasubset.index:
-		datasubset = datasubset.drop(np.nan, axis=0)
+	    if not datafilter['ctrlist']:
+	        if np.nan in datasubset.index:
+		    datasubset = datasubset.drop(np.nan, axis=0)
             panel.append(datasubset)
             subsets[handle] = datasubset
 
