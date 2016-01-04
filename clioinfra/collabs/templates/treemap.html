@@ -114,6 +114,7 @@ function buildtreemap(apiurl)
   d3.json(apiurl, function(error, root) {
   if (error) throw error;
 
+  var dataroot = root;
   var node = div.datum(root).selectAll(".node")
       .data(treemap.nodes)
     .enter().append("div")
@@ -130,7 +131,7 @@ function buildtreemap(apiurl)
     node
         .data(treemap.value(value).nodes)
       .transition()
-        .duration(1500)
+        .duration(800)
         .call(position);
   });
   });
@@ -138,16 +139,21 @@ function buildtreemap(apiurl)
 
 function refreshtreemap(apiurl) 
 {
+  var root;
   d3.json(apiurl, function(error, root2) {
   if (error) throw error;
 
-  var node = div.datum(root2).selectAll(".node")
-      .data(treemap.nodes(root2))
+  div.datum(root).selectAll(".node").remove();
+  root = root2;
+  var node = div.datum(root).selectAll(".node")
+      .data(treemap.nodes(root))
+    .enter().append("div")
+      .attr("class", "node")
       .transition()
-      .duration(1500)
-      .call(position)
+      .duration(800)
       .style("background", function(d) { return color(d.children) ? color(d.name) : null; })
-      .text(function(d) { return d.children ? null : d.name; });
+      .text(function(d) { return d.children ? null : d.name; })
+      .call(position);
 
     console.log("treemap", treemap.nodes(root2));
     console.log(apiurl);
@@ -160,10 +166,6 @@ function position() {
       .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
       .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
 }
-{% if lastyear %}
-document.getElementById("yearslider").value = '{{ lastyear }}';
-{% endif %}
-
 </script>
 
 <script>
@@ -202,7 +204,6 @@ document.getElementById("yearslider").value = '{{ lastyear }}';
 
       var curValue = $( "#yearslider option:selected" ).text() || '0';
       var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
-      $('.ui-slider-handle').html(tooltip);
       $('.slider-time2').html($( "#yearslider option:selected" ).text());
       $("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
       var apilink = rootlink + "&historical=&year=" + curValue;
@@ -226,4 +227,10 @@ document.getElementById("yearslider").value = '{{ lastyear }}';
   {% endfor %}
   </select>
 </form>
+<script>
+{% if lastyear %}
+document.getElementById("yearslider").value = '{{ lastyear }}';
+{% endif %}
+</script>
+
 </body>
