@@ -67,7 +67,7 @@ label.switch {
     <label class="switch"><input type="checkbox" name="greyscale" id="greyscale">Greyscale</label>
 </form>
 <script>
-var rootlink = "/api/treemap?handle={{ handle }}";
+var rootlink = "/api/treemap?handle={{ handle }}&ctrlist={{ ctrlist }}";
 parent.postMessage("treemap", "*");
 function vizswitch(viztype) {
    if (viztype == '1')
