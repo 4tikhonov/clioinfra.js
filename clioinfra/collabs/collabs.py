@@ -438,6 +438,8 @@ def treemap(settings=''):
         historical = request.args.get('hist')
     if request.args.get('ctrlist'):
 	ctrlist = request.args.get('ctrlist')
+        if ctrlist == config['ctrlist']:
+	    ctrlist = ''
 
     mainlink = '&handle=' + str(handle)
     try:
