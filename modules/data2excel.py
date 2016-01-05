@@ -229,7 +229,6 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
 	except:
 	    activectr = ''
 
-	activectr = 'yes'
 	if activectr == 'yes':
 	    # Checking active years
 	    for year in yearscolumns:
