@@ -823,7 +823,7 @@ def download():
 	isselection = 'yes'
 	if datafilter['startyear'] == '1500':
 	    if datafilter['ctrlist'] == '':
-		isselection = ''
+		isselection = 'yes'
 
 	if isselection:
 	    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
