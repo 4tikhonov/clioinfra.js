@@ -1008,7 +1008,6 @@ def statistics(settings=''):
     #data = advpanel2dict(cleanedpanel)
     #return data.to_html()
 
-    return cleanedpanel.to_html()
     ctrlimit = 200
     data = handle2statistics(handles, cleanedpanel, names)
     showhtml = statistics2table(data)
