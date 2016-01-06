@@ -994,8 +994,12 @@ def statistics(settings=''):
             #datasubset['handle'] = handle
 	    meta = metadata[handle]
 	    names[handle] = meta['title'] 
-	    if np.nan in datasubset.index:
-	        datasubset = datasubset.drop(np.nan, axis=0)
+	    # Try to remove years columns
+	    try:
+	        if np.nan in datasubset.index:
+	            datasubset = datasubset.drop(np.nan, axis=0)
+	    except:
+		skip = 'yes'
 
             if not datasubset.empty:
 		datasubset['handle'] = handle
