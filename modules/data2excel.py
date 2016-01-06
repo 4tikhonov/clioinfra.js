@@ -215,9 +215,11 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
             except:
                 skip = 1
                 
+	    c = ws.cell(row=i, column=j)
             if thisvalue != '':
-		c = ws.cell(row=i, column=j)
                 c.value = thisvalue
+	    else:
+		c.value = ''
             j = j + 1
 
 	# Searching for active countries
