@@ -994,6 +994,9 @@ def statistics(settings=''):
             #datasubset['handle'] = handle
 	    meta = metadata[handle]
 	    names[handle] = meta['title'] 
+	    if np.nan in datasubset.index:
+	        datasubset = datasubset.drop(np.nan, axis=0)
+
             if not datasubset.empty:
 		datasubset['handle'] = handle
                 panel.append(datasubset)
@@ -1005,6 +1008,7 @@ def statistics(settings=''):
     #data = advpanel2dict(cleanedpanel)
     #return data.to_html()
 
+    return cleanedpanel.to_html()
     ctrlimit = 200
     data = handle2statistics(handles, cleanedpanel, names)
     showhtml = statistics2table(data)
