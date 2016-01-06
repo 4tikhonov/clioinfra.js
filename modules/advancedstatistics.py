@@ -56,6 +56,8 @@ def handle2statistics(handles, cleanedpanel, names):
         newpanel = newpanel.reset_index()
 	if 'Code' in newpanel:
             newpanel = newpanel.drop('Code', axis=1)
+	if 'ccode' in newpanel:
+	    newpanel = newpanel.drop('ccode', axis=1)
         cdataframe = {}
         if handle:
             data = {}
@@ -70,7 +72,7 @@ def handle2statistics(handles, cleanedpanel, names):
             tmpframe = ctrdata.min()
             data['Min'] = roundme(tmpframe.min())
             # Max
-            tmpframe = ctrdata.max()
+            tmpframe = ctrdata.max(axis=1)
             data['Max'] = roundme(tmpframe.max())
             # Std
             tmpframe = ctrdata.std()
