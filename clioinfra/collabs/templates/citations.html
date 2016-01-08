@@ -34,10 +34,10 @@ This site shows an overview of labor conflicts that have occurred on a global sc
             <p>
         {% for dataset in datasets %}
 		<h3>
-         	<a href="{{ dataset.handleurl }}">{{ dataset.title }}</a>
+         	<a href="{{ dataset.url }}">{{ dataset.name }}</a>
                 </h3>
-		<p>Subject: {{ dataset.Subject }}</p>
-		<p>{{ dataset.Description }}</p>
+		<p>Author(s): {{ dataset.authors[0] }}</p>
+		<p>{{ dataset.description }}</p>
         {% endfor %}
 	    </p>
         </div>
@@ -46,10 +46,10 @@ This site shows an overview of labor conflicts that have occurred on a global sc
             <p>
         {% for dataset in datasets %}
                 <h3>
-                <a href="{{ dataset.handleurl }}">{{ dataset.title }}</a>
+                <a href="{{ dataset.url }}">{{ dataset.name }}</a>
                 </h3>
-                <p>{{ dataset.Description }}</p>
-                <p>{{ dataset.Notes }} </p>
+                <p>{{ dataset.description }}</p>
+                <p>{{ dataset.citation }} </p>
         {% endfor %}
 	    </p>
         </div>
