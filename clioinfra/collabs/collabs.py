@@ -68,6 +68,8 @@ from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
 from datasets import *
+from searchapi import search_by_keyword, search_by_handles
+from dataverse import Connection
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -627,6 +629,7 @@ def graphlib(settings=''):
 
 @app.route('/datasetspace')
 def datasetspace(settings=''):
+    datasets = []
     config = configuration()
     if config['error']:
         return config['error']
@@ -636,33 +639,23 @@ def datasetspace(settings=''):
     if request.args.get('dv'):
 	dataverse = request.args.get('dv')
 
-    jsonapi = root + "/cgi-bin/citations.cgi?dataverse=" + dataverse
-    req = urllib2.Request(jsonapi)
-    opener = urllib2.build_opener()
-    f = opener.open(req)
-    citations = simplejson.load(f, "utf-8")
-    result = ''
-    datasets = []
-    for line in citations:
-        cite = json.loads(line)
-	dataset  = {}
-        for item in cite:
-            #result = str(result) + '<b>' + str(item) + '</b>' + ' ' + str(cite[item]) + '<br>'
-	    result = str(result) + "<b>" + str(item) + "</b>" + " " + str(cite[item]) + "<br>\n"
-	    dataset[item] = cite[item]
+    connection = Connection(config['hostname'], config['key'])
+    dataverse = connection.get_dataverse(dataverse)
+    handlestr = ''
+    for item in dataverse.get_contents():
+        handlestr = handlestr + item['identifier'] + ' '
+    metadata = []
+    if handlestr:
+	s = {}
+	s['q'] = handlestr	
+	s['per_page'] = 100
+	metadata = search_by_keyword(connection, s)
 
-	try:
-	    if cite['Subject']:
-	        datasets.append(dataset)
-	except:
-	    nothing = 1
-
-    #datasets = result
-    activepage = 'Dashboard'
-    pages = getindex(activepage)
+    for dataset in metadata['items']:
+        datasets.append(dataset)
 
     template = 'citations.html'
-    resp = make_response(render_template(template, active=activepage, pages=pages, datasets=datasets))
+    resp = make_response(render_template(template, datasets=datasets))
     return resp
 
 @app.route('/')
@@ -998,6 +991,14 @@ def statistics(settings=''):
 	    try:
 	        if np.nan in datasubset.index:
 	            datasubset = datasubset.drop(np.nan, axis=0)
+                if str(np.nan) in datasubset.columns:
+                    datasubset = datasubset.drop(np.nan, axis=1)
+	    except:
+		skip = 'yes'
+	    # Try to remove index columns
+	    try:
+                if config['webmapperoecd'] in datasubset.index:
+                    datasubset = datasubset.drop(config['webmapperoecd'], axis=0)
 	    except:
 		skip = 'yes'
 
