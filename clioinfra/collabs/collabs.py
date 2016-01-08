@@ -629,7 +629,7 @@ def graphlib(settings=''):
 
 @app.route('/datasetspace')
 def datasetspace(settings=''):
-    datasets = []
+    (query, datasets, metadata, s) = ('', [], [], {})
     config = configuration()
     if config['error']:
         return config['error']
@@ -638,24 +638,28 @@ def datasetspace(settings=''):
     dataverse = 'global'
     if request.args.get('dv'):
 	dataverse = request.args.get('dv')
+    if request.args.get('q'):
+        query = request.args.get('q')
 
     connection = Connection(config['hostname'], config['key'])
     dataverse = connection.get_dataverse(dataverse)
     handlestr = ''
-    for item in dataverse.get_contents():
-        handlestr = handlestr + item['identifier'] + ' '
-    metadata = []
-    if handlestr:
-	s = {}
-	s['q'] = handlestr	
-	s['per_page'] = 100
+    if query:
+	s['q'] = query
 	metadata = search_by_keyword(connection, s)
+    else:
+        for item in dataverse.get_contents():
+            handlestr = handlestr + item['identifier'] + ' '
+        if handlestr:
+	    s['q'] = handlestr	
+	    s['per_page'] = 100
+	    metadata = search_by_keyword(connection, s)
 
     for dataset in metadata['items']:
         datasets.append(dataset)
 
     template = 'citations.html'
-    resp = make_response(render_template(template, datasets=datasets))
+    resp = make_response(render_template(template, datasets=datasets, searchq=query))
     return resp
 
 @app.route('/')
