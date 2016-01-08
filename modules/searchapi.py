@@ -9,11 +9,15 @@ import requests
 import re
 
 def search_by_handles(self, searchquery):
-    (searchhandles, metadata) = ('', [])
+    (searchhandles, metadata, pids) = ('', [], [])
     if ' ' in searchquery['q']:
 	pids = searchquery['q'].split()
     if ',' in searchquery['q']:
         pids = searchquery['q'].split(",")
+
+    if not pids:
+        return metadata
+
     for handle in pids:
         ids = re.search(r'hdl\:\d+\/(\w+)', handle, re.M|re.I)
         if ids:

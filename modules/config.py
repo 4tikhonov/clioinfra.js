@@ -43,6 +43,10 @@ def configuration():
    for key, value in path_items:
 	config[key] = value
 
+   # Find host for Dataverse connection
+   findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', config['dataverseroot'])
+   if findhost:
+       config['hostname'] = findhost.group(2)
    config['remote'] = ''
    return config
 
