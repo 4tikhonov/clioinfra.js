@@ -20,7 +20,6 @@
   
 <script>
    var thiscolor = '';
-   var histo = '';
    var mapurl = "/collabs/static/v/worldmap.html?start=on&action=map&dataset={{ dataset }}&handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
    var printurl = "/collabs/print?handle={{ handle }}&catmax={{ catmax }}&ctrlist={{ customcountrycodes }}";
    var starturl = mapurl + '&year=' + year + '&lasty={{ lastyear }}';
@@ -36,7 +35,15 @@
     $('#logscale2').attr('checked', false);
     $('#logscale10').attr('checked', false);
     $('#greyscale').attr('checked', false);
-    $('#histo').attr('checked', false);
+    if (histo)
+    {
+        $('#histo').attr('checked', true);
+    }
+    else
+    {
+	$('#histo').attr('checked', false);
+    }
+
     var select = $( "#yearslider" );
     var sliderTooltip = function(event, ui, start) {
     var curValue = $( "#yearslider option:selected" ).text() || '0';

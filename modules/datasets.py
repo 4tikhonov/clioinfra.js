@@ -21,6 +21,31 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), './mod
 from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
 from sys import argv
 
+def dpemetadata(config, handle):
+    topicnames = {}
+    if config:
+        (dataset, handle, title, units) = loaddataset(config, handle)
+        allyears = []
+        try:
+            dataset.columns = dataset.ix[1]
+            print dataset.columns
+            if str(1) in dataset.columns:
+                dataset = dataset.drop(str(1), axis=1)
+            (allyears, notyears) = selectint(dataset.columns)
+        except:
+            allyears = []
+
+        return (title, units, allyears)
+
+def topicscoder(config):
+    topicnames = {}
+    if config:
+        (dataset, handle, title, units) = loaddataset(config, config['topicindex'])
+        dataset.index = dataset['ID']
+        for uid in dataset.index:
+            topicnames[str(dataset.ix[uid]['Name'])] = str(dataset.ix[uid]['parent name'])
+        return topicnames
+
 def buildgeocoder(geocoder, config, query):
     geodict = []
     geolist = {}
@@ -79,8 +104,12 @@ def load_geocodes(config, switch, codes, maindata, geolist):
             geocodes[int(code)] = ctr
     elif switch == 'historical':
         for code in codes[0]:
-            ctr = geolist[code]            
-            geocodes[int(code)] = ctr        
+	    try:
+                ctr = geolist[code]            
+                geocodes[int(code)] = ctr        
+	    except:
+		ctr = 0	
+		geocodes[0] = str(ctr)
     return geocodes
 
 # Select int values
@@ -138,7 +167,7 @@ def buildstatistics(config, dataset, classification):
     df = df.convert_objects(convert_numeric=True)
     df = df.replace(r'', np.nan, regex=True)
     sum_row = {col: df[col].sum() for col in df}
-    #return (df, stats)
+    # TREEMAP
     codes = df.index
     cols = df.sum()
     total = cols.sum()
@@ -300,7 +329,7 @@ def content2dataframe(config, handle):
 
     return (classtype, df, title, units)
 
-def treemap(config, dataset, classification, ctrfilter, coder):
+def buildtreemap(config, dataset, classification, ctrfilter, coder):
     jsonresult = "{\n\"name\": \"treemap\",\n\"children\": [\n"
     (df, result) = buildstatistics(config, dataset, classification)
     for idc in result:
@@ -353,6 +382,11 @@ def datasetfilter(maindata, datafilter):
 
     if yearsfilter:
         datasubset = datasubset[yearsfilter]
+    # Remove columns with empty years
+    for colyear in datasubset.columns:
+        if datasubset[colyear].count() == 0:
+            datasubset = datasubset.drop(colyear, axis=1)
+
     return (datasubset, ctrlist)
 
 def dataset_analyzer(datasubset, coder, yearscolumns):
@@ -440,7 +474,7 @@ def request_datasets(config, switch, modern, historical, handles, geolist):
 
 def request_geocoder(config, buildvocabulary):
     # Geocoder
-    (geocoder, geolist, oecd2webmapper) = ('', '', '')
+    (geocoder, geolist, oecd2webmapper) = ('', {}, '')
     (classification, dataset, title, units) = content2dataframe(config, config['geocoderhandle'])
 
     dataset = dataset[1:]
@@ -456,12 +490,19 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
     (years, notyears) = selectint(totalpanel.columns)
 
     for code in codes:
+        # ['France', 1901, 2826.0, 250]
+        try:
+            country = str(geocoder.ix[int(code)][config['webmappercountry']])
+            #country = 'xxx'
+        except:
+            country = 'Unknown country'
+
         for year in years:
             # ['France', 1901, 2826.0, 250]
-            try:
-                country = str(geocoder.ix[int(code)][config['webmappercountry']])
-            except:
-                country = 'Unknown country'
+            #try:
+                #country = str(geocoder.ix[int(code)][config['webmappercountry']])
+            #except:
+                #country = 'Unknown country'
             value = totalpanel[year][code]
             if value:
                 origvalue = value

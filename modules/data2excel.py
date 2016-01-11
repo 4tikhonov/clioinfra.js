@@ -55,7 +55,8 @@ def panel2excel(datadir, filename, header, panelcells, metadata):
         dataonly.append(dataitem[1])
         # Skip all country codes
 	for j in range(2, len(dataitem)):
-	    if (j/2)*2 == j:
+	    #if (j/2)*2 == j:
+	    if j:
 	        dataonly.append(dataitem[j])
 
 	dataitem = dataonly
@@ -63,7 +64,8 @@ def panel2excel(datadir, filename, header, panelcells, metadata):
             value = dataitem[j]
             if value == 'NaN':
                 value = ''
-            ws.write(i, j, value)
+	    if value > -1000000000000:
+                ws.write(i, j, value)
 
     fullpath = datadir + "/" + filename
     wb.save(fullpath)
@@ -207,16 +209,17 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
         j = 0        
         for columnname in metacolumns:
             thisvalue = ''
-            c = ws.cell(row=i, column=j)            
+            #c = ws.cell(row=i, column=j)            
             try:
                 thisvalue = str(geocoder.ix[int(idc)][columnname])                
             except:
                 skip = 1
                 
-            if thisvalue == '':
-                c.value = '' 
-            else:
+	    c = ws.cell(row=i, column=j)
+            if thisvalue != '':
                 c.value = thisvalue
+	    else:
+		c.value = ''
             j = j + 1
 
 	# Searching for active countries
@@ -226,13 +229,14 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
 	        activectr = 'yes'
 	except:
 	    activectr = ''
+
 	if activectr == 'yes':
 	    # Checking active years
 	    for year in yearscolumns:
                 if year in datayears:
                     try:
+			tmpval = dataset.ix[int(idc)][int(year)]
                         c = ws.cell(row=i, column=j)
-                        tmpval = dataset.ix[int(idc)][int(year)]
                         c.value = tmpval
                     except:
                         skip = 'on'                

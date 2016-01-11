@@ -9,6 +9,91 @@ import vincent
 import numpy as np
 import ast
 from pandas.io.json import json_normalize
+from datasets import loaddataset, request_geocoder, loaddataset_fromurl, request_datasets, loadgeocoder, buildtreemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, dataset2panel
+from data2excel import panel2excel
+
+def build_panel(config, switch, handles, datafilter):
+
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, panel) = ({}, [])
+    logscale = ''
+    for handle in handles:    
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+            try:
+                if np.nan in datasubset.index:
+                    datasubset = datasubset.drop(np.nan, axis=0)
+            except:
+                skip = 'yes'
+
+            datasubset['handle'] = handle
+            metadata['url'] = 0
+            panel.append(datasubset)
+            subsets[handle] = datasubset 
+            (panelcells, originalvalues) = dataset2panel(config, subsets[handle], historical, logscale)
+        
+    totalpanel = pd.concat(panel)
+    try:
+        if np.nan in totalpanel.index:
+            totalpanel = totalpanel.drop(np.nan, axis=0)
+    except: 
+	skip = 'yes'
+
+    if switch == 'historical':
+        geocoder = historical
+    else:
+        geocoder = modern
+    # Remove columns with empty years
+
+    for colyear in totalpanel.columns:
+        if totalpanel[colyear].count() == 0:
+            totalpanel = totalpanel.drop(colyear, axis=1)
+
+    (allyears, nyears) = selectint(totalpanel.columns)
+    print totalpanel.index
+    panels = []
+    known = {}
+    matrix = {}
+    #return (str(totalpanel.to_html()), '', '', '')
+    for code in totalpanel.index:
+	try:
+            country = geocoder.ix[int(code)][config['webmappercountry']]
+	except:
+	    country = ''
+
+        for thisyear in allyears:
+            thiskey = str(int(code)) + str(thisyear)
+            
+            if thiskey not in known:
+                dataitem = [country]
+                dataitem.append(thisyear)
+                known[thiskey] = thisyear
+		matrix[thiskey] = ''
+        
+                for handle in handles:
+                    tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
+                    try:
+                        thisval = tmpframe.ix[int(code)][thisyear]
+			matrix[thiskey] = thisval
+                    except:
+                        thisval = ''
+                    dataitem.append(thisval)
+                    
+		# Filter out np.NaN
+		if str(thisval) != 'nan':
+		    if country:
+		        if matrix[thiskey]:
+                            panels.append(dataitem)
+
+    # Build header
+    header = ['Country', 'Year']
+    for handle in handles:
+        header.append(metadata[handle]['title'])
+    
+    return (header, panels, metadata, totalpanel)
 
 def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):        
     years = dataframe[1]    
@@ -82,9 +167,17 @@ def paneldatafilter(dataframe, yearmin, yearmax, ctrlist, handle):
             
     return (data, codes)    
 
-def panel2dict(cleanedpaneldata, names):
-    data = cleanedpaneldata.reset_index().to_dict()
-    codes = data['Code']
+def panel2dict(config, cleanedpaneldata, names):
+    #data = cleanedpaneldata.reset_index().to_dict()
+    #codes = data['Code']
+    data = cleanedpaneldata.to_dict()
+    codes = []
+    if 'Code' in cleanedpaneldata.columns:
+        codes = data['Code']
+    if config['webmappercode'] in cleanedpaneldata.columns:
+        #(codes, notcodes) = selectint(cleanedpaneldata[config['webmappercode']])
+	(codes, ncodes) = selectint(cleanedpaneldata.index)
+
     handlesdata = data['handle']
     handles = {}
     vhandles = {}

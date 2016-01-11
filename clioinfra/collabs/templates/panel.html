@@ -26,12 +26,13 @@ body {
 }
 
 </style>
-  <style>
+<style>
   .indicators select {
         float: center;
   }
   .indicators h3 {
         text-align: center;
+	font: 20px;
   }
   .alright {
         float: left;
@@ -47,6 +48,10 @@ body {
      <option value="3">Bar Graph</option>
      <option value="4">Treemap</option>
   </select>
+<center>
+<div class="indicators"><h2>{{ title }}<label id="yearlab"> {{ lastyear }}</label></h2>
+</h2>
+</center>
 {% endif %}
 <br>
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
@@ -71,7 +76,7 @@ function vizswitch(viztype) {
 }
 var margin = {top: 20, right: 20, bottom: 20, left: 40}
     width = 920 - margin.left - margin.right,
-    height = 400 - margin.top - margin.bottom;
+    height = 380 - margin.top - margin.bottom;
 
 var x0 = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -138,8 +143,8 @@ d3.csv("/api/panel?{{ handle|safe }}", function(error, data) {
     .enter().append("rect")
       .attr("width", x1.rangeBand())
       .attr("x", function(d) { return x1(d.name); })
-      .attr("y", function(d) { return y(d.value); })
-      .attr("height", function(d) { return height - y(d.value); })
+      .attr("y", function(d) { return y(d.value) + margin.top; })
+      .attr("height", function(d) { return height - y(d.value) - margin.top; })
       .style("fill", function(d) { return color(d.name); });
 
   var legend = svg.selectAll(".legend")
@@ -149,16 +154,17 @@ d3.csv("/api/panel?{{ handle|safe }}", function(error, data) {
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 18)
+      .attr("x", 40)
+      .attr("y", 0)
       .attr("width", 18)
       .attr("height", 18)
       .style("fill", color);
 
   legend.append("text")
-      .attr("x", width - 24)
-      .attr("y", 9)
+      .attr("x", 60)
+      .attr("y", 6)
       .attr("dy", ".35em")
-      .style("text-anchor", "end")
+      .style("text-anchor", "start")
       .text(function(d) { return d; });
 
 });

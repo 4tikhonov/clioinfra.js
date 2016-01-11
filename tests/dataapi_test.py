@@ -5,12 +5,15 @@ import sys
 import os
 import json
 import simplejson
+import numexpr as ne
 from datetime import datetime
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname("__file__"), '../modules')))
+from data2excel import create_excel_dataset
 from tabulardata import loadcodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel, moderncodes, data2json
 from config import configuration, dataverse2indicators, load_dataverse, findpid, load_metadata
+from datacompiler import dataframe_compiler
 from historical import load_historical, histo
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
+from datasets import *
 
 hist = {}
 switch = 'modern'
@@ -22,12 +25,15 @@ handles = ["hdl:10622/4X6NCK"]
 #handles = ["hdl:10622/F9418N"]
 #handles = ["hdl:10622/4VGTV9"]
 handles = ["hdl:10622/I0YK5M"]
+handles = ["hdl:10622/KICLW5"]
+handles = ["hdl:10622/ACOPHR"]
 customyear = '1901'
 fromyear = '1500'
 toyear = '2000'
 customcountrycodes = '380,250,276,804,174,108,232,528,756'
 logflag = 0
 DEBUG = 0
+ne.set_num_threads(5)
         
 config = configuration()
 config['remote'] = ''
@@ -51,11 +57,12 @@ if fromyear:
 
 datafilter = {}
 logscale = ''
-datafilter['startyear'] = '1950'
+datafilter['startyear'] = '1500'
 datafilter['endyear'] = '2010'
 datafilter['ctrlist'] = '528,14,18,67'
 datafilter['ctrlist'] = '528'
-selectedyear = '1960'
+datafilter['ctrlist'] = ''
+selectedyear = 0
 if int(selectedyear) > 0:
     datafilter['startyear'] = selectedyear
     datafilter['endyear'] = selectedyear  
@@ -66,23 +73,77 @@ a = datetime.now()
 (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
 b = datetime.now()
 d = b - a
+#print modern.index
 print "Geocoder time: " + str(d.seconds) + " seconds"
 
 a = datetime.now()
 (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
 b = datetime.now()
 d = b - a
+#print origdata.to_html()
 print "Dataset load time: " + str(d.seconds) + " seconds"
 
 (subsets, panel) = ({}, [])
 for handle in handles:
     #handle = 'hdl:10622/I0YK5M'
     (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+#    for colyear in datasubset.columns:
+#        if datasubset[colyear].count() == 0:
+#            datasubset = datasubset.drop(colyear, axis=1)
+
     datasubset['handle'] = handle
     if not datasubset.empty:
         panel.append(datasubset)
         subsets[handle] = datasubset    
+	print "Added to subsets...\n"
 
-logscale = '10'
+print subsets[handles[0]].columns
+logscale = ''
+a = datetime.now()
 (datacells, original) = dataset2panel(config, subsets[handles[0]], modern, logscale)
-print datacells
+b = datetime.now()
+d = b - a
+#print origdata.to_html()
+print "Dataset panel load time: " + str(d.seconds) + " seconds"
+#print datacells
+
+excel_test1 = 'on'
+
+if excel_test1:
+    a = datetime.now()
+    fullpath = "/home/dpe/clioinfra.js/clioinfra/collabs/static/test.xlsx"
+    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, switch, datafilter)
+    b = datetime.now()
+    d = b - a
+    print "Dataset storing to Excel time: " + str(d.seconds) + " seconds"
+    print fullpath
+
+excel_test2 = ''
+if excel_test2:
+    # Create Excel
+    if switch == 'modern':
+        activeindex = modern.index
+        coder = modern
+        class1 = switch
+    else:
+        activeindex = historical.index
+        coder = historical
+
+    metadata = {}
+    (title, units) = ('', '')
+    metadata['title'] = 'testtitle'
+    metadata['units'] = 'testunits'
+    if title:
+        metadata['title'] = title
+    if units:
+        metadata['units'] = units
+
+    datasubset = subsets[handles[0]]
+    #print datasubset.to_html()
+    (yearscolumns, notyears) = selectint(datasubset.columns)
+    #coderyears = [1900, 2010];
+    coderyears = yearscolumns
+    (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
+    print finalsubset.to_html()
+    datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
+    print datafile

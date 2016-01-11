@@ -33,7 +33,7 @@ def dataset2zip(tmpdir, arc, finaldir):
 def get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir):
     DEBUG = 0
     files = []
-    proc = subprocess.Popen("/usr/bin/curl -s %s%s" % (cmd, pid), shell=True, stdout=subprocess.PIPE)
+    proc = subprocess.Popen("/usr/bin/curl -k -s %s%s" % (cmd, pid), shell=True, stdout=subprocess.PIPE)
     (xml, err) = proc.communicate()
 
     y=BeautifulSoup(xml)
@@ -47,6 +47,7 @@ def get_papers(HOSTNAME, API_TOKEN, cmd, pid, tmpdir, arc, finaldir):
         if isfile:
             fileID = isfile.group(1)
             fileoriginal = isfile.group(2)
+	    print fileoriginal
             status = download(HOSTNAME, API_TOKEN, tmpdir, fileID, fileoriginal)
             if DEBUG:
                 print filename.string

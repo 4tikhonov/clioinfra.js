@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import math
 import pandas as pd
 import random
 from random import randint
@@ -7,6 +8,33 @@ import numpy as np
 import brewer2mpl
 from config import webmapper_geocoder
 import math
+import re
+
+def value2scale(value, logscale, original):
+    convertedvalue = 0
+    if logscale:
+        origvalue = value
+        rvalue = "%.1f" % value
+        if logscale:
+            try:
+                if logscale == '2':
+                    value = math.log(value, int(logscale))
+                elif logscale == '10':
+                    value = math.log10(value)
+                else:
+                    value = math.log(value)
+                    rvalue = "%.5f" % value
+		convertedvalue = value
+            except:
+                value = 'NaN'
+                rvalue = 'NaN'
+                original[str(rvalue)] = origvalue
+        else:
+            original[origvalue] = origvalue
+    else:
+	convertedvalue = value
+
+    return (convertedvalue, original)
 
 def getcolors(catnum, pallete, newcolormap):
     nodatacolor = '#ffffff'
@@ -92,15 +120,20 @@ def get_normal_scale(catmax, valarray):
     ranges.append(imax)
     return ranges
 
-def getscales(data, colors, catnum, geocoder, original, logscale):
+def getscales(config, data, colors, catnum, geocoder, original, histclass, logscale):
     values = []
     finalcatnum = 0   
-    webmapper = {}
+    (webmapper, geoison) = ({}, '')
     dataset = {}
-    if geocoder:
-        webmapper = webmapper_geocoder()
+    try: 
+        if not geocoder.empty:
+            webmapper = geocoder #webmapper_geocoder()
+	    geoison = 'on'
+    except:
+	geoison = ''
     
     try:
+    #if data:
         # Fill values for dataframe
         for row in data:          
             value = row[2]
@@ -144,7 +177,8 @@ def getscales(data, colors, catnum, geocoder, original, logscale):
         for row in data:
             value = row[2]
             dataitem = {}
-            try:
+            #try:
+	    if value:
                 if value != 'NA':
                     dataitem['value'] = value                    
                     colorID = 0
@@ -154,35 +188,40 @@ def getscales(data, colors, catnum, geocoder, original, logscale):
                         if dataitem['value'] > validx:
                             dataitem['range'] = validx
                             dataitem['color'] = colors[colorID]
-			    if geocoder:
-			        dataitem['country'] = row[0]
-				dataitem['id'] = webmapper[row[3]]
+			    if geoison:
+				try:
+			            dataitem['country'] = webmapper.ix[row[3]][config['webmappercountry']]
+				except:
+				    dataitem['country'] = row[0] + ' problem'
+				dataitem['id'] = str(row[3])
                         colorID = colorID + 1        
 
 		    # Check if round required
 		    rlen = len(str(value))
+		    rvalue = value
 		    if rlen > 10:
-		        rvalue = "%.5f" % value
+		        rvalue = "%.2f" % value
 			#rvalue = value
 			try:
 			    uvalue = original[str(rvalue)]
 			except:
 			    uvalue = ''
-		        dataitem['value'] = uvalue
-		mainindex = row[0]
-		if geocoder:
-		    try:
-		        webmapperindex = webmapper[row[3]]
-		    except:
-		        webmapperindex = mainindex
-
-		    if webmapperindex:
-		        mainindex = webmapperindex
+		    dataitem['value'] = rvalue
+		mainindex = str(row[0])
+		if geoison:
+		    mainindex = str(row[3])
+		    if histclass == 'modern':
+			try:
+			    mainindex = int(webmapper.ix[row[3]][config['webmappercode']])
+			except:
+			    mainindex = str(row[3])
 
 		dataset[mainindex] = dataitem
-            except:
+            #except:
+	    else:
                 showwarning("can't calculate scales")
     except:
+    #else:
         # No scales
         showwarning('not possible to calculate scales')
         
@@ -210,6 +249,17 @@ def floattodec(s):
     except ValueError:
         return s
 
+def roundme(thisval):
+    toround = 3
+    strval = str(thisval)
+    dots = re.search(r'\.(.+)', strval)
+    afterdots = 0
+    if dots:
+        afterdots = len(dots.group(1))
+    if afterdots > toround:
+        thisval = round(thisval, toround)
+    return thisval
+
 # Combine all ranges to show on map    
 def combinerange(map):
     rangestr = ''
@@ -217,10 +267,10 @@ def combinerange(map):
     for i in reversed(range(len(map))):
         if i > 0:
             id = i - 1
-            min = map[id]
-            max = map[i]
-            rangestr = rangestr + str(min) + ' - ' + str(max) + ', '
-            rangearr.append(str(floattodec(min)) + ' - ' + str(floattodec(max)))
+            imin = str(roundme(floattodec(map[id])))
+            imax = str(roundme(floattodec(map[i])))
+            rangestr = rangestr + str(imin) + ' - ' + str(imax) + ', '
+            rangearr.append(str(imin) + ' - ' + str(imax))
     rangestr = rangestr[:-2]
     return (rangearr, rangestr)
 

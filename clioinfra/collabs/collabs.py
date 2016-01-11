@@ -40,8 +40,6 @@ import urllib2
 import glob
 import csv
 import sys
-import psycopg2
-import psycopg2.extras
 import pprint
 import getopt
 import ConfigParser
@@ -69,7 +67,9 @@ from locations import load_locations
 from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
+from datasets import *
+from searchapi import search_by_keyword, search_by_handles
+from dataverse import Connection
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -189,8 +189,12 @@ def graphslider():
 
 @app.route('/mapslider')
 def mapslider():
-    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax) = ('', 0, '', '1500', '2012', '', 6) 
+    (title, steps, customcountrycodes, fromyear, toyear, customyear, catmax, histo) = ('', 0, '', '1500', '2012', '', 6, '') 
     config = configuration()
+    datafilter = {}
+    datafilter['ctrlist'] = ''
+    datafilter['startyear'] = fromyear
+    datafilter['endyear'] = toyear
     if config['error']:
 	return config['error']
     handleface = ''
@@ -200,6 +204,8 @@ def mapslider():
             thismapurl = urlmatch.group(1)
     except:
 	thismapurl = request.url
+    thismapurl = thismapurl.replace('http://', 'https://')
+
     geocoder = ''
     pids = []
     handledataset = ''
@@ -217,6 +223,7 @@ def mapslider():
            if ids:
                customcountrycodes = str(customcountrycodes) + str(ids) + ','
         customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = customcountrycodes
 
     if request.args.get('dataset'): 
         dataset = request.args.get('dataset')
@@ -248,12 +255,15 @@ def mapslider():
 	catmax = request.args.get('catmax')
     if request.args.get('yearmin'):
         fromyear = request.args.get('yearmin')
+	datafilter['startyear'] = fromyear
     if request.args.get('yearmax'):
         toyear = request.args.get('yearmax')
+	datafilter['endyear'] = toyear
     if request.args.get('geocoder'):
         geocoder = request.args.get('geocoder')
     if request.args.get('hist'):
         geocoder = request.args.get('hist') 
+	histo = 'on'
     if request.args.get('face'):
         handleface = request.args.get('face')
     if handleface:
@@ -267,24 +277,30 @@ def mapslider():
 
     historical = 0
 
-    #if config:
-	#switch = 'modern'
-        #(geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, 'geocoder')
-        #(origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
- 	#return str(maindata[handles[0]].index)
-	#return str(handles[0])
+    hubyears = []
+    if config:
+	switch = 'modern'
+	if histo:
+	    switch = 'historical'
+        (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+	(hubyears, notyears) = selectint(origdata.columns)
+	title = metadata[handles[0]]['title'] 
 
-    try:
-        (header, panelcells, codes, datahub, data, handle2ind, unit2ind, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
-	for dataitem in handle2ind:
-	    title = handle2ind[dataitem]
-    except:
-	datahub = {}
-	#warning = logging.exception()
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        datasubset['handle'] = handle
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+	    (allyears, notyears) = selectint(datasubset.columns)
+	    for year in datasubset:
+		if datasubset[year].count() == 0:
+		    datasubset = datasubset.drop(year, axis=1)
+	    (hubyears, notyears) = selectint(datasubset.columns)
 
     validyears = []
     lastyear = ''
-    for year in sorted(datahub):
+    for year in sorted(hubyears):
 	validyears.append(year)
 	lastyear = year
 	steps = steps + 1
@@ -332,7 +348,7 @@ def download(settings=''):
     if format == 'shapefile':
 	year = year
     else:
-        cmd = path + "/node_modules/phantomjs/lib/phantom/bin/phantomjs " + path + "/web/demo/static/renderHTML.js '" + website + page + year + "&code=" + code + "&province=" + province + "&custom=" + custom + "'"
+        cmd = path + "/node_modules/phantomjs/lib/phantom/bin/phantomjs " + path + "/collabs/static/renderHTML.js '" + website + page + year + "&code=" + code + "&province=" + province + "&custom=" + custom + "'"
         #cmd = '/bin/echo test'
 
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
@@ -393,12 +409,19 @@ def download(settings=''):
 
 @app.route('/treemap')
 def treemap(settings=''):
+    (years, ctrlist) = ([], '')
     showpanel = 'yes'
     config = configuration()
     if config['error']:
         return config['error'] 
 
-    (historical, handle, handles) = ('', '', [])
+    (historical, handle, handles, thisyear) = ('', '', [], '')
+    if request.args.get('face'):
+        facehandle = request.args.get('face')
+        if facehandle not in handles:
+            handles.append(facehandle)
+	    handle = facehandle
+
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         try:
@@ -411,23 +434,67 @@ def treemap(settings=''):
             nopanel = 'yes'
     if request.args.get('historical'):
         historical = request.args.get('historical')
+    if request.args.get('year'):
+        thisyear = request.args.get('year')
+    if request.args.get('hist'):
+        historical = request.args.get('hist')
+    if request.args.get('ctrlist'):
+	ctrlist = request.args.get('ctrlist')
+        if ctrlist == config['ctrlist']:
+	    ctrlist = ''
+
     mainlink = '&handle=' + str(handle)
+    try:
+        (title, units, years) = dpemetadata(config, handle)
+    except:
+        (title, units, years) = ('Panel Data', '', [])
+
     if historical:
 	mainlink = str(mainlink) + '&historical=on'
-    links = graphlinks(mainlink)
+    if thisyear:
+	mainlink = str(mainlink) + '&year=' + str(thisyear)
+    if ctrlist:
+	mainlink = str(mainlink) + '&ctrlist=' + str(ctrlist)
 
-    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical))
+    links = graphlinks(mainlink)
+    apitreemap = config['apiroot'] + "/api/treemap?action=showyears&handle=" + str(handles[0]) + "&ctrlist=" + str(ctrlist)
+    years = load_api_data(apitreemap, 1)
+    total = len(years)
+    lastyear = years[-1]
+
+    resp = make_response(render_template('treemap.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, historical=historical, title=title, thisyear=thisyear, years=years, total=total, lastyear=lastyear, ctrlist=ctrlist))
+    return resp
+
+# Visualize
+@app.route('/visualize')
+def visualize():
+    config = configuration()
+    resp = 'visualize'
+    view = 'panel'
+    if request.args.get('view'):
+	view = request.args.get('view')
+
+    if config['error']:
+        return config['error']
+
+    if view == 'panel':
+        resp = panel()
+    elif view == 'time-series':
+	resp = chartlib()
+    elif view == 'treemap':
+	resp = treemap()
     return resp
 
 @app.route('/panel')
 def panel(settings=''):
     showpanel = ''
+    handle = ''
+    handler = ''
     config = configuration()
     if config['error']:
         return config['error']
 
     f = request.args
-    handle = ''
     for q in f:
 	value = f[q]
 	if value:
@@ -449,9 +516,13 @@ def panel(settings=''):
     except:
 	showpanel = 'yes'
 
+    try:
+        (title, units, years) = dpemetadata(config, handle)
+    except:
+	(title, units, years) = ('Panel Data', '', [])
     links = graphlinks(handle)
 
-    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel))
+    resp = make_response(render_template('panel.html', handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib'], q=handle, showpanel=showpanel, title=title))
     return resp
 
 @app.route('/chartlib')
@@ -459,6 +530,7 @@ def chartlib():
     (thismapurl, apilink, ctrlist, title, units, switch) = ('', '', '', 'Title', 'Units', 'modern')
     handleface = []
     config = configuration()
+    ctrlist = config['ctrlist']
     if config['error']:
         return config['error']
 
@@ -557,6 +629,7 @@ def graphlib(settings=''):
 
 @app.route('/datasetspace')
 def datasetspace(settings=''):
+    (query, datasets, metadata, s) = ('', [], [], {})
     config = configuration()
     if config['error']:
         return config['error']
@@ -565,34 +638,28 @@ def datasetspace(settings=''):
     dataverse = 'global'
     if request.args.get('dv'):
 	dataverse = request.args.get('dv')
+    if request.args.get('q'):
+        query = request.args.get('q')
 
-    jsonapi = root + "/cgi-bin/citations.cgi?dataverse=" + dataverse
-    req = urllib2.Request(jsonapi)
-    opener = urllib2.build_opener()
-    f = opener.open(req)
-    citations = simplejson.load(f, "utf-8")
-    result = ''
-    datasets = []
-    for line in citations:
-        cite = json.loads(line)
-	dataset  = {}
-        for item in cite:
-            #result = str(result) + '<b>' + str(item) + '</b>' + ' ' + str(cite[item]) + '<br>'
-	    result = str(result) + "<b>" + str(item) + "</b>" + " " + str(cite[item]) + "<br>\n"
-	    dataset[item] = cite[item]
+    connection = Connection(config['hostname'], config['key'])
+    dataverse = connection.get_dataverse(dataverse)
+    handlestr = ''
+    if query:
+	s['q'] = query
+	metadata = search_by_keyword(connection, s)
+    else:
+        for item in dataverse.get_contents():
+            handlestr = handlestr + item['identifier'] + ' '
+        if handlestr:
+	    s['q'] = handlestr	
+	    s['per_page'] = 100
+	    metadata = search_by_keyword(connection, s)
 
-	try:
-	    if cite['Subject']:
-	        datasets.append(dataset)
-	except:
-	    nothing = 1
-
-    #datasets = result
-    activepage = 'Dashboard'
-    pages = getindex(activepage)
+    for dataset in metadata['items']:
+        datasets.append(dataset)
 
     template = 'citations.html'
-    resp = make_response(render_template(template, active=activepage, pages=pages, datasets=datasets))
+    resp = make_response(render_template(template, datasets=datasets, searchq=query))
     return resp
 
 @app.route('/')
@@ -820,6 +887,7 @@ def dashboard(settings=''):
     valtitle = ''
     if validate:
 	# VALIDATION
+	return 'Dataset not updated'
 	cmd = path + "/../../bin/import.py -d '" + dataverseroot + "' -H '" + dataset + "'"
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         maincontent = p.communicate()[0]
@@ -923,6 +991,21 @@ def statistics(settings=''):
             #datasubset['handle'] = handle
 	    meta = metadata[handle]
 	    names[handle] = meta['title'] 
+	    # Try to remove years columns
+	    try:
+	        if np.nan in datasubset.index:
+	            datasubset = datasubset.drop(np.nan, axis=0)
+                if str(np.nan) in datasubset.columns:
+                    datasubset = datasubset.drop(np.nan, axis=1)
+	    except:
+		skip = 'yes'
+	    # Try to remove index columns
+	    try:
+                if config['webmapperoecd'] in datasubset.index:
+                    datasubset = datasubset.drop(config['webmapperoecd'], axis=0)
+	    except:
+		skip = 'yes'
+
             if not datasubset.empty:
 		datasubset['handle'] = handle
                 panel.append(datasubset)
@@ -1176,7 +1259,7 @@ def printall():
     fileformat = 'png'
     year = '1982'
     code = '4X6NCK'
-    imagefile = chartonprint(webpage, fileformat, year, code)
+    imagefile = chartonprint(webpage, fileformat, year, code, config['proxy'])
     return redirect(imagefile, code=301)
 
 @app.route('/advanced')

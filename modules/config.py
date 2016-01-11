@@ -43,6 +43,10 @@ def configuration():
    for key, value in path_items:
 	config[key] = value
 
+   # Find host for Dataverse connection
+   findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', config['dataverseroot'])
+   if findhost:
+       config['hostname'] = findhost.group(2)
    config['remote'] = ''
    return config
 
@@ -117,7 +121,7 @@ def load_dataverse(apiurl):
         datasets['url'] = item['url']
         datasets['pid'] = item['global_id']
         datasets['name'] = item['name']
-        datasets['topic'] = item['description']
+        datasets['topic'] = item['description'] 
         datasets['citation'] = item['citation']
         info.append(datasets)
     

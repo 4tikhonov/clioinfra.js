@@ -3,22 +3,42 @@
   <script src="//code.jquery.com/jquery-1.10.2.js"></script>
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   <script src="/collabs/static/jquery.responsiveiframe.js"></script>
-
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="//d3js.org/d3.v3.min.js"></script>
 <style>
 
 body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: 10px sans-serif;
   margin: auto;
   position: relative;
   width: 900px;
 }
 
 form {
-  position: absolute;
-  right: 10px;
-  top: 10px;
+  position: relative;
 }
 
+label.sort {
+    float: left;
+}
+
+label.switch {
+    float: right;
+}
+
+#years {
+  height: 40px;
+  float: right;
+}
+
+#ynavi {
+  margin-top: 10px;
+  text-align: right;
+  border:0; 
+  width: 900px;
+  position: relative;  
+  vertical-align: bottom;
+}
 .node {
   border: solid 1px white;
   font: 10px sans-serif;
@@ -29,6 +49,10 @@ form {
 }
 
 </style>
+<body>
+<center>
+<div class="indicators"><h1>{{ title }}<label id="yearlab">, {{ lastyear }}</label></h1>
+</center>
   <select name="viz" class="alright" onchange="vizswitch($(this).val())">
      <option value="4" selected>Treemap</option>
      <option value="1">Panel Bar</option>
@@ -37,12 +61,14 @@ form {
   </select>
 
 <form>
-  <label><input type="radio" name="mode" value="size" checked> Values</label>
-  <label><input type="radio" name="mode" value="count"> Count</label>
+  <label class="sort"><input type="radio" id="mode" name="mode" value="size" checked> By values</label>
+  <label class="sort"><input type="radio" id="mode" name="mode" value="count"> By count</label>
+    <label class="switch"><input type="checkbox" name="histo" id="histo" onclick="historical();">Historical</label>
+    <label class="switch"><input type="checkbox" name="greyscale" id="greyscale">Greyscale</label>
 </form>
-<script src="//d3js.org/d3.v3.min.js"></script>
 <script>
-
+var rootlink = "/api/treemap?handle={{ handle }}&ctrlist={{ ctrlist }}";
+parent.postMessage("treemap", "*");
 function vizswitch(viztype) {
    if (viztype == '1')
    {
@@ -64,13 +90,13 @@ function vizswitch(viztype) {
 
 var margin = {top: 40, right: 0, bottom: 10, left: 0},
     width = 900 - margin.left - margin.right,
-    height = 420 - margin.top - margin.bottom;
+    height = 360 - margin.top - margin.bottom;
 
 var color = d3.scale.category20c();
 
 var treemap = d3.layout.treemap()
     .size([width, height])
-    .sticky(true)
+    .sticky(false)
     .value(function(d) { return d.size; });
 
 var div = d3.select("body").append("div")
@@ -80,9 +106,15 @@ var div = d3.select("body").append("div")
     .style("left", margin.left + "px")
     .style("top", margin.top + "px");
 
-d3.json("/api/treemap?handle={{ handle }}&historical={{ historical }}", function(error, root) {
+var apilink = rootlink + "&historical={{ historical }}&year={{ thisyear }}";
+buildtreemap(apilink);
+
+function buildtreemap(apiurl) 
+{
+  d3.json(apiurl, function(error, root) {
   if (error) throw error;
 
+  var dataroot = root;
   var node = div.datum(root).selectAll(".node")
       .data(treemap.nodes)
     .enter().append("div")
@@ -91,7 +123,7 @@ d3.json("/api/treemap?handle={{ handle }}&historical={{ historical }}", function
       .style("background", function(d) { return color(d.children) ? color(d.name) : null; })
       .text(function(d) { return d.children ? null : d.name; });
 
-  d3.selectAll("input").on("change", function change() {
+  d3.selectAll("#mode").on("change", function change() {
     var value = this.value === "count"
         ? function() { return 1; }
         : function(d) { return d.size; };
@@ -99,10 +131,34 @@ d3.json("/api/treemap?handle={{ handle }}&historical={{ historical }}", function
     node
         .data(treemap.value(value).nodes)
       .transition()
-        .duration(1500)
+        .duration(800)
         .call(position);
   });
-});
+  });
+};
+
+function refreshtreemap(apiurl) 
+{
+  var root;
+  d3.json(apiurl, function(error, root2) {
+  if (error) throw error;
+
+  div.datum(root).selectAll(".node").remove();
+  root = root2;
+  var node = div.datum(root).selectAll(".node")
+      .data(treemap.nodes(root))
+    .enter().append("div")
+      .attr("class", "node")
+      .transition()
+      .duration(800)
+      .style("background", function(d) { return color(d.children) ? color(d.name) : null; })
+      .text(function(d) { return d.children ? null : d.name; })
+      .call(position);
+
+    console.log("treemap", treemap.nodes(root2));
+    console.log(apiurl);
+  });
+};
 
 function position() {
   this.style("left", function(d) { return d.x + "px"; })
@@ -110,5 +166,71 @@ function position() {
       .style("width", function(d) { return Math.max(0, d.dx - 1) + "px"; })
       .style("height", function(d) { return Math.max(0, d.dy - 1) + "px"; });
 }
+</script>
+
+<script>
+    var select = $( "#yearslider" );
+    var sliderTooltip = function(event, ui, start) {
+    var curValue = $( "#yearslider option:selected" ).text() || '0';
+    if (typeof(start) == 'undefined')
+    {
+        curValue = {{ lastyear }};
+    }
+
+    var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
+
+    $('.ui-slider-handle').html(tooltip);
+  }
+
+  $(function() {
+    var select = $( "#yearslider" );
+    var slider = $( "<div id='slider'></div>" ).insertAfter( select ).slider({
+      min: 1,
+      max: {{ total }},
+      range: "min",
+      value: select[ 0 ].selectedIndex + 1,
+      slide: function( event, ui ) {
+        select[ 0 ].selectedIndex = ui.value - 1;
+        $('.slider-time2').html($( "#yearslider option:selected" ).text());
+        $("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
+
+        var apilink = rootlink + "&historical=&year=" + $( "#yearslider option:selected" ).text();
+	refreshtreemap(apilink);
+      }
+    });
+
+    $( "#yearslider" ).change(function() {
+      slider.slider( "value", this.selectedIndex + 1 );
+
+      var curValue = $( "#yearslider option:selected" ).text() || '0';
+      var tooltip = '<div class="tooltip"><div class="tooltip-inner">' + curValue + '</div><div class="tooltip-arrow"></div></div>';
+      $('.slider-time2').html($( "#yearslider option:selected" ).text());
+      $("#yearlab").html(', ' + $( "#yearslider option:selected" ).text());
+      var apilink = rootlink + "&historical=&year=" + curValue;
+      refreshtreemap(apilink);
+
+    });
+  });
+
+  function historical()
+  {
+     var apilink = rootlink + "&historical=on&year=" + $( "#yearslider option:selected" ).text();
+     refreshtreemap(apilink);
+  }
 
 </script>
+
+<form id="ynavi">
+  <select name="years" id="yearslider">
+  {% for year in years %}
+    <option>{{ year }}</option>
+  {% endfor %}
+  </select>
+</form>
+<script>
+{% if lastyear %}
+document.getElementById("yearslider").value = '{{ lastyear }}';
+{% endif %}
+</script>
+
+</body>

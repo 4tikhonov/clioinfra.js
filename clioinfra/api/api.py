@@ -1,4 +1,4 @@
-# Copyright (C) 2015 International Institute of Social History.
+# Copyright (C) 2015-2016 International Institute of Social History.
 # @author Vyacheslav Tykhonov <vty@iisg.nl>
 #
 # This program is free software: you can redistribute it and/or  modify
@@ -35,9 +35,8 @@ import glob
 import csv
 import xlwt
 import os
+import shutil
 import sys
-import psycopg2
-import psycopg2.extras
 import pprint
 import collections
 import ast
@@ -65,11 +64,12 @@ import matplotlib as mpl
 from palettable.colorbrewer.sequential import Greys_8
 from data2excel import panel2excel, individual_dataset
 from historical import load_historical, histo
-from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales
-from storage import data2store, readdata, readdataset, readdatasets, datasetadd, formdatasetquery
-from paneldata import paneldatafilter, panel2dict, panel2csv
-from datasets import loaddataset, loaddataset_fromurl, loadgeocoder, treemap, selectint, buildgeocoder, load_geocodes, datasetfilter, content2dataframe, dataset_analyzer, request_geocoder, request_datasets, dataset2panel
+from scales import getcolors, showwarning, buildcategories, getscales, floattodec, combinerange, webscales, value2scale
+from storage import *
+from paneldata import build_panel, paneldatafilter, panel2dict, panel2csv
+from datasets import *
 from datacompiler import dataframe_compiler
+from data2excel import panel2excel
 
 # Function to create json from dict 
 def json_generator(c, jsondataname, data):
@@ -414,20 +414,45 @@ def open():
 
 @app.route('/treemap')
 def treemapweb():
+    (thisyear, datafilter, yearmin, lastyear, handles) = (0, {}, 1500, 2010, [])
+    (action, switch, geodataset) = ('', 'modern', '')
     config = configuration()
+    datafilter['startyear'] = yearmin
+    datafilter['endyear'] = lastyear
+    datafilter['ctrlist'] = ''
+
     handle = ''
-    switch = 'modern'
     if request.args.get('handle'):
-        handle = request.args.get('handle')
+        handledataset = request.args.get('handle')
+        try:
+            (pids, pidslist) = pidfrompanel(handledataset)
+	    handle = pids[0]
+            handles.append(handle)
+        except:
+            handles.append(handledataset)
+            nopanel = 'yes'
+
+    if request.args.get('face'):
+        handle = request.args.get('face')
+	handles.append(handle)
+    if request.args.get('year'):
+        thisyear = request.args.get('year')
+    if request.args.get('action'):
+        action = request.args.get('action')
+    if request.args.get('ctrlist'):
+	datafilter['ctrlist'] = request.args.get('ctrlist')
+
+    if int(thisyear) > 0:
+	datafilter['startyear'] = int(thisyear)
+	datafilter['endyear'] = int(thisyear)
+
     if request.args.get('historical'):
 	switch = 'historical'
-    config['remote'] = 'on'
-    handles = []
-    geodataset = ''
     # Geocoder
     (classification, geodataset, title, units) = content2dataframe(config, config['geocoderhandle']) 
 
-    (modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
+    #(modern, historical) = loadgeocoder(config, geodataset, 'geocoder')
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
 
     if switch == 'modern':
         activeindex = modern.index
@@ -439,71 +464,198 @@ def treemapweb():
 	class1 = switch
 
     # Loading dataset in dataframe
-    handles = []
-    handles.append(handle)
     try:
 	(class1, dataset, title, units) = content2dataframe(config, handle)
     except:
 	return 'No dataset ' + handle
 
     (cfilter, notint) = selectint(activeindex.values)
-    (moderndata, historicaldata) = loadgeocoder(config, dataset, '')
-    if switch == 'modern':
-        maindata = moderndata
-    else:
-        maindata = historicaldata
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, panel) = ({}, [])
 
-    treemapdata = treemap(config, maindata, switch, cfilter, coder)
+    # Show only available years
+    if action == 'showyears':
+	years = []
+        datafilter['startyear'] = yearmin
+        datafilter['endyear'] = lastyear
+        (datasubset, ctrlist) = datasetfilter(maindata[handles[0]], datafilter)
+        # Remove years without any values
+	if not datafilter['ctrlist']:
+            if np.nan in datasubset.index:
+                datasubset = datasubset.drop(np.nan, axis=0)
+        for colyear in datasubset.columns:
+            if datasubset[colyear].count() == 0:
+                datasubset = datasubset.drop(colyear, axis=1)
+
+        (years, notyears) = selectint(datasubset.columns)
+        # YEARS
+        return Response(json.dumps(years),  mimetype='application/json')
+
+    # Process all indicators
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        if not datasubset.empty:
+            #datasubset = datasubset.dropna(how='all')
+	    if not datafilter['ctrlist']:
+	        if np.nan in datasubset.index:
+		    datasubset = datasubset.drop(np.nan, axis=0)
+            panel.append(datasubset)
+            subsets[handle] = datasubset
+
+    maindata = subsets[handles[0]]
+    treemapdata = buildtreemap(config, maindata, switch, cfilter, coder)
     return Response(treemapdata,  mimetype='application/json')
 
 # Panel data
 @app.route('/panel')
 def panel():
-    (handle, yearmin, yearmax, thisyear, ctrlist, lastyear) = ('', '1500', '2020', 1950, '', 2010)
+    (thisyear, datafilter, handle, yearmin, yearmax, thisyear, ctrlist, lastyear, logscale) = (0, {}, '', '1500', '2020', 1950, '', 2010, '')
+    handles = []
     config = configuration()
-    modern = moderncodes(config['modernnames'], config['apiroot'])
+    datafilter['startyear'] = yearmin
+    datafilter['endyear'] = lastyear
+    datafilter['ctrlist'] = config['ctrlist']
+
+    #modern = moderncodes(config['modernnames'], config['apiroot'])
     if request.args.get('handle'):
         handle = str(request.args.get('handle'))
 	handle = handle.replace(" ", "")
 	handle = handle.replace("'", "")
+        try:
+            (pids, pidslist) = pidfrompanel(handle)
+	    handles = pids
+        except:
+            nopanel = 'yes'
+	    handles.append(handle)
+    if request.args.get('face'):
+	facehandle = request.args.get('face')
+	if facehandle not in handles:
+	    handles.append(facehandle)
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
     if request.args.get('ctrlist'):
         customcountrycodes = ''
         ctrlist = request.args.get('ctrlist')
+	datafilter['ctrlist'] = ctrlist
+    if request.args.get('logscale'):
+        logscale = request.args.get('logscale')
     if request.args.get('year'):
         thisyear = request.args.get('year')
+        datafilter['startyear'] = int(thisyear)
+        datafilter['endyear'] = int(thisyear)
+    if request.args.get('yearmin'):
+        fromyear = request.args.get('yearmin')
+        datafilter['startyear'] = fromyear
+    if request.args.get('yearmax'):
+        toyear = request.args.get('yearmax')
+        datafilter['endyear'] = toyear
+    if request.args.get('hist'):
+	switch = 'historical'
+	if datafilter['ctrlist'] == '':
+	    datafilter['ctrlist'] = config['histctrlist']
+    else:
+	switch = 'modern'
 
-    jsonapi = config['apiroot'] + "/api/datasets?handle=" + str(handle)
-    dataframe = load_api_data(jsonapi, '')
+    (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
+    (subsets, subsetyears, panel) = ({}, [], [])
     
-    result = ''
+    for handle in handles:
+        (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+        datasubset['handle'] = handle
+        if not datasubset.empty:
+            datasubset = datasubset.dropna(how='all')
+	    try:
+	        if np.nan in datasubset.index:
+	            datasubset = datasubset.drop(np.nan, axis=0)
+	    except:
+		skip = 'yes'
+
+            for year in datasubset:
+                if datasubset[year].count() == 0:
+                    datasubset = datasubset.drop(year, axis=1)
+
+	    (datayears, notyears) = selectint(datasubset.columns)
+            panel.append(datasubset)
+            subsets[handle] = datasubset    
+	    subsetyears.append(datayears)
+
+    dataframe = subsets
     ctrlimit = 10
+
+    # Trying to find the best year with most filled data values
+    try:
+        bestyearlist = subsetyears[0]
+        for i in range(1,len(subsetyears)):
+	    bestyearlist = list(set(bestyearlist) & set(subsetyears[i]))
+	#bestyearlist = bestyearlist.sort()
+	thisyear = bestyearlist[0]
+    except:
+	bestyearlist = []
 
     allcodes = {}
     panel = []
     names = {}
 
-    for dataitem in dataframe:
-        handle = dataitem['handle']
+    for handle in dataframe:
 	try:
-	    names[handle] = dataitem['title']
+	    names[handle] = metadata[handle]['title']
 	except:
 	    names[handle] = 'title'
 	try:
-            (dataset, codes) = paneldatafilter(dataitem['data'], int(yearmin), int(yearmax), ctrlist, handle)
+            #(dataset, codes) = paneldatafilter(dataframe[handle], int(yearmin), int(yearmax), ctrlist, handle)
+	    dataset = dataframe[handle]
 	    if not dataset.empty:
                 panel.append(dataset)
 	except:
 	    nodata = 0
 	
-    #return str(panel)
     if panel:
         totalpanel = pd.concat(panel)
         cleanedpanel = totalpanel.dropna(axis=1, how='any')
         cleanedpanel = totalpanel
 
-        (header, data, countries, handles, vhandles) = panel2dict(cleanedpanel, names)  
+	#return str(cleanedpanel.to_html())
+    totalpanel = cleanedpanel
+    if int(thisyear) <= 0:
+        thisyear = totalpanel.columns[-2]
+    result = ''
+    original = {}
+    if thisyear:
+	if switch == 'historical':
+	    geocoder = historical
+	if switch == 'hist':
+	    geocoder = historical
+	else:
+	    geocoder = modern
+        result = 'Country,'
+        for handle in handles:
+            result = result + str(metadata[handle]['title']) + ','
+	result = result[:-1]
+    
+        known = {}
+        for code in totalpanel.index:
+            if str(code) not in known:
+                result = result + '\n' + str(geocoder.ix[int(code)][config['webmappercountry']])
+                for handle in handles:
+                    tmpframe = totalpanel.loc[totalpanel['handle'] == handle]
+		    try:
+                        (thisval, original) = value2scale(tmpframe.ix[code][thisyear], logscale, original)
+		    except:
+			thisval = 'NaN'
+                    result = result + ',' + str(thisval)
+                known[str(code)] = code
+
+	return Response(result,  mimetype='text/plain')
+
+	(allyears, notyears) = selectint(cleanedpanel.columns)
+	(codes, notcodes) = selectint(cleanedpanel.index)
+	cleanedpanel.index = codes
+        (header, data, countries, handles, vhandles) = panel2dict(config, cleanedpanel, names)  
+	#return str(data)
+	#thisyear = 1882
+	#return str(countries)
+	#return str(countries)
 	years = []
 	for year in sorted(data):
             try:
@@ -520,9 +672,6 @@ def panel():
 	    #yearsdata['data'] = data
 	    yearsjson = json.dumps(yearsdata, ensure_ascii=False, sort_keys=True, indent=4)
 	    return Response(yearsjson,  mimetype='application/json')
-
-	# Show dataframe in CSV
-        result = panel2csv(header, data, thisyear, countries, handles, vhandles, ctrlimit, modern)
 
     return Response(result,  mimetype='text/plain')
 
@@ -582,27 +731,44 @@ def advanced_statistics():
 # Dataverse API
 @app.route('/download')
 def download():
-    (classification, pid, root) = ('', '', '')
+    (classification, pid, root, switch) = ('modern', '', '', 'modern')
     handle = ''
     classification = 'modern'
     config = configuration()
+    cmd = "--insecure -u " + config['key'] + ": " + config['dataverseroot'] + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
+
     config['remote'] = ''
     datafilter = {}
     datafilter['startyear'] = '1500'
     datafilter['endyear'] = '2010'
     datafilter['ctrlist'] = ''
 
-    if request.args.get('pid'):
-        pid = request.args.get('pid')
-        handle = pid
+    tmpdir = config['tmpdir']
+    filerandom = randomword(10)
+    #filerandom = '12345'
+    arc = "data" + filerandom + ".zip"
+    filename = filerandom
+    finaldir = config['path'] + '/static/tmp'
+    # ToDO
+    if filename:
+        finaldir = str(finaldir) + '/' + str(filename)
+        tmpdir = str(tmpdir) + '/' + str(filename)
+
+    try:
+        os.mkdir(tmpdir)
+        os.mkdir(finaldir)
+    except:
+        donothing = 'ok'
+
     if request.args.get('handle'):
         handle = request.args.get('handle')
     if request.args.get('type[0]') == 'historical':
-	classification = request.args.get('type[0]')	
+        classification = request.args.get('type[0]')
+	switch = classification
     if request.args.get('y[min]'):
-	datafilter['startyear'] = request.args.get('y[min]')
+        datafilter['startyear'] = request.args.get('y[min]')
     if request.args.get('y[max]'):
-	datafilter['endyear'] = request.args.get('y[max]')
+        datafilter['endyear'] = request.args.get('y[max]')
 
     # Select countries
     customcountrycodes = ''
@@ -613,13 +779,65 @@ def download():
                 customcountrycodes = str(customcountrycodes) + str(value) + ','
     if customcountrycodes:
         customcountrycodes = customcountrycodes[:-1]
-	datafilter['ctrlist'] = customcountrycodes
+        datafilter['ctrlist'] = customcountrycodes
+
+    if request.args.get('ctrlist'):
+	datafilter['ctrlist'] = request.args.get('ctrlist')
+
+    if request.args.get('pid'):
+        pid = request.args.get('pid')
+	ispanel = ''
+	try:
+	    (pids, pidslist) = pidfrompanel(pid)
+	    handles = pids
+	    handle = pids[0]
+   	    match = re.match(r'Panel\[(.+)\]', pid)
+    	    if match:
+	        ispanel = 'yes'
+	except:
+	    handles = pid
+	    handle = pids[0]
+	    
+	if ispanel:
+	    dirforzip = ''
+	    for handle in handles:
+	        dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
+
+            (header, panelcells, metadata, totalpanel) = build_panel(config, switch, handles, datafilter)
+            filename = "paneldata.xlsx"
+            metadata = []
+	    datadir = config['webtest']
+            localoutfile = panel2excel(dirforzip, filename, header, panelcells, metadata)
+	    arc = 'dataarchive.zip'
+	    compile2zip(dirforzip, arc)
+	    root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
+            return redirect(root, code=301)
 
     if classification:
-	outfile = "test1.xlsx"
+	outfile = "clioinfra.xlsx"
+	dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
 	fullpath = config['webtest'] + "/" + str(outfile)
-	(outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
-	root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
+	fullpath = dirforzip + "/" + str(outfile)
+
+	# Check selection
+	isselection = 'yes'
+	if datafilter['startyear'] == '1500':
+	    if datafilter['ctrlist'] == '':
+		isselection = 'yes'
+
+	if isselection:
+	    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	else:
+	    # Copy original dataset
+	    source = os.listdir(tmpdir)
+	    for excelfile in source:
+        	shutil.copy(tmpdir + '/' + excelfile, dirforzip)
+
+	#return outfilefinal
+        arc = 'dataarchive.zip'
+        compile2zip(dirforzip, arc)
+        root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
+	#root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
 	return redirect(root, code=301)
     else:
         zipfile = downloadzip(pid)
@@ -812,7 +1030,9 @@ def dataapi():
     if request.args.get('colormap'):
         colormap = request.args.get('colormap')
     if request.args.get('geocoder'):
-        geocoder = request.args.get('geocoder')
+        switch = request.args.get('geocoder')
+	if switch == 'on':
+	    switch = 'modern'
     if request.args.get('handle'):
         handlestring = request.args.get('handle')
 	ishandle = re.search(r'(hdl:\d+\/\w+)', handlestring)
@@ -831,6 +1051,7 @@ def dataapi():
            if ids:
                customcountrycodes = str(customcountrycodes) + str(ids) + ','
         customcountrycodes = customcountrycodes[:-1]
+	datafilter['ctrlist'] = tmpcustomcountrycodes
 
     hist = {}
     config = configuration()
@@ -861,12 +1082,18 @@ def dataapi():
         (panelcells, originalvalues) = dataset2panel(config, subsets[handles[0]], modern, logscale)
     #(header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
-    modern = moderncodes(config['modernnames'], config['apiroot'])
+    #modern = moderncodes(config['modernnames'], config['apiroot'])
     #jsondata = data2json(modern, codes, panelcells)
     #data = json.dumps(jsondata, ensure_ascii=False, sort_keys=True, indent=4)
     # SCALES
+    if switch:
+        if switch == 'historical':
+            geocoder = historical
+        else:
+            geocoder = modern
+    #geocoder = ''
     (defaultcolor, colors) = getcolors(categoriesMax, pallette, colormap)
-    (catlimit, ranges, dataset) = getscales(panelcells, colors, categoriesMax, geocoder, originalvalues, logscale)
+    (catlimit, ranges, dataset) = getscales(config, panelcells, colors, categoriesMax, geocoder, originalvalues, switch, logscale)
  
     if getrange:
 	(showrange, tmprange) = combinerange(ranges)
