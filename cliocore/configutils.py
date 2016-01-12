@@ -13,14 +13,13 @@ from . import configpath, FORBIDDENURI, FORBIDDENPIPES, ERROR1, ERROR2
 class Configuration:
     def __init__(self):
         self.config = {}
-        self.config['error'] = ''
         cparser = ConfigParser.RawConfigParser()
         cparser.read(configpath)
         path_items = cparser.items( "config" )
         for key, value in path_items:
             self.config[key] = value
 
-        # Find host for Dataverse connection
+        # Extract host for Dataverse connection
         findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', self.config['dataverseroot'])
         if findhost:
             self.config['hostname'] = findhost.group(2)
@@ -28,12 +27,15 @@ class Configuration:
 
     # Validate url to prevent SQL and shell injections
     def not_valid_uri(self, actualurl):
+	self.error = False
+        self.config['message'] = ''
     	# Web params check
         semicolon = re.split(FORBIDDENPIPES, actualurl)
         if len(semicolon) <= 1:
     	    cmd = 'on'
     	else:
-    	    self.config['error'] = ERROR1
+    	    self.error = True
+	    self.config['message'] = ERROR1
    
         # Check for vocabulary words in exploits
         try:
@@ -42,12 +44,13 @@ class Configuration:
             threat = ''
  
         if threat:
-            self.config['error'] = ERROR2
+            self.error = True
+	    self.config['message'] = ERROR2
 
-	return self.config
+	return self.error
 
-class Utils:
-    def loadjson(apiurl):
+class Utils(Configuration):
+    def loadjson(self, apiurl):
         jsondataurl = apiurl
     
         req = urllib2.Request(jsondataurl)
@@ -56,17 +59,18 @@ class Utils:
         dataframe = simplejson.load(f)
         return dataframe
 
-    def webmapper_geocoder():
+    def webmapper_geocoder(self):
         coder = {}
-        config = configuration()
-        apiroot = config['apiroot'] + "/collabs/static/data/" + config['geocoder'] + ".json"
-        geocoder = loadjson(apiroot)
+        #config = configuration()
+        apiroot = self.config['apiroot'] + "/collabs/static/data/" + self.config['geocoder'] + ".json"
+	print apiroot
+        geocoder = self.loadjson(apiroot)
         for item in geocoder:
             if item['ccode']:
                 coder[int(item['ccode'])] = item['Webmapper numeric code']
         return coder
 
-    def findpid(handle):
+    def findpid(self, handle):
         ids = re.search(r'hdl\:\d+\/(\w+)', handle, re.M|re.I)
         (pid, fileid, revid, cliohandle, clearpid) = ('', '', '', '', '')
         if ids:
@@ -79,7 +83,7 @@ class Utils:
                 cliohandle = pid + str(fileid) + '_' + str(revid)
         return (pid, revid, cliohandle, clearpid)
 
-    def pidfrompanel(pid):
+    def pidfrompanel(self, pid):
         # Check Panel
         pids = []
         (thispid, revpid, cliopid, pidslist) = ('', '', '', '')
@@ -100,8 +104,8 @@ class Utils:
         pidslist = pidslist[0:-1]
         return (pids, pidslist)
 
-    def load_dataverse(apiurl):
-        dataframe = loadjson(apiurl)
+    def load_dataverse(self, apiurl):
+        dataframe = self.loadjson(apiurl)
 
         info = []
         # Panel
@@ -124,7 +128,7 @@ class Utils:
     
         return info
 
-    def load_fullmetadata(dataset):
+    def load_fullmetadata(self, dataset):
         data = {}
         config = configuration()
         if dataset:
@@ -137,7 +141,7 @@ class Utils:
 	
         return data
 
-    def load_metadata(dataset):
+    def load_metadata(self, dataset):
         config = configuration()
         (pid, fileid, cliohandle, clearpid) = findpid(dataset)
 
@@ -148,7 +152,7 @@ class Utils:
             data = load_dataverse(apiurl)
         return (data, pid, fileid, cliohandle)
 
-    def get_citation(citejson):    
+    def get_citation(self, citejson):    
         metadata = {}    
         latestversion = ''
         title = ''
@@ -186,7 +190,7 @@ class Utils:
         citation = citation[:-2]
         return (title, citation)
 
-    def dataverse2indicators(branch):
+    def dataverse2indicators(self, branch):
         config = configuration()
         rows = 10
         start = 0
@@ -194,7 +198,7 @@ class Utils:
         condition = True # emulate do-while
         datasets = {}
         while (condition):
-            url = config['dataverseroot'] + '/api/search?q=*' + "&key=" + config['key'] + "&start=" + str(start) 
+            url = self.config['dataverseroot'] + '/api/search?q=*' + "&key=" + config['key'] + "&start=" + str(start) 
     	#+ "&type=dataset"
             if branch:
                 url = url + "&subtree=" + branch
@@ -216,7 +220,7 @@ class Utils:
 
         return datasets
 
-    def graphlinks(handle):
+    def graphlinks(self, handle):
         links = {}
         links['chartlib'] = "/collabs/chartlib?start=on" + handle + "&logscale="
         links['barlib'] = "/collabs/graphlib?start=on&arr=on" + handle
