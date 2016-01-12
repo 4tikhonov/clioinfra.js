@@ -8,44 +8,43 @@ import re
 import ConfigParser
 import sys
 from flask import Flask, request, redirect
-from . import configpath, forbiddenuri, ERROR1, ERROR2
+from . import configpath, FORBIDDENURI, FORBIDDENPIPES, ERROR1, ERROR2
 
 class Configuration:
-    def __init__(self, actualurl):
-       self.config = {}
-       self.config['error'] = ''
-       cparser = ConfigParser.RawConfigParser()
-       cparser.read(configpath)
-       path_items = cparser.items( "config" )
-       for key, value in path_items:
-           self.config[key] = value
+    def __init__(self):
+        self.config = {}
+        self.config['error'] = ''
+        cparser = ConfigParser.RawConfigParser()
+        cparser.read(configpath)
+        path_items = cparser.items( "config" )
+        for key, value in path_items:
+            self.config[key] = value
 
-       # Find host for Dataverse connection
-       findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', self.config['dataverseroot'])
-       if findhost:
-           self.config['hostname'] = findhost.group(2)
-       self.config['remote'] = ''
+        # Find host for Dataverse connection
+        findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', self.config['dataverseroot'])
+        if findhost:
+            self.config['hostname'] = findhost.group(2)
+        self.config['remote'] = ''
 
-       # Prevent SQL and shell injections
-       try:
+    # Validate url to prevent SQL and shell injections
+    def not_valid_uri(self, actualurl):
     	# Web params check
-            pipes = '[\|\;><`()$]'
-            semicolon = re.split(pipes, actualurl)
-            if len(semicolon) <= 1:
-    	        cmd = 'on'
-    	    else:
-    	        self.config['error'] = ERROR1
-       except:
-    	cmd = 'on'
+        semicolon = re.split(FORBIDDENPIPES, actualurl)
+        if len(semicolon) <= 1:
+    	    cmd = 'on'
+    	else:
+    	    self.config['error'] = ERROR1
    
-       # Check for vocabulary words in exploits
-       try:
-           threat = re.search(r'%s' % forbiddenuri, actualurl)
-       except:
-           threat = ''
+        # Check for vocabulary words in exploits
+        try:
+            threat = re.search(r'%s' % FORBIDDENURI, actualurl)
+        except:
+            threat = ''
  
-       if threat:
-           self.config['error'] = ERROR2
+        if threat:
+            self.config['error'] = ERROR2
+
+	return self.config
 
 class Utils:
     def loadjson(apiurl):
