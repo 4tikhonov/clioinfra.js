@@ -1,5 +1,30 @@
 #!/usr/bin/python
-
+# Copyright (C) 2016 International Institute of Social History.
+# @author Vyacheslav Tykhonov <vty@iisg.nl>
+#
+# This program is free software: you can redistribute it and/or  modify
+# it under the terms of the GNU Affero General Public License, version 3,
+# as published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# As a special exception, the copyright holders give permission to link the
+# code of portions of this program with the OpenSSL library under certain
+# conditions as described in each individual source file and distribute
+# linked combinations including the program with the OpenSSL library. You
+# must comply with the GNU Affero General Public License in all respects
+# for all of the code used other than as permitted herein. If you modify
+# file(s) with this exception, you may extend this exception to your
+# version of the file(s), but you are not obligated to do so. If you do not
+# wish to do so, delete this exception statement from your version. If you
+# delete this exception statement from all source files in the program,
+# then also delete it in the license file.
 import urllib2 
 import simplejson
 import json
@@ -25,8 +50,22 @@ class Configuration:
             self.config['hostname'] = findhost.group(2)
         self.config['remote'] = ''
 
-    # Validate url to prevent SQL and shell injections
-    def not_valid_uri(self, actualurl):
+    # Primary URL validation 
+    def is_valid_uri(self, url):
+        regex = re.compile(
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+        return url is not None and regex.search(url)
+
+    # Validate url for some forbidden words to prevent SQL and shell injections
+    def are_parameters_valid(self, actualurl):
+	# primary check
+	if not self.is_valid_uri(actualurl):
+	    return False
+	# complex validation
 	self.error = False
         self.config['message'] = ''
     	# Web params check
@@ -36,18 +75,17 @@ class Configuration:
     	else:
     	    self.error = True
 	    self.config['message'] = ERROR1
+	    return False
    
         # Check for vocabulary words in exploits
-        try:
-            threat = re.search(r'%s' % FORBIDDENURI, actualurl)
-        except:
-            threat = ''
+        threat = re.search(r'%s' % FORBIDDENURI, actualurl)
  
         if threat:
             self.error = True
 	    self.config['message'] = ERROR2
+	    return False
 
-	return self.error
+	return True
 
 class Utils(Configuration):
     def loadjson(self, apiurl):
