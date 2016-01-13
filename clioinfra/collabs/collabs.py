@@ -1091,7 +1091,7 @@ def browse(settings=''):
     resp = make_response(render_template('dataverse.html', active=activepage, pages=pages, dataverse=dataverse))
     return resp
 
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def signup(settings=''):
     config = configuration()
     if config['error']:
@@ -1107,14 +1107,22 @@ def signup(settings=''):
 	    admin = 'user'
 
     for field in fieldslist:
+	fields[field] = ''
 	if request.args.get(field):
 	     fields[field] = request.args.get(field)
-	else:
-	     fields[field] = ''
+	elif request.form.getlist(field):
+	    fields[field] = str(request.form.getlist(field)[0])	
 
-    f = request.args
-    for key in f.keys():
-	value = str(f.getlist(key))
+    uriparams = {}
+    if request.args:
+	for key in request.args.keys():
+	    uriparams[key] = str(request.args.getlist(key))
+    elif request.form:
+	for key in request.form.keys():
+	    uriparams[key] = str(request.form.getlist(key))
+
+    for key in uriparams:
+	value = uriparams[key]
 	#if key == 'datasets':
 	if value == "[u'on']":
 	    value = 'checked'
