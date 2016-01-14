@@ -13,7 +13,7 @@ class ExtrasearchAPI:
     def __init__(self, root, dataversename):
         self.config = {}
 	self.dataverseroot = root
-	self.datasersename = dataversename
+	self.dataversename = dataversename
 	self.query = ''
 
     # read all handles from HTML page
@@ -42,7 +42,7 @@ class ExtrasearchAPI:
         while (condition):
             (query, total) = self.read_dataverse_html_page(page)    
             results = page * per_page    
-            tq+=tq + query
+            tq+= query
             page+=1
             if results > int(total):
                 condition = False
