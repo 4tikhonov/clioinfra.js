@@ -1,4 +1,5 @@
 import os
+import urllib2
 
 try:
     from StringIO import StringIO
@@ -7,6 +8,18 @@ except ImportError:
 
 import requests
 import re
+
+def get_datasets_from_html(root, dataversename):
+    query = ''
+    url = root + "/dataverse/" + dataversename + "?types=datasets"
+    response = urllib2.urlopen(url)
+
+    html = response.read()
+    pattern = re.compile(r'>http\:\/\/hdl.handle.net\/\d+\/(\S+)<', re.IGNORECASE)
+    match = pattern.findall(html)
+    for q in match:
+        query+=q + ' '
+    return query
 
 def search_by_handles(self, searchquery):
     (searchhandles, metadata, pids) = ('', [], [])
@@ -47,11 +60,11 @@ def search_by_keyword(self, searchquery):
 	resp = requests.get(url, params)
 
         if resp.status_code == 404:
-            raise VersionJsonNotFoundError(
+            raise self.VersionJsonNotFoundError(
                 'JSON metadata could not be found for this version.'
             )
         elif resp.status_code != 200:
-            raise ConnectionError('JSON metadata could not be retrieved.')
+            raise self.ConnectionError('JSON metadata could not be retrieved.')
 
         metadata = resp.json()['data']
 
