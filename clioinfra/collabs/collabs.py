@@ -68,7 +68,7 @@ from historical import load_historical
 from tabulardata import loadcodes, moderncodes, load_api_data, countryset, json_dict, createframe, combinedata, data2panel
 from storage import data2store, readdata, removedata, readdatasets, formdatasetquery
 from datasets import *
-from searchapi import search_by_keyword, search_by_handles
+from searchapi import search_by_keyword, search_by_handles, get_datasets_from_html
 from dataverse import Connection
 
 def readglobalvars():
@@ -637,19 +637,28 @@ def datasetspace(settings=''):
     root = config['apiroot']
     dataverse = 'global'
     if request.args.get('dv'):
-	dataverse = request.args.get('dv')
+	dataversename = request.args.get('dv')
     if request.args.get('q'):
         query = request.args.get('q')
 
     connection = Connection(config['hostname'], config['key'])
-    dataverse = connection.get_dataverse(dataverse)
+    dataverse = connection.get_dataverse(dataversename)
     handlestr = ''
     if query:
 	s['q'] = query
 	metadata = search_by_keyword(connection, s)
     else:
-        for item in dataverse.get_contents():
-            handlestr = handlestr + item['identifier'] + ' '
+	active = None
+	if dataverse.get_contents():
+	    try:
+                for item in dataverse.get_contents():
+                    handlestr+= item['identifier'] + ' '
+		    active = 'yes'
+	    except:
+	 	active = None
+
+	if not active:
+	    handlestr = get_datasets_from_html(config['dataverseroot'], dataversename)
         if handlestr:
 	    s['q'] = handlestr	
 	    s['per_page'] = 100
