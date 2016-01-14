@@ -70,6 +70,8 @@ from storage import data2store, readdata, removedata, readdatasets, formdatasetq
 from datasets import *
 from searchapi import search_by_keyword, search_by_handles, get_datasets_from_html
 from dataverse import Connection
+from cliocore.configutils import Configuration, Utils
+from cliocore.searchapi import ExtrasearchAPI
 
 def readglobalvars():
     cparser = ConfigParser.RawConfigParser()
@@ -641,7 +643,10 @@ def datasetspace(settings=''):
     if request.args.get('q'):
         query = request.args.get('q')
 
-    connection = Connection(config['hostname'], config['key'])
+    settings = Configuration()
+    sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dataversename)
+    connection = Connection(config['hostname'], settings.config['key'])
+
     dataverse = connection.get_dataverse(dataversename)
     handlestr = ''
     if query:
@@ -658,7 +663,8 @@ def datasetspace(settings=''):
 	 	active = None
 
 	if not active:
-	    handlestr = get_datasets_from_html(config['dataverseroot'], dataversename)
+	    handlestr = sconnection.read_all_datasets()
+
         if handlestr:
 	    s['q'] = handlestr	
 	    s['per_page'] = 100
