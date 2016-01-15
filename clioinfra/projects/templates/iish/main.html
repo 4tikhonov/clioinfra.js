@@ -62,6 +62,14 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                                 <h6 class="site-slogan">Conducts research and collects data on the global history of labour, workers, and labour relations</h6>
               </hgroup>
           </div>
+	  <div align="right">
+                <p>
+                        <a href=/collabs/datasetspace?dv={{ projectname }}&action=indicators>Public Datasets</a> / 
+                        <a href=/{{ projectname }}&action=closed>Closed Data</a> / 
+                        <a href=/collabs/signup?project={{ projectname }}>Settings</a> / 
+			<a href=/collabs/signup>Create new project</a>
+                </p>
+	  </div>
           </div>
 </div>
   </div>
@@ -85,22 +93,22 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
   <div class="block-inner clearfix">
                 
     <div class="content clearfix">
-      <span class="print_html"><a href="https://socialhistory.org/en/print/5288" title="Display a printer-friendly version of this page." class="print-page" rel="nofollow">print</a></span>    </div>
+</div>
   </div>
 </div><div class="block block-nice-menus block-2 block-nice-menus-2 even block-without-title" id="block-nice-menus-2">
   <div class="block-inner clearfix">
                 
-    <div class="content clearfix">
-      <ul class="nice-menu nice-menu-down nice-menu-user-menu" id="nice-menu-2"><li class="menu-2627 menu-path-node-920 first odd last"><a href="/en/services/faq" title="Help and FAQ">Help</a></li>
+    <div "content clearfix">
+      <ul class="nice-menu nice-menu-down nice-menu-user-menu" id="nice-menu-2">
+<li><a href="/{{ projectname }}">Home</a>
+<li><a href="https://datasets.socialhistory.org/dataverse/{{ projectname }}">Datasets</a></li>
+<li><a href="/{{ projectname }}/maps">Visualize</a></li>
+<li><a href="/{{ projectname }}/news">News</a></li>
+<li><a href="http://www.clio-infra.eu/about-clio-infra">About</a></li>
 </ul>
     </div>
   </div>
 </div><div class="block block-iish-language block-language block-iish-language-language odd block-without-title" id="block-iish-language-language">
-  <div class="block-inner clearfix">
-                
-    <div class="content clearfix">
-      <ul class="language-switcher-iish"><li class="translation_nl first last"><a href="/nl/nieuws/tussen-droom-en-daad" title="&#039;Tussen Droom en Daad&#039;" class="translation-link" xml:lang="nl">Nederlands</a></li></ul>    </div>
-  </div>
 </div>  </div>
 </div>
   </div>
@@ -112,6 +120,14 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
           </div>
 </div><div id="zone-content-wrapper" class="zone-wrapper zone-content-wrapper clearfix">  
   <div id="zone-content" class="zone zone-content clearfix container-12">    
+
+    <div style="width:100%;">
+    <form action="/collabs/datasetspace">
+    <center>
+    <input type="text" style="width:90%;" name="q" value={{ searchq }}>
+    <input type="Submit" value="Search">
+    </center>
+    </form>
 
 	<div id="main-wrap">
                 <div id="abouttab">
