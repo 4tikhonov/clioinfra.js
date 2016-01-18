@@ -645,7 +645,10 @@ def datasetspace(settings=''):
 
     settings = Configuration()
     sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dataversename)
-    connection = Connection(config['hostname'], settings.config['key'])
+    try:
+        connection = Connection(config['hostname'], settings.config['key'])
+    except:
+	return 'Error: no connection to Dataverse. Please try later...'
 
     handlestr = ''
     if query:
