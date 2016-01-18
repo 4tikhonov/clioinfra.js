@@ -637,7 +637,7 @@ def datasetspace(settings=''):
         return config['error']
 
     root = config['apiroot']
-    dataverse = 'global'
+    dataversename = 'global'
     if request.args.get('dv'):
 	dataversename = request.args.get('dv')
     if request.args.get('q'):
@@ -647,14 +647,18 @@ def datasetspace(settings=''):
     sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dataversename)
     connection = Connection(config['hostname'], settings.config['key'])
 
-    dataverse = connection.get_dataverse(dataversename)
     handlestr = ''
     if query:
 	s['q'] = query
 	metadata = search_by_keyword(connection, s)
     else:
-	active = None
-	if dataverse.get_contents():
+	try:
+	    dataverse = connection.get_dataverse(dataversename)
+	    item = dataverse.get_contents()
+	    active = 'yes'	
+	except:
+	    active = None
+	if active:
 	    try:
                 for item in dataverse.get_contents():
                     handlestr+= item['identifier'] + ' '
@@ -671,6 +675,13 @@ def datasetspace(settings=''):
 	    metadata = search_by_keyword(connection, s)
 
     for dataset in metadata['items']:
+	try:
+	    for author in dataset['authors']:
+	        dataset['author'] = str(author) + ', '
+	    dataset['author'] = dataset['author'][:-2]
+	except:
+	    dataset['author'] = str(dataset['description'])
+	
         datasets.append(dataset)
 
     template = 'citations.html'
