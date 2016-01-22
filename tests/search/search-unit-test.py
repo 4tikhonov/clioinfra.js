@@ -38,8 +38,15 @@ from cliocore.searchapi import ExtrasearchAPI
 class SearchAPITestClass(unittest.TestCase):
    def testsearch(self):
 	settings = Configuration()
-	sconnection = ExtrasearchAPI(settings.config['dataverseroot'], "labourconflicts")
+	dv = "National"
+	dv = "Micro"
+	sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dv)
+	p = sconnection.read_all_datasets()
 	self.assertTrue(bool(sconnection.read_all_datasets()))
+	# test if dataset is private
+	self.assertTrue(bool(sconnection.has_restricted_data("V4Q8XE")))	
+	# test if dataset is public
+	self.assertFalse(bool(sconnection.has_restricted_data("8FCYOX")))
 
 if __name__ == '__main__':
     unittest.main()
