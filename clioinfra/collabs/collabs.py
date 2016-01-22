@@ -631,7 +631,7 @@ def graphlib(settings=''):
 
 @app.route('/datasetspace')
 def datasetspace(settings=''):
-    (query, datasets, metadata, s) = ('', [], [], {})
+    (query, datasets, metadata, s, permissions) = ('', [], [], {}, 'yes')
     config = configuration()
     if config['error']:
         return config['error']
@@ -642,6 +642,8 @@ def datasetspace(settings=''):
 	dataversename = request.args.get('dv')
     if request.args.get('q'):
         query = request.args.get('q')
+    if request.args.get('permissions'):
+        permissions = request.args.get('permissions')
 
     settings = Configuration()
     sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dataversename)
@@ -678,14 +680,25 @@ def datasetspace(settings=''):
 	    metadata = search_by_keyword(connection, s)
 
     for dataset in metadata['items']:
-	try:
-	    for author in dataset['authors']:
-	        dataset['author'] = str(author) + ', '
-	    dataset['author'] = dataset['author'][:-2]
-	except:
-	    dataset['author'] = str(dataset['description'])
+	active = ''
+	# Private datasets
+	if permissions == 'closed':
+	    if (sconnection.has_restricted_data(dataset['global_id'])):
+		active = 'yes'
+	# Public data
+	else:
+            if not (sconnection.has_restricted_data(dataset['global_id'])):
+                active = 'yes'
 	
-        datasets.append(dataset)
+	if active:
+	    try:
+	        for author in dataset['authors']:
+	            dataset['author'] = str(author) + ', '
+	            dataset['author'] = dataset['author'][:-2]
+	    except:
+	        dataset['author'] = str(dataset['description'])
+	
+            datasets.append(dataset)
 
     template = 'citations.html'
     resp = make_response(render_template(template, datasets=datasets, searchq=query))
