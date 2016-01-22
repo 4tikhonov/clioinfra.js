@@ -14,6 +14,8 @@ class ExtrasearchAPI:
         self.config = {}
 	self.dataverseroot = root
 	self.dataversename = dataversename
+	self.handle = 'hdl'
+	self.org = '10622'
 	self.query = ''
 
     # read all handles from HTML page
@@ -33,6 +35,13 @@ class ExtrasearchAPI:
         total = re.search(r'of\s+(\d+)\s+Results', html)            
         return (query, total.group(1))
 
+    def load_dataset_page(self, page, pID):
+        query = ''
+        url = "%s/%s=%s:%s/%s" % (self.dataverseroot, page, self.handle, self.org, pID)    
+        response = urllib2.urlopen(url)
+        html = response.read()
+        return html
+
     def read_all_datasets(self):
         condition = True
         start = 0
@@ -48,6 +57,17 @@ class ExtrasearchAPI:
                 condition = False
 	self.query = tq
         return tq
+
+    # Check if there is restricted dataset
+    def has_restricted_data(self, pID):
+	html = self.load_dataset_page("dataset.xhtml?persistentId", pID)
+        restricted = ''
+        pattern = re.compile(r'\/primepush\/ingest(\d+).*class\=\"file\-icon\-restricted\-block\"', re.DOTALL)
+        match = pattern.findall(html)
+        if match:
+            restricted = match[0]
+        
+        return restricted
 
     def get_datasets_from_html(root, dataversename):
         query = ''
