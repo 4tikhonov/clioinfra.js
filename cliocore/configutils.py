@@ -97,13 +97,13 @@ class OpenLDAP(Configuration):
 	self.ldapconn.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
 
     def authentificate(self, username, password):
-	Base = "cn=%s,%s" % (username, self.config['ldapbase'])
-	self.ldapconn.simple_bind_s(Base, self.config['ldapsecret'])
+	Base = "cn=%s,ou=users,%s" % (username, self.config['ldapbase'])
+	self.ldapconn.simple_bind_s(Base, password)
 	user_ids = self.ldapconn.search(Base, ldap.SCOPE_SUBTREE, "cn="+username, None)
 	result_type, user_data = self.ldapconn.result(user_ids, 0)
 	return user_data
 
-    def search(self, username):
+    def searchuser(self, username):
 	Base = "cn=admin,%s" % self.config['ldapbase']
 	Baseusers = "ou=users,%s" % self.config['ldapbase']
 	self.ldapconn.simple_bind_s(Base, self.config['ldapsecret'])	
