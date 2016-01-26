@@ -45,7 +45,8 @@ class URITestClass(ConfigTestClass):
     def test_ldap(self):
 	self.clioinfra = Configuration()
 	self.openldap = OpenLDAP()
-	thisuser = self.openldap.search("vty")
+	thisuser = self.openldap.searchuser("testusername")
+	thisuser = self.openldap.authentificate("testusername", "passwd")
 	print thisuser
 
 if __name__ == '__main__':
