@@ -32,6 +32,7 @@ import pandas as pd
 import re
 import ConfigParser
 import sys
+import ldap
 from flask import Flask, request, redirect
 from . import configpath, FORBIDDENURI, FORBIDDENPIPES, ERROR1, ERROR2
 
@@ -86,6 +87,29 @@ class Configuration:
 	    return False
 
 	return True
+
+# OpenLDAP class to implement authentification services
+class OpenLDAP(Configuration):
+    def __init__(self):
+	Configuration.__init__(self) 
+	self.ldapconn = ldap.open(host=self.config['ldapserver'], port=int(self.config['ldapport']))
+	self.ldapconn.set_option(ldap.OPT_REFERRALS, 0)
+	self.ldapconn.set_option(ldap.OPT_PROTOCOL_VERSION, 3)
+
+    def authentificate(self, username, password):
+	Base = "cn=%s,%s" % (username, self.config['ldapbase'])
+	self.ldapconn.simple_bind_s(Base, self.config['ldapsecret'])
+	user_ids = self.ldapconn.search(Base, ldap.SCOPE_SUBTREE, "cn="+username, None)
+	result_type, user_data = self.ldapconn.result(user_ids, 0)
+	return user_data
+
+    def search(self, username):
+	Base = "cn=admin,%s" % self.config['ldapbase']
+	Baseusers = "ou=users,%s" % self.config['ldapbase']
+	self.ldapconn.simple_bind_s(Base, self.config['ldapsecret'])	
+        user_ids = self.ldapconn.search(Baseusers, ldap.SCOPE_SUBTREE, "cn="+username, None)
+        result_type, user_data = self.ldapconn.result(user_ids, 0)
+        return user_data
 
 class Utils(Configuration):
     def loadjson(self, apiurl):
