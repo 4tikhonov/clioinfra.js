@@ -25,9 +25,9 @@
 # delete this exception statement from all source files in the program,
 # then also delete it in the license file.
 
-from flask import Flask, render_template
+from flask import Flask, render_template, session
 from flask import g
-from flask import Response, make_response, request, send_from_directory
+from flask import Response, request, make_response, request, send_from_directory
 from twisted.web import http
 from flask_bootstrap import Bootstrap
 from flask_appconfig import AppConfig
@@ -44,15 +44,38 @@ import sys
 import re
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
 from storage import data2store, readdata
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+from cliocore.projects import Project
+from cliocore.configutils import Configuration, OpenLDAP, Utils
 
 app = Flask(__name__)
+app.secret_key = 'flask-session-insecure-secret-key'
 
 @app.route('/')
 def browse(settings=''):
     return 'test'
 
+@app.route('/logout', methods=['GET'])
+def logout(settings=''):
+    session['name'] = ''
+    return make_response(render_template('iish/login.html'))
+
+@app.route('/login', methods=['POST', 'GET'])
+def login(settings=''):
+    clioinfra = Configuration()
+    openldap = OpenLDAP()
+    try:
+        thisuser = openldap.authentificate(request.form.get('login'), request.form.get('password'))
+	if thisuser[0][1]['uid'][0]:
+	    session['name'] = thisuser[0][1]['displayName'][0]
+	    session['uid'] = thisuser[0][1]['uid'][0]
+	name = str(thisuser[0][1]['displayName'][0])
+	return make_response(render_template('iish/login.html', username=name))
+    except:
+        return make_response(render_template('iish/login.html'))
+
 @app.errorhandler(404)
-def page_not_found(e):
+def projectpage(e):
     uri = str(request.path)
     branch = ''
     dataverse = 'global'
@@ -63,6 +86,9 @@ def page_not_found(e):
     projectinfo = {}  
     data = {}
     try:
+	#projecthandle = Project('database', project)
+	#return 'x'
+	#return str(projecthandle.project)
         data = readdata('projects', 'uri', project)
 	# Remove data
         for item in data:
@@ -76,7 +102,7 @@ def page_not_found(e):
 		    if len(value) > 0:
 		        projectinfo[var] = value
 		except:
-		    error = 'no settins'
+		    error = 'no settings'
             projectdata = json.dumps(item, encoding="utf-8", sort_keys=True, indent=4)
     except:
 	data = readdata('projects', 'uri', project)
@@ -102,9 +128,10 @@ def page_not_found(e):
 	    except:
 	        branch = dataverse
 
-	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, projectname=project)) 
+	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, projectname=project, username=session['name'])) 
 	#return 'ok'
         #return Response(projectdata,  mimetype='application/json')
 
 if __name__ == '__main__':
+    app.secret_key = str(os.random(32))
     app.run()
