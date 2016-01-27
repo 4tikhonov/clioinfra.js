@@ -65,11 +65,10 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
 	  <div align="right">
                 <p>
 {% if username %}
-			{{ username }} / <a href=/logout>Log out</a><br />
                         <a href=/collabs/signup?project={{ projectname }}>Settings</a> / 
 			<a href=/collabs/signup>Create new project</a>
 {% else %}
-			<a href=login>Log In</a>
+			<a href=/collabs/login>Log In</a>
 {% endif %}
                 </p>
 	  </div>
@@ -126,67 +125,7 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
 
     <div style="width:100%;">
 	<div id="main-wrap">
-                <div id="abouttab">
-		<h2 class="block-title">About the project</h2>
-                {{ projectdata.about | safe }}
-                </div>
-
-		<div id="exploretab">
-		<h2>Explore our datasets</h2>
-<ul class="menu">
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ projectname }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
-{% endif %}
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ projectname }}&action=indicators&permissions=closed" title="" class="menu__link">Closed datasets</a></li>
-{% endif %}
-{% if projectdata.ind %}
-  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Indicators</a></li>
-{% endif %}
-{% if projectdata.countries %}
-<li class="menu__item is-leaf leaf"><a href="http://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Datasets by Countries</a></li>
-{% endif %}
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">
-Metadata Search
-</a></li>
-{% endif %}
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">
-Full-text Search
-</a></li>
-{% endif %}
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">
-Search in all IISH Dataverses
-</a></li>
-{% endif %}
-<br>
-</ul>
-		</div>
-	</div>
-	<div id="main-wrap">
-                <div id="summarytab">
-                <br>
-		<h2 class="block-title">Brief description</h2> 
-                {{ projectdata.description | safe }}
-                </div>
-
-                <div id="viztab">
-                <br>
-                <h2>Visualize our datasets</h2>
-  			<a href="/collabs/dashboard?action=visualize&pid=hdl:10622/4X6NCK"><img width="500" src="/collabs/static/1981_4X6NCK_map.png"></a>
-                </div>
-        </div>
-        <div id="main-wrap">
-                <div id="fulltab">
-                <br>
-                <h2>News</h2>
-                {{ projectdata.about | safe }}
-                </div>
-
-
-
+	{% block content %}{% endblock %}
 	</div>
 
   
