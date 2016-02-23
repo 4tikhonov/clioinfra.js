@@ -122,27 +122,37 @@ h2.block-title { /* Block title */
   margin: 15px 10px 15px 15px;
 }
 
+#bodycontent {
+  width: 940px;
+  border: 0px solid #000;
+  margin-left: 10px;
+  margin-right: 20px;
+}
+
 #content .block {
   width: 460px;
   float: left;
 }
 #block-menu-menu-explore-discover {
-  margin-left: 20px;
+  width: 450px;
+  background-color: #96BD0D;
+  height: 230px;
+  float: right;
 }
+ 
 #block-menu-menu-explore-discover h2.block-title {
   color: #fff;
+  padding-top: 10px;
   background-color: #96BD0D;
   padding-left: 10px;
 }
 #block-menu-menu-explore-discover ul.menu {
   list-style: none;
-  margin: 0;
-  padding: 0;
 }
 #block-menu-menu-explore-discover ul.menu li {
   list-style: none;
   font-size: 2.3em;
-  line-height: 1.5em;
+  line-height: 1.4em;
   padding-left: 10px;
   background-color: #cade85;
   margin-top: 5px;
@@ -192,6 +202,7 @@ a.views-more-link,
 #block-intro-introduction-block {
   background-color: #A0522D;
   padding-bottom: 10px;
+  padding-top: 10px;
   height: 230px;
 }
 #block-intro-introduction-block h2.block-title {
@@ -209,15 +220,36 @@ a.views-more-link,
   padding-left: 10px;
 }
 #block-intro-introduction-block .view {
-  padding: 0 10px;
 }
 
 
 #block-views-introduction-block {
   background-color: #D9B500;
+  padding-left: 10px;
   padding-bottom: 10px;
   height: 235px;
+  width: 450px;
+  float: left;
 }
+
+#block-views-visualization-block {
+  background-color: #fff;
+  padding-bottom: 10px;
+  height: 235px;
+  width: 450px;
+  float: right;
+}
+
+#block-views-desc-block {
+  background-color: #efefef;
+  clear: both;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  height: 235px;
+  width: 450px;
+  float: left;
+}
+
 #block-views-introduction-block h2.block-title {
   color: #fff;
   padding-left: 10px;
