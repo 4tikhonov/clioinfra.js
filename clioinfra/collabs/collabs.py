@@ -632,6 +632,7 @@ def graphlib(settings=''):
 @app.route('/datasetspace')
 def datasetspace(settings=''):
     (query, datasets, metadata, s, permissions) = ('', [], [], {}, 'yes')
+    pagetitle = "Public datasets"
     config = configuration()
     if config['error']:
         return config['error']
@@ -679,16 +680,24 @@ def datasetspace(settings=''):
 	    s['per_page'] = 100
 	    metadata = search_by_keyword(connection, s)
 
+    #return str(metadata['items'])
     for dataset in metadata['items']:
 	active = ''
 	# Private datasets
 	if permissions == 'closed':
-	    if (sconnection.has_restricted_data(dataset['global_id'])):
-		active = 'yes'
+	    pagetitle = "Restricted datasets"
+	    try:
+	        if (sconnection.has_restricted_data(dataset['global_id'])):
+		    active = 'yes'
+	    except:
+		active = ''
 	# Public data
 	else:
-            if not (sconnection.has_restricted_data(dataset['global_id'])):
-                active = 'yes'
+	    try:
+                if not (sconnection.has_restricted_data(dataset['global_id'])):
+                    active = 'yes'
+	    except:
+		active = ''
 	
 	if active:
 	    try:
@@ -700,8 +709,7 @@ def datasetspace(settings=''):
 	
             datasets.append(dataset)
 
-    template = 'citations.html'
-    resp = make_response(render_template(template, datasets=datasets, searchq=query))
+    resp = make_response(render_template('search.html', datasets=datasets, searchq=query, pagetitle=pagetitle))
     return resp
 
 @app.route('/')
@@ -1133,7 +1141,7 @@ def browse(settings=''):
     resp = make_response(render_template('dataverse.html', active=activepage, pages=pages, dataverse=dataverse))
     return resp
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route('/settings', methods=['GET', 'POST'])
 def signup(settings=''):
     config = configuration()
     if config['error']:
@@ -1175,7 +1183,7 @@ def signup(settings=''):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
 	    fields = f
-	return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
+	return make_response(render_template('settings.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
     else:
 	# Clean settings first
 	if len(fields['uri']):
@@ -1183,7 +1191,7 @@ def signup(settings=''):
             result = data2store('projects', fields)
 	    return redirect(config['apiroot'] + '/' + fields['uri'], code=301)
 	else:
-	    return make_response(render_template('signup.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
+	    return make_response(render_template('settings.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
 
 @app.route('/boundaries')
 def boundaries(settings=''):
