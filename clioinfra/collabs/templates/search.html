@@ -1,0 +1,34 @@
+{% extends "iish/iishbase.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/blocks.css" media="screen" type="text/css" />
+<div id="bodycontent">
+        <div id="main-wrap">
+        <form>
+        <input type="text" size="60" name="q" value="{{ searchq }}">
+	<input type="Submit" value="Search">
+	<br />
+	<div style="clear:both;width:100%;float:center;">
+	<input type="radio" name="where" value="collab">&nbsp;Labour Conflicts data
+	<input type="radio" name="where" value="iish">&nbsp;IISH datasets
+	<input type="radio" name="where" value="harvard">&nbsp;Harvard datasets network
+	</div>
+	
+        </form>
+        </div>
+        <div id="main-wrap">
+	<br />
+        <h2>{{ pagetitle }}</h2>
+
+        {% for dataset in datasets %}
+                <h3>
+                <a href="{{ dataset.url }}">{{ dataset.name }}</a>
+                </h3>
+                <p>Author(s): {{ dataset.author }}</p>
+                <p>{{ dataset.description }}</p>
+        {% endfor %}
+        {% if not datasets %}
+        <p>No datasets found. Please try different keywords.</p>
+        {% endif %}
+        </div>
+</div>
+{% endblock %}
