@@ -631,7 +631,8 @@ def graphlib(settings=''):
 
 @app.route('/datasetspace')
 def datasetspace(settings=''):
-    (query, datasets, metadata, s, permissions) = ('', [], [], {}, 'yes')
+    (where, query, datasets, metadata, s, permissions) = ({}, '', [], [], {}, 'yes')
+    where = {'collab': '', 'iish': '', 'harvard': ''}
     pagetitle = "Public datasets"
     config = configuration()
     if config['error']:
@@ -645,13 +646,22 @@ def datasetspace(settings=''):
         query = request.args.get('q')
     if request.args.get('permissions'):
         permissions = request.args.get('permissions')
+    if request.args.get('where'):
+	where[request.args.get('where')] = 'checked="checked"' 
 
     settings = Configuration()
     sconnection = ExtrasearchAPI(settings.config['dataverseroot'], dataversename)
-    try:
-        connection = Connection(config['hostname'], settings.config['key'])
-    except:
-	return 'Error: no connection to Dataverse. Please try later...'
+    if where['harvard']:
+        # Extract host for Dataverse connection
+        findhost = re.search('(http\:\/\/|https\:\/\/)(.+)', settings.config['harvarddataverse'])
+        if findhost:
+            settings.config['dataversehostname'] = findhost.group(2)
+        connection = Connection(settings.config['dataversehostname'], settings.config['harvardkey'])
+    else:
+       try:
+           connection = Connection(config['hostname'], settings.config['key'])
+       except:
+           return 'Error: no connection to Dataverse. Please try later...'
 
     handlestr = ''
     if query:
@@ -708,8 +718,10 @@ def datasetspace(settings=''):
 	        dataset['author'] = str(dataset['description'])
 	
             datasets.append(dataset)
+	if where['harvard']:
+	    datasets.append(dataset)
 
-    resp = make_response(render_template('search.html', datasets=datasets, searchq=query, pagetitle=pagetitle))
+    resp = make_response(render_template('search.html', datasets=datasets, searchq=query, pagetitle=pagetitle, where=where))
     return resp
 
 @app.route('/')
