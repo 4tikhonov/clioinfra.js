@@ -316,7 +316,7 @@ def mapslider():
 	    handledict[thishandle] = x['title']
 
     #validyears.reverse()
-    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=geocoder, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear, indicators=pids, thismapurl=thismapurl, handledict=handledict))
+    return make_response(render_template('mapslider.html', handle=handle, years=validyears, warning=warning, steps=steps, title=title, geocoder=histo, dataset=dataset, customcountrycodes=customcountrycodes, catmax=catmax, lastyear=lastyear, indicators=pids, thismapurl=thismapurl, handledict=handledict))
 
 ALLOWED_EXTENSIONS = set(['xls', 'xlsx', 'csv'])
 
@@ -558,6 +558,8 @@ def chartlib():
 
     if request.args.get('ctrlist'):
         ctrlist = request.args.get('ctrlist')
+    if request.args.get('hist'):
+	switch = 'historical'
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         try:
@@ -570,6 +572,8 @@ def chartlib():
 	    apilink = "/api/tabledata?handle=" + str(pids[0])
 	    if ctrlist:
 	        apilink = apilink + '&ctrlist=' + ctrlist
+	    if request.args.get('hist'):
+		apilink = apilink + '&hist=' + request.args.get('hist')
 
     if request.args.get('face'):
         handles = []
@@ -579,13 +583,17 @@ def chartlib():
 	    apilink = "/api/tabledata?handle=" + str(handleface)
             if ctrlist:
                 apilink = apilink + '&ctrlist=' + ctrlist
+            if request.args.get('hist'):
+                apilink = apilink + '&hist=' + request.args.get('hist')
+	    
         try:
             pids.remove(handleface)
         except:
             nothing = 1
 
-    links = graphlinks('&face=' + str(handles[0]))
+    links = graphlinks('&face=' + str(handles[0]) + '&hist=' + request.args.get('hist'))
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
+    # vty hist
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
     try:
 	title = metadata[handles[0]]['title']
