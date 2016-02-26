@@ -25,7 +25,7 @@
 # delete this exception statement from all source files in the program,
 # then also delete it in the license file.
 
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, url_for, redirect
 from flask import g
 from flask import Response, request, make_response, request, send_from_directory
 from twisted.web import http
@@ -35,13 +35,17 @@ from flask_wtf import Form, RecaptchaField
 from wtforms import TextField, HiddenField, ValidationError, RadioField,\
     BooleanField, SubmitField, IntegerField, FormField, validators
 from wtforms.validators import Required
+from werkzeug import secure_filename
 import json
 import os
 import urllib2
 import glob
 import csv
 import sys
+import uuid
 import re
+import string
+import random
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../modules')))
 from storage import data2store, readdata
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
@@ -49,7 +53,39 @@ from cliocore.projects import Project
 from cliocore.configutils import Configuration, OpenLDAP, Utils
 
 app = Flask(__name__)
+UPLOAD_FOLDER = '/home/dpe/tmp/'
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif', 'lnk'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+   return '.' in filename and \
+       filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+@app.route('/upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        file = request.files['files']
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+	    return redirect("%spics/%s" % (request.url_root, filename))
+    return 'Upload form'
+
+@app.route('/pics/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+def get_random_key(string_length=10):
+    """Returns a random string of length string_length."""
+    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
+    random = random.upper() # Make all characters uppercase.
+    random = random.replace("-","") # Remove the UUID '-'.
+    return random[0:string_length] # Return the random string.
+
 app.secret_key = 'flask-session-insecure-secret-key'
+#app.secret_key = os.urandom(24)
+#app.secret_key = string.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(17))
+#app.secret_key = string.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(17))
 
 @app.route('/')
 def browse(settings=''):
@@ -128,10 +164,13 @@ def projectpage(e):
 	    except:
 	        branch = dataverse
 
-	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, projectname=project, username=session['name'])) 
+	if session['name']:
+	    username = session['name']
+	else:
+	    username = ''
+	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, projectname=project, username=username)) 
 	#return 'ok'
         #return Response(projectdata,  mimetype='application/json')
 
 if __name__ == '__main__':
-    app.secret_key = str(os.random(32))
     app.run()
