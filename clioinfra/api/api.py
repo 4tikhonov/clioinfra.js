@@ -252,6 +252,8 @@ def tableapi():
             nopanel = 'yes'
     if request.args.get('dataset'):
         dataset = request.args.get('dataset')
+    if request.args.get('hist'):
+	switch = 'historical'
     if request.args.get('ctrlist'):
 	customcountrycodes = ''
         tmpcustomcountrycodes = request.args.get('ctrlist')
@@ -300,7 +302,10 @@ def tableapi():
                 datasubset = datasubset.dropna(how='all')
                 panel.append(datasubset)
                 subsets[handle] = datasubset
-        (csvdata, aggrdata) = dataset_to_csv(config, subsets[handles[0]], modern)
+	classification = modern
+	if switch == 'historical':
+	    classification = historical
+        (csvdata, aggrdata) = dataset_to_csv(config, subsets[handles[0]], classification)
 
     if aggr:
         csvdata = aggrdata
@@ -1001,6 +1006,33 @@ def load_province_data(apiurl, province):
     dataframe = simplejson.load(f)
     return dataframe
 
+def loadjson(url):
+    req = urllib2.Request(url)
+    opener = urllib2.build_opener()
+    f = opener.open(req)
+    dataframe = simplejson.load(f, "utf-8")
+    return dataframe
+
+def get_iishvisitors_frame(thisyear):
+    if thisyear:
+        years = [thisyear]
+    else:
+        years = [2015, 2016]
+    finaldata = pd.DataFrame()
+    for year in years:    
+        url = "http://visitors.collections.iisg.org/api/statistics/maps.php?year=" + str(year)
+        data = loadjson(url)
+        clioframe = pd.DataFrame(data['data'])
+	clioframe = clioframe.convert_objects(convert_numeric=True)
+	clioframe.columns = [u'coordinates', u'country', u'Webmapper numeric code', u'iso_code', u'total']        
+	clioframe.index = clioframe['Webmapper numeric code']
+        if 'coordinates' in clioframe.columns:
+            clioframe = clioframe.drop('coordinates', axis=1)
+        xdata = pd.DataFrame(clioframe['total'])
+        xdata.columns = [year]    
+        finaldata = pd.concat([finaldata, xdata], axis=1)
+    return finaldata
+
 @app.route('/dataapi')
 def dataapi():
     (datafilter, handles) = ({}, [])
@@ -1013,8 +1045,10 @@ def dataapi():
     categoriesMax = 6
     countriesNum = 200
     geocoder = ''
-    (getrange, colormap, pallette, customcountrycodes, switch) = ('', '', '', '', 'modern')
+    (special, getrange, colormap, pallette, customcountrycodes, switch) = ('', '', '', '', '', 'modern')
 
+    if request.args.get('special'):
+        special = request.args.get('special')
     if request.args.get('logscale'):
         logscale = request.args.get('logscale')
     if request.args.get('year'):
@@ -1070,15 +1104,19 @@ def dataapi():
     # New version is fast
     if config:
         (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
-        (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
-        (subsets, panel) = ({}, [])
+	(subsets, panel) = ({}, [])
+	try:
+            (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
     
-        for handle in handles:
-            (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
-            if not datasubset.empty:
-	        datasubset = datasubset.dropna(how='all')
-                panel.append(datasubset)
-                subsets[handle] = datasubset
+            for handle in handles:
+                (datasubset, ctrlist) = datasetfilter(maindata[handle], datafilter)
+                if not datasubset.empty:
+	            datasubset = datasubset.dropna(how='all')
+                    panel.append(datasubset)
+                    subsets[handle] = datasubset
+	except:
+	    subsets[handles[0]] = get_iishvisitors_frame(int(customyear))
+
         (panelcells, originalvalues) = dataset2panel(config, subsets[handles[0]], modern, logscale)
     #(header, panelcells, codes, x1, x2, x3, x4, originalvalues) = data2panel(handles, customcountrycodes, fromyear, toyear, customyear, hist, logscale)
 
