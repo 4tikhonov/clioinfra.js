@@ -83,6 +83,7 @@ def get_random_key(string_length=10):
     return random[0:string_length] # Return the random string.
 
 app.secret_key = 'flask-session-insecure-secret-key'
+# To do: something is wrong here with secret keys, should find solution
 #app.secret_key = os.urandom(24)
 #app.secret_key = string.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(17))
 #app.secret_key = string.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(17))
