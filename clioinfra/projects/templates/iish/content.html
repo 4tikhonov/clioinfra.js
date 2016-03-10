@@ -28,15 +28,17 @@
         <h2 class="block__title block-title">Explore &amp; datasets</h2>
     
 <ul class="menu">
-{% if projectdata.ind %}
-  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Indicators</a></li>
+{% if projectdata.browsedata %}
+  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
 {% endif %}
-<li class="menu__item is-leaf leaf"><a href="http://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Topics</a></li>
-{% if projectdata.countries %}
-<li class="menu__item is-leaf leaf"><a href="http://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Countries</a></li>
+{% if projectdata.harvarddataverse %}
+<li class="menu__item is-leaf leaf"><a href="http://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Harvard network datasets</a></li>
 {% endif %}
-{% if projectdata.searchdata %}
-<li class="menu__item is-leaf last leaf"><a href="http://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Combined search</a></li>
+{% if projectdata.iishdataverses %}
+<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">IISH datasets</a></li>
+{% endif %}
+{% if projectdata.workingpapers %}
+<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Working papers</a></li>
 {% endif %}
 </ul>
 </div>
@@ -44,6 +46,7 @@
 </div>
 </div></div>
 
+{% if projectdata.description %}
 <div id="block-views-desc-block" class="block block-views last even">
 
   <h2 class="block__title block-title">Brief description of the project</h2>
@@ -58,10 +61,11 @@
     </div>
 </div>
 </div>
+{% endif %}
 
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize our datasets</h2>
-  <a href="/collabs/dashboard?action=visualize&pid=hdl:10622/4X6NCK"><img width="450" src="/collabs/static/1981_4X6NCK_map.png"></a>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" src="/collabs/static/1981_4X6NCK_map.png"></a>
 
 </div>
 

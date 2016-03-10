@@ -62,12 +62,12 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                                 <h6 class="site-slogan">Conducts research and collects data on the global history of labour, workers, and labour relations</h6>
               </hgroup>
           </div>
-	  <div align="right">
+	  <div align="right" style="width:250px">
                 <p>
 {% if username %}
 			{{ username }} / <a href=/logout>Log out</a><br />
-                        <a href=/collabs/signup?project={{ projectname }}>Settings</a> / 
-			<a href=/collabs/signup>Create new project</a>
+                        <a href=/collabs/settings?project={{ projectname }}>Settings</a> / 
+			<a href=/collabs/settings>Create new project</a>
 {% else %}
 			<a href=login>Log In</a>
 {% endif %}

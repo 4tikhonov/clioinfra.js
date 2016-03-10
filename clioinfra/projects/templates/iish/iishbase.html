@@ -99,12 +99,13 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
   <div class="block-inner clearfix">
                 
     <div class="content clearfix">
-          <div align="right">
+          <div align="right" style="width:350px">
                 <p>
 {% if username %}
                         {{ username }} / <a href=/logout>Log out</a><br />
                         <a href=/collabs/settings?project={{ projectname }}>Settings</a> /
-                        <a href=/collabs/settings>Create new project</a>
+                        <a href=/collabs/settings>Create new project</a> /
+			<a href="/api/collabs?project={{ projectname }}">Export</a>
 {% else %}
                         <a href=login>Login</a>
 {% endif %}
