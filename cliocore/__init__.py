@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+database = 'datasets'
 configpath = "/etc/apache2/clioinfra.conf"
 
 FORBIDDENURI = "(curl|bash|mail|ping|sleep|passwd|cat\s+|cp\s+|mv\s+|certificate|wget|usr|bin|lhost|lport)"

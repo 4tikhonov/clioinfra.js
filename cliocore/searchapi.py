@@ -37,7 +37,13 @@ class ExtrasearchAPI:
 
     def load_dataset_page(self, page, pID):
         query = ''
-        url = "%s/%s=%s:%s/%s" % (self.dataverseroot, page, self.handle, self.org, pID)    
+	# full handle check
+	if len(pID) < 10:
+	   pIDhandle = "%s:%s/%s" % (self.handle, self.org, pID) 
+	else:
+	   pIDhandle = pID 
+
+        url = "%s/%s=%s" % (self.dataverseroot, page, pIDhandle)    
         response = urllib2.urlopen(url)
         html = response.read()
         return html

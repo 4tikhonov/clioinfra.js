@@ -38,9 +38,15 @@ import re
 from storage import Storage
 
 class Project:
-    def __init__(self, database, projectname):
+    def __init__(self, database):
         self.project = {}
-        storage = Storage(database)
-        self.project = storage.readstorage('projects', 'uri', projectname)
+        self.storage = Storage(database)
+
+    def get_project_info(self, projectname):
+        self.project = self.storage.readstorage('projects', 'uri', projectname)
+	return self.project
+
+    def get_all_projects(self):
+	return self.storage.get_all_data() 
 
 

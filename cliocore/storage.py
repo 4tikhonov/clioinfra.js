@@ -53,6 +53,9 @@ class Storage:
         self.result = collection.insert(data)
         return self.result 
 
+    def get_all_data(self):
+	return self.connection.data.find()
+
     def readstorage(self, dbname, key, val):
         client = MongoClient()
         db = client.get_database(dbname)
