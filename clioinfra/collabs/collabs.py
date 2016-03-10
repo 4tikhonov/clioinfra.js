@@ -595,6 +595,8 @@ def chartlib():
         except:
             nothing = 1
 
+    if set(pids) == set(handles):
+	pids[:] = []
     links = graphlinks('&face=' + str(handles[0]) + '&hist=' + hist)
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
     # vty hist
