@@ -545,7 +545,7 @@ def chartlib():
             thismapurl = urlmatch.group(1)
     except:
         thismapurl = request.url
-    if not thismapurl.find("sandbox"):
+    if 'sandbox' not in thismapurl:
         thismapurl = thismapurl.replace('http://', 'https://')
 
     handles = []
