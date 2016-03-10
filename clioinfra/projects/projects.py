@@ -75,18 +75,8 @@ def upload_file():
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-def get_random_key(string_length=10):
-    """Returns a random string of length string_length."""
-    random = str(uuid.uuid4()) # Convert UUID format to a Python string.
-    random = random.upper() # Make all characters uppercase.
-    random = random.replace("-","") # Remove the UUID '-'.
-    return random[0:string_length] # Return the random string.
-
-app.secret_key = 'flask-session-insecure-secret-key'
-# To do: something is wrong here with secret keys, should find solution
-#app.secret_key = os.urandom(24)
-#app.secret_key = string.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(17))
-#app.secret_key = string.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(17))
+clioinfra = Configuration()
+app.secret_key = clioinfra.config['secretkey']
 
 @app.route('/')
 def browse(settings=''):
