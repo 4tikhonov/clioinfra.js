@@ -80,7 +80,8 @@ app.secret_key = clioinfra.config['secretkey']
 
 @app.route('/')
 def browse(settings=''):
-    return 'test'
+    session['name'] = ''
+    return make_response(render_template('iish/projects.html'))
 
 @app.route('/logout', methods=['GET'])
 def logout(settings=''):
