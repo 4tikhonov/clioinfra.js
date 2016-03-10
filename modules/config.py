@@ -86,7 +86,8 @@ def pidfrompanel(pid):
     # Check Panel
     pids = []
     (thispid, revpid, cliopid, pidslist) = ('', '', '', '')
-    match = re.match(r'Panel\[(.+)\]', pid)
+    pid = pid.replace("]", "")
+    match = re.match(r'Panel\[(.+)', pid)
     if match:
         pidstr = match.group(1)
         # Remove quotes
