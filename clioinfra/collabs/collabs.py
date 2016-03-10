@@ -532,7 +532,7 @@ def panel(settings=''):
 
 @app.route('/chartlib')
 def chartlib():
-    (thismapurl, apilink, ctrlist, title, units, switch) = ('', '', '', 'Title', 'Units', 'modern')
+    (thismapurl, apilink, ctrlist, title, units, switch, hist) = ('', '', '', 'Title', 'Units', 'modern', '')
     handleface = []
     config = configuration()
     ctrlist = config['ctrlist']
@@ -563,6 +563,7 @@ def chartlib():
         ctrlist = request.args.get('ctrlist')
     if request.args.get('hist'):
 	switch = 'historical'
+	hist = request.args.get('hist')
     if request.args.get('handle'):
         handledataset = request.args.get('handle')
         try:
@@ -576,7 +577,7 @@ def chartlib():
 	    if ctrlist:
 	        apilink = apilink + '&ctrlist=' + ctrlist
 	    if request.args.get('hist'):
-		apilink = apilink + '&hist=' + request.args.get('hist')
+		apilink = apilink + '&hist=' + hist
 
     if request.args.get('face'):
         handles = []
@@ -587,14 +588,14 @@ def chartlib():
             if ctrlist:
                 apilink = apilink + '&ctrlist=' + ctrlist
             if request.args.get('hist'):
-                apilink = apilink + '&hist=' + request.args.get('hist')
+                apilink = apilink + '&hist=' + hist
 	    
         try:
             pids.remove(handleface)
         except:
             nothing = 1
 
-    links = graphlinks('&face=' + str(handles[0]) + '&hist=' + request.args.get('hist'))
+    links = graphlinks('&face=' + str(handles[0]) + '&hist=' + hist)
     (geocoder, geolist, oecd2webmapper, modern, historical) = request_geocoder(config, '')
     # vty hist
     (origdata, maindata, metadata) = request_datasets(config, switch, modern, historical, handles, geolist)
