@@ -608,6 +608,9 @@ def chartlib():
 	skip = 0
 
     handledict = {}
+    if handles:
+        handle = handles[0]
+
     if pids:
 	try:
 	    if handles[1]:
@@ -618,7 +621,8 @@ def chartlib():
         d = readdatasets('datasets', json.loads(hquery))
         for x in d:
             thishandle = x['handle']
-            handledict[thishandle] = x['title']
+	    if thishandle != handle:
+                handledict[thishandle] = x['title']
 
     resp = make_response(render_template('chartlib.html', thismapurl=thismapurl, indicators=handledict, apilink=apilink, title=title, units=units, showpanel=showpanel, handle=handle, chartlib=links['chartlib'], barlib=links['barlib'], panellib=links['panellib'], treemaplib=links['treemaplib']))
     return resp
