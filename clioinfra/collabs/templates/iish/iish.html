@@ -145,6 +145,9 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                 <p>Author(s): {{ dataset.author }}</p>
                 <p>{{ dataset.description }}</p>
         {% endfor %}
+	{% if not datasets %}
+	<p>No datasets found. Please try different keywords.</p>
+	{% endif %}
 
 
 	</div>
