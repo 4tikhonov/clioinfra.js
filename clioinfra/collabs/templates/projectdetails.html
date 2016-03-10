@@ -1,0 +1,96 @@
+{% extends "settings.html" %}
+{% block projectdetails %}
+        <div class="form-group">
+		<label for="passwordField inline">Project URI</label>
+                        <input name="uri" type="uri" class="form-control" id="passwordField" placeholder="URI like /myproject should correspond to Dataverse URI like https://datasets.socialhistory.org/dataverse/myproject" value="{{ fields.uri }}">
+    	</div>
+        <div class="form-group">
+                <label for="passwordField">Project title</label>
+                        <input name="title" type="text" class="form-control input-sm" id="title" placeholder="Enter title of the project, for example, Labor Conflicts" value="{{ fields.title }}">
+        </div>
+        <div class="form-group">
+                <label for="about">About</label>
+                <textarea name="about" class="form-control custom-control" id="about" rows="3" autofocus="" style="resize:horizontal" placeholder="Motivation of the project">{{ fields.about }}</textarea>
+        </div>
+        <div class="form-group">
+                <label for="passwordField">Project logo (optional)</label>
+                        <input name="logo" type="text" class="form-control" id="title" placeholder="Enter http:// URL to project logo" value="{{ fields.logo }}">
+        </div>
+	<input name="username" type="hidden" value="{{ username }}">
+
+        <div class="form-group">
+                <label for="passwordField">Short description of the project (optional)</label>
+                <textarea name="description" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter full description of the project">{{ fields.description }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="fulldescription">Summary (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter full description of the project">{{ fields.summary }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="fulldescription">Contact (optional)</label>
+                <textarea name="contact" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter contact information">{{ fields.contact }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="partners">Partners (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter information about partners of the project">{{ fields.partners }}</textarea>
+        </div>
+
+        <div class="form-group">
+                <label for="partners">News (optional)</label>
+                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Latest news">{{ fields.news }}</textarea>
+        </div>
+
+	<div class="form-group">
+	<table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Navigation</th>
+                <th>Visualization</th>
+                <th>Statistics</th>
+                <th>Extra pages</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                <input type="checkbox" name="searchmetadata" {{ fields.searchmetadata }}> Metadata Search<br>
+                <input type="checkbox" name="browsedata" {{ fields.browsedata }}> Browse Datasets <br>
+                <input type="checkbox" name="fulltextsearch" {{ fields.fulltextsearch }}> Full-text Search <br>
+		<input type="checkbox" name="iishdataverses" {{ fields.iishdataverses }}> Search in IISH Dataverses <br>
+		<input type="checkbox" name="harvarddataverse" {{ fields.harvarddataverse }}> Harvard Dataverse<br>
+                <input type="checkbox" name="workingpapers" {{ fields.workingpapers }}> Working papers<br>
+                </td>
+                <td>
+                Maps<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="modmaps" {{ fields.modmaps }}> Modern map<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="histmaps" {{ fields.histmaps }}> Historical map<br>
+                Graphs<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="chart" {{ fields.chart }}> Chart<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="histogram" {{ fields.histogram }}> Histogram<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="quality" {{ fields.quality }}> Data quality<br>
+                &nbsp;&nbsp;&nbsp;<input type="checkbox" name="treemaps" {{ fields.treemaps }}> Treemaps
+
+                </td>
+                <td>
+                <input type="checkbox" name="min" {{ fields.min }}> Min<br>
+                <input type="checkbox" name="max" {{ fields.max }}> Max <br>
+                <input type="checkbox" name="mean" {{ fields.mean }}> Mean<br>
+                <input type="checkbox" name="median" {{ fields.median }}> Median <br>
+                <input type="checkbox" name="std" {{ fields.std }}> Standard Deviation<br>
+		<input type="checkbox" name="cov" {{ fields.cov }}> Coefficient of Variation
+                </td>
+                <td>
+                <input type="checkbox" name="news" {{ fields.news }}> News<br>
+                <input type="checkbox" name="papersblock" {{ fields.papersblock }}> Papers <br>
+		<input type="checkbox" name="contact" {{ fields.contact }}> Contact<br>
+		<input type="checkbox" name="partners" {{ fields.partners }}> Partners<br>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    </div>
+{% endblock %}
