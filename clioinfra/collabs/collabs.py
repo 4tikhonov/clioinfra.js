@@ -26,7 +26,7 @@
 # then also delete it in the license file.
 
 from flask import Flask, render_template, redirect
-from flask import g
+from flask import g, session
 from flask import Response, make_response, request, send_from_directory
 from twisted.web import http
 from flask_bootstrap import Bootstrap
@@ -40,6 +40,7 @@ import urllib2
 import glob
 import csv
 import sys
+import string
 import pprint
 import getopt
 import ConfigParser
@@ -179,6 +180,8 @@ def load_api_data1(apiurl, code, year, custom, scales, catnum):
     return dataframe
 
 app = Flask(__name__)
+clioinfra = Configuration()
+app.secret_key = clioinfra.config['secretkey']
 
 @app.route('/graphslider')
 def graphslider():
@@ -1163,6 +1166,7 @@ def browse(settings=''):
 
 @app.route('/settings', methods=['GET', 'POST'])
 def signup(settings=''):
+    user = ''
     config = configuration()
     if config['error']:
         return config['error']
@@ -1175,13 +1179,24 @@ def signup(settings=''):
 	user = request.args.get("user")
 	if user == 'admin':
 	    admin = 'user'
+    try:
+        if session['name']:
+	    user = session['name']
+    except:
+	donothing = 0	
 
     for field in fieldslist:
+	cfield = "%s%s" % ("closed", field)
 	fields[field] = ''
+	fields[cfield] = ''
 	if request.args.get(field):
 	     fields[field] = request.args.get(field)
 	elif request.form.getlist(field):
 	    fields[field] = str(request.form.getlist(field)[0])	
+        if request.args.get(cfield):
+             fields[cfield] = request.args.get(cfield)
+        elif request.form.getlist(cfield):
+            fields[cfield] = str(request.form.getlist(cfield)[0])
 
     uriparams = {}
     if request.args:
@@ -1203,7 +1218,7 @@ def signup(settings=''):
 	fieldsall = readdata('projects', 'uri', request.args.get('project'))
 	for f in fieldsall:
 	    fields = f
-	return make_response(render_template('settings.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
+	return make_response(render_template('closedprojectdetails.html', fields=fields, checkboxes=str(checkboxes), admin=admin, username=user))
     else:
 	# Clean settings first
 	if len(fields['uri']):
@@ -1211,7 +1226,7 @@ def signup(settings=''):
             result = data2store('projects', fields)
 	    return redirect(config['apiroot'] + '/' + fields['uri'], code=301)
 	else:
-	    return make_response(render_template('settings.html', fields=fields, checkboxes=str(checkboxes), admin=admin))
+	    return make_response(render_template('projectdetails.html', fields=fields, checkboxes=str(checkboxes), admin=admin, username=user))
 
 @app.route('/boundaries')
 def boundaries(settings=''):
