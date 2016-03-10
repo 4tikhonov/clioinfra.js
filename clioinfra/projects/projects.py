@@ -160,9 +160,7 @@ def projectpage(e):
 	    username = session['name']
 	else:
 	    username = ''
-	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, projectname=project, username=username)) 
-	#return 'ok'
-        #return Response(projectdata,  mimetype='application/json')
+	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, username=username)) 
 
 if __name__ == '__main__':
     app.run()
