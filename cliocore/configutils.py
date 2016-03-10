@@ -149,7 +149,7 @@ class Utils(Configuration):
         # Check Panel
         pids = []
         (thispid, revpid, cliopid, pidslist) = ('', '', '', '')
-        match = re.match(r'Panel\[(.+)\]', pid)
+        match = re.match(r'Panel\[(.+)', pid)
         if match:
             pidstr = match.group(1)
             # Remove quotes
