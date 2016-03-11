@@ -26,6 +26,10 @@ h2.block-title { /* Block title */
 #block-aggregator-category-1 { /* Block for the latest news items in the first category */
 }
 
+#introfont {
+font-size: 0.1em;
+}
+
 #block-aggregator-feed-1 { /* Block for the latest news items in the first feed */
 }
 
@@ -124,9 +128,17 @@ h2.block-title { /* Block title */
 
 #bodycontent {
   width: 940px;
-  border: 0px solid #000;
+  font-size: 0.8em;
   margin-left: 10px;
   margin-right: 20px;
+}
+
+#bodycontent .settings {
+  padding: 0 10px 0 10px;
+}
+
+#bodycontent .loginform {
+  padding-left: 0px;
 }
 
 #content .block {
@@ -136,13 +148,12 @@ h2.block-title { /* Block title */
 #block-menu-menu-explore-discover {
   width: 450px;
   background-color: #96BD0D;
-  height: 230px;
+  height: 250px;
   float: right;
 }
  
 #block-menu-menu-explore-discover h2.block-title {
   color: #fff;
-  padding-top: 10px;
   background-color: #96BD0D;
   padding-left: 10px;
 }
@@ -151,10 +162,9 @@ h2.block-title { /* Block title */
 }
 #block-menu-menu-explore-discover ul.menu li {
   list-style: none;
-  font-size: 2.3em;
+  font-size: 1.8em;
   line-height: 1.4em;
   padding-left: 10px;
-  background-color: #cade85;
   margin-top: 5px;
 }
 #block-menu-menu-explore-discover ul.menu li a {
@@ -203,7 +213,8 @@ a.views-more-link,
   background-color: #A0522D;
   padding-bottom: 10px;
   padding-top: 10px;
-  height: 230px;
+  width: 420px;
+  height: 250px;
 }
 #block-intro-introduction-block h2.block-title {
   color: #fff;
@@ -213,7 +224,7 @@ a.views-more-link,
 #block-info-introduction-block {
   margin-left: 20px;
   background-color: #4B0082;
-  height: 230px;
+  height: 250px;
 }
 #block-info-introduction-block h2.block-title {
   color: #fff;
@@ -227,7 +238,7 @@ a.views-more-link,
   background-color: #D9B500;
   padding-left: 10px;
   padding-bottom: 10px;
-  height: 235px;
+  height: 250px;
   width: 450px;
   float: left;
 }
@@ -235,7 +246,7 @@ a.views-more-link,
 #block-views-visualization-block {
   background-color: #fff;
   padding-bottom: 10px;
-  height: 235px;
+  height: 250px;
   width: 450px;
   float: right;
 }
@@ -245,7 +256,7 @@ a.views-more-link,
   clear: both;
   padding-bottom: 10px;
   padding-left: 10px;
-  height: 235px;
+  height: 250px;
   width: 450px;
   float: left;
 }
