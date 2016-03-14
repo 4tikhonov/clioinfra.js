@@ -65,7 +65,11 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
             <div class="logo-img grid-6">
         <a href="/en" rel="home" title=""><img src="https://socialhistory.org/sites/all/themes/iisg/images/logo-en.png" alt="" id="logo" /></a>      </div>
                         <hgroup class="site-name-slogan grid-3">
-                        <h2 class="site-name"><a href="/en" title="Home"></a></h2>
+			{% if dataverse %}
+                        <h2 class="site-name"><a href="/{{ dataverse }}" title="Home"></a></h2>
+			{% else %}
+			<h2 class="site-name"><a href="/" title="Home"></a></h2>
+			{% endif %}
                                 <h6 class="site-slogan">Conducts research and collects data on the global history of labour, workers, and labour relations</h6>
               </hgroup>
           </div>
@@ -82,11 +86,16 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                 
     <div class="content clearfix">
       <ul class="nice-menu nice-menu-down nice-menu-user-menu" id="nice-menu-2">
-<li><a href="/{{ projectname }}">Home</a>
-<li><a href="https://datasets.socialhistory.org/dataverse/{{ projectname }}">Datasets</a></li>
-<li><a href="/{{ projectname }}/maps">Visualize</a></li>
-<li><a href="/{{ projectname }}/news">News</a></li>
-<li><a href="http://www.clio-infra.eu/about-clio-infra">About</a></li>
+<li><a href="/{{ dataverse }}">Home</a>
+{% if dataverse %}
+<li><a href="https://datasets.socialhistory.org/dataverse/{{ dataverse }}">Datasets</a></li>
+{% else %}
+<li><a href="https://datasets.socialhistory.org">Datasets</a></li>
+{% endif %}
+<li><a href="https://socialhistory.org/en/research">Research</a></li>
+<li><a href="https://socialhistory.org/en/publications">Publications</a></li>
+<li><a href="https://socialhistory.org/en/news-events">News</a></li>
+<li><a href="https://socialhistory.org/en/about">About</a></li>
 </ul>
     </div>
   </div>
