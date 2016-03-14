@@ -55,6 +55,12 @@ $(document).ready(function(){
 		</div>
 
 		<button type="submit" class="btn btn-success">Save</button>
+
+<script type="text/javascript">
+$('#dropbutton').button();
+</script>
+                <button type="button" id="dropbutton" class="btn btn-success" style="float:right" onclick="redirect('{{ fields.uri }}?action=drop');">Drop Project</button>
+
 	</div>
 {% else %}
 	<center>
