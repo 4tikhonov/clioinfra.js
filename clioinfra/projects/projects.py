@@ -156,9 +156,9 @@ def projectpage(e):
 	    except:
 	        branch = dataverse
 
-	if session['name']:
+	try:
 	    username = session['name']
-	else:
+	except:
 	    username = ''
 	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, username=username)) 
 
