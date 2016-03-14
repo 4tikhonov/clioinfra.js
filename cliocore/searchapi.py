@@ -32,8 +32,12 @@ class ExtrasearchAPI:
         for q in match:
             query+=q + ' '
         
-        total = re.search(r'of\s+(\d+)\s+Results', html)            
-        return (query, total.group(1))
+        total = re.search(r'of\s+(\d+)\s+Result', html)            
+	if total:
+	    results = total.group(1)
+	else:
+	    results = 1
+        return (query, results)
 
     def load_dataset_page(self, page, pID):
         query = ''
