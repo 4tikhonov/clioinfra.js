@@ -107,7 +107,11 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                         <a href=/collabs/settings>Create new project</a> /
 			<a href="/api/collabs?project={{ projectname }}">Export</a>
 {% else %}
-                        <a href=login>Login</a>
+			{% if dataverse %}
+			<a href="/login?project={{ dataverse }}">Login</a>
+			{% else %}
+                        <a href="/login">Login</a>
+			{% endif %}
 {% endif %}
                 </p>
           </div>
