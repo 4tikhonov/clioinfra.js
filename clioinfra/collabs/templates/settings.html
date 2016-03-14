@@ -2,13 +2,19 @@
 {% block content %}
     <link rel="stylesheet" href="/static/blocks.css" media="screen" type="text/css" />
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-   <link href="http://www.bootstrap-switch.org/docs/css/bootstrap.min.css" rel="stylesheet">
-    <link href="http://www.bootstrap-switch.org/docs/css/highlight.css" rel="stylesheet">
-    <link href="http://www.bootstrap-switch.org/dist/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+   <link href="https://www.bootstrap-switch.org/docs/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://www.bootstrap-switch.org/docs/css/highlight.css" rel="stylesheet">
+    <link href="https://www.bootstrap-switch.org/dist/css/bootstrap3/bootstrap-switch.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <link href="http://getbootstrap.com/assets/css/docs.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/assets/css/docs.min.css" rel="stylesheet">
+
+<script type="text/javascript">
+$(document).ready(function(){ 
+    $("#myTab li:eq({{ tabnum }}) a").tab('show');
+});
+</script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -22,7 +28,6 @@
     	<ul class="nav nav-tabs" id="myTab">
         <li><a data-toggle="tab" href="#sectionA">Public Page</a></li>
         <li><a data-toggle="tab" href="#sectionB">Closed Page</a></li>
-	<li><a data-toggle="tab" href="#sectionC">Dataverse</a></li>
     	</ul>
 
 	<div class="settings">
@@ -41,16 +46,12 @@
     		<script>
     		$("[name='Search']").bootstrapSwitch();
     		</script>
-    		<script src="http://www.bootstrap-switch.org/docs/js/highlight.js"></script>
-    		<script src="http://www.bootstrap-switch.org/dist/js/bootstrap-switch.js"></script>
+    		<script src="https://www.bootstrap-switch.org/docs/js/highlight.js"></script>
+    		<script src="https://www.bootstrap-switch.org/dist/js/bootstrap-switch.js"></script>
 
 		<div id="sectionB" class="tab-pane fade">
 		<h2 class="text-muted">Restricted Section</h2>
     		{% block closedprojectdetails %}{% endblock %}
-		</div>
-
-		<div id="sectionC" class="tab-pane fade">
-            	<iframe src='https://datasets.socialhistory.org/dataverse/{{ fields.uri }}' style='border:0; width:100%; height:100vh;'></iframe>
 		</div>
 
 		<button type="submit" class="btn btn-success">Save</button>
