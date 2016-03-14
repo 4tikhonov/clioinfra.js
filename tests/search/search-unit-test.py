@@ -47,6 +47,8 @@ class SearchAPITestClass(unittest.TestCase):
 	self.assertTrue(bool(sconnection.has_restricted_data("V4Q8XE")))	
 	# test if dataset is public
 	self.assertFalse(bool(sconnection.has_restricted_data("8FCYOX")))
+	# test full handle pid
+	self.assertTrue(bool(sconnection.has_restricted_data("hdl:10622/V4Q8XE")))
 
 if __name__ == '__main__':
     unittest.main()
