@@ -82,11 +82,16 @@ jQuery.extend(Drupal.settings, {"basePath":"\/","pathPrefix":"en\/","ajaxPageSta
                 
     <div class="content clearfix">
       <ul class="nice-menu nice-menu-down nice-menu-user-menu" id="nice-menu-2">
-<li><a href="/{{ projectname }}">Home</a>
-<li><a href="https://datasets.socialhistory.org/dataverse/{{ projectname }}">Datasets</a></li>
-<li><a href="/{{ projectname }}/maps">Visualize</a></li>
-<li><a href="/{{ projectname }}/news">News</a></li>
-<li><a href="http://www.clio-infra.eu/about-clio-infra">About</a></li>
+<li><a href="/{{ fields.uri }}">Home</a>
+{% if fields.uri %}
+<li><a href="https://datasets.socialhistory.org/dataverse/{{ fields.uri }}">Datasets</a></li>
+{% else %}
+<li><a href="https://datasets.socialhistory.org">Datasets</a></li>
+{% endif %}
+<li><a href="https://socialhistory.org/en/research">Research</a></li>
+<li><a href="https://socialhistory.org/en/publications">Publications</a></li>
+<li><a href="https://socialhistory.org/en/news-events">News</a></li>
+<li><a href="https://socialhistory.org/en/about">About</a></li>
 </ul>
     </div>
   </div>
