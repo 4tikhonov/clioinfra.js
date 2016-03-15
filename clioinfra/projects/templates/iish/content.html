@@ -89,7 +89,7 @@ $(document).ready(function(){
 
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
-  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="230" src="/collabs/static/1981_4X6NCK_map.png"></a>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="220" src="/collabs/static/1981_4X6NCK_map.png"></a>
 </div>
 
 <br />
@@ -171,6 +171,11 @@ $(document).ready(function(){
     </div>
 </div>
 </div>
+{% else %}
+<div id="block-views-chart-block" class="block block-views last even">
+        <h2 class="block__title block-title">Data on chart</h2>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="230" src="/collabs/static/chart.png"></a>
+</div>
 {% endif %}
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
@@ -190,7 +195,9 @@ $(document).ready(function(){
                 </div>
 
                 <div id="sectionC" class="tab-pane fade">
-                <iframe src='https://datasets.socialhistory.org/dataverse/{{ dataverse }}' style='border:0; width:100%; height:100vh;'></iframe>
+		<div id="block-views-dataverse-block" class="block block-views last even">
+                <iframe src='https://datasets.socialhistory.org/dataverse/{{ dataverse }}' style='border:0; width:100%; display:flex; min-height:100vh;'></iframe>
+		</div>
                 </div>
 
 </div>
