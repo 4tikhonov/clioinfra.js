@@ -243,12 +243,31 @@ a.views-more-link,
   float: left;
 }
 
+#block-views-dataverse-block {
+  background-color: #fff;
+  padding-bottom: 10px;
+  height: 100%;
+  width: 100%;
+  float: left;
+  margin-bottom: 50px;
+}
+
+#block-views-chart-block {
+  background-color: #fff;
+  padding-bottom: 10px;
+  height: 250px;
+  width: 450px;
+  float: left;
+  margin-bottom: 50px;
+}
+
 #block-views-visualization-block {
   background-color: #fff;
   padding-bottom: 10px;
   height: 250px;
   width: 450px;
   float: right;
+  margin-bottom: 50px;
 }
 
 #block-views-desc-block {
