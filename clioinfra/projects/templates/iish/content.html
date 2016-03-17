@@ -25,7 +25,7 @@ $(document).ready(function(){
 <div id="sectionA" class="tab-pane fade">
 <div class="settings">
 <h2>{{ projectdata.title }}</h2>
-{% if projectdata.browsedata %}
+{% if projectdata.explore %}
 <div id="block-views-introduction-block" class="block block-views last even">
 {% else %}
 <div id="block-views-introduction-wideblock" class="block block-views last even">
@@ -47,7 +47,7 @@ $(document).ready(function(){
 </div>
 </div>
 
-{% if projectdata.browsedata %}
+{% if projectdata.explore %}
 <div>
   <div class="region-inner region-preface-second-inner">
 <div class="block-inner clearfix">
@@ -116,7 +116,11 @@ $(document).ready(function(){
 {% else %}
 <div class="settings">
 <h2>{{ projectdata.closedtitle }}</h2>
+{% if projectdata.closedexplore %}
 <div id="block-views-introduction-block" class="block block-views last even">
+{% else %}
+<div id="block-views-introduction-wideblock" class="block block-views last even">
+{% endif %}
 
         <h2 class="block__title block-title">About</h2>
 
@@ -135,6 +139,7 @@ $(document).ready(function(){
 </div>
 </div>
 
+{% if projectdata.closedexplore %}
 <div>
   <div class="region-inner region-preface-second-inner">
 <div class="block-inner clearfix">
@@ -160,6 +165,7 @@ $(document).ready(function(){
 
 </div>
 </div></div>
+{% endif %}
 
 {% if projectdata.closeddescription %}
 <div id="block-views-desc-block" class="block block-views last even">
