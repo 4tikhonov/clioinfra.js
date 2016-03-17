@@ -11,6 +11,10 @@
 .block.first { /* The first block in the region */
 }
 
+.fill-height-or-more {
+  display: flex;
+}
+
 .block.last { /* The last block in the region */
 }
 
@@ -244,12 +248,11 @@ a.views-more-link,
 }
 
 #block-views-dataverse-block {
+  display: block;
   background-color: #fff;
   padding-bottom: 10px;
-  height: 100%;
   width: 100%;
-  float: left;
-  margin-bottom: 50px;
+  height: 100vh;
 }
 
 #block-views-chart-block {
