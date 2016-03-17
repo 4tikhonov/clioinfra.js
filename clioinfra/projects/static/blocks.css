@@ -256,11 +256,13 @@ a.views-more-link,
 }
 
 #block-views-chart-block {
-  background-color: #fff;
+  background-color: #4B0082;
+  color: #fff;
+  padding-top: 5px;
   padding-bottom: 10px;
-  height: 250px;
-  width: 450px;
-  float: left;
+  height: 280px;
+  width: 920px;
+  float: center;
   margin-bottom: 50px;
 }
 
