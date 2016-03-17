@@ -176,6 +176,25 @@ def projectpage(e):
 	    username = session['name']
 	except:
 	    username = ''
+
+	# Check if browse block should be enabled
+	options = ["searchmetadata", "browsedata", "fulltextsearch", "iishdataverses", "harvarddataverse", "workingpapers"
+]
+	# Check public and closed section parameters
+	for item in options:
+	    closeditem = "closed%s" % item
+	    try:
+	        value = projectinfo[item]
+		closedvalue = projectinfo[closeditem]
+	    except:
+		value = ''
+		closedvalue = ''
+
+	    if value:
+	        projectinfo['explore'] = 'active'
+	    if closedvalue:
+		projectinfo['closedexplore'] = 'active'
+
 	return make_response(render_template('iish/content.html', projectdata=projectinfo, dataverse=dataverse, username=username)) 
 
 if __name__ == '__main__':
