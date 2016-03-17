@@ -196,7 +196,9 @@ $(document).ready(function(){
 
                 <div id="sectionC" class="tab-pane fade">
 		<div id="block-views-dataverse-block" class="block block-views last even">
-                <iframe src='https://datasets.socialhistory.org/dataverse/{{ dataverse }}' style='border:0; width:100%; display:flex; min-height:100vh;'></iframe>
+		<section class="fill-height-or-more">
+                <iframe src='https://datasets.socialhistory.org/dataverse/{{ dataverse }}' height="100%" width="100%" style='height:100vh;overflow:hidden;overflow-x:hidden;overflow-y:hidden;'></iframe>
+		</section>
 		</div>
                 </div>
 
