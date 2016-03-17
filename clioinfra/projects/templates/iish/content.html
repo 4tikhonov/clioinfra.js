@@ -89,7 +89,7 @@ $(document).ready(function(){
 
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
-  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="220" src="/collabs/static/1981_4X6NCK_map.png"></a>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
 </div>
 
 <br />
@@ -173,14 +173,18 @@ $(document).ready(function(){
 </div>
 {% else %}
 <div id="block-views-chart-block" class="block block-views last even">
-        <h2 class="block__title block-title">Data on chart</h2>
-  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="230" src="/collabs/static/chart.png"></a>
+	<center>
+        <h2 class="block__title block-title">Visualize data</h2>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
+	</center>
 </div>
 {% endif %}
+{% if projectdata.closeddescription %}
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
-  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="230" src="/collabs/static/1981_4X6NCK_map.png"></a>
+  <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
 </div>
+{% endif %}
 
 <br />
 <table border=0 valign=top width="100%">
