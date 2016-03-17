@@ -238,6 +238,15 @@ a.views-more-link,
 }
 
 
+#block-views-introduction-wideblock {
+  background-color: #D9B500;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  height: 100%;
+  width: 920px;
+  float: left;
+}
+
 #block-views-introduction-block {
   background-color: #D9B500;
   padding-left: 10px;
