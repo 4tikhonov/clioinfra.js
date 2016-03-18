@@ -742,7 +742,9 @@ def datasetspace(settings=''):
 	if where['harvard']:
 	    datasets.append(dataset)
 
-    resp = make_response(render_template('search.html', datasets=datasets, searchq=query, pagetitle=pagetitle, where=where))
+    (username, projectname) = ('','')    
+    fields = {}
+    resp = make_response(render_template('search.html', projectname=projectname, username=username, datasets=datasets, searchq=query, pagetitle=pagetitle, where=where, fields=fields))
     return resp
 
 @app.route('/')
