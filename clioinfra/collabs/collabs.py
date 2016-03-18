@@ -1181,10 +1181,10 @@ def signup(settings=''):
     if config['error']:
         return config['error']
 
-    (admin, user, tabnum, createnews) = ('','',0,'')
+    (admin, user, tabnum, createnews, editnews) = ('','',0,'','')
     fields = {}
     checkboxes = {}
-    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news"]
+    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news", "newstitle", "newstext"]
     if request.args.get("user"):
 	user = request.args.get("user")
 	if user == 'admin':
@@ -1232,7 +1232,10 @@ def signup(settings=''):
 	    tabnum = 2
  	if request.args.get('action') == 'create':
 	    createnews = 'yes'
-	return make_response(render_template('closedprojectdetails.html', fields=fields, checkboxes=str(checkboxes), admin=admin, username=user, tabnum=tabnum, createnews=createnews))
+        if request.args.get('action') == 'edit':
+            editnews = 'yes'
+
+	return make_response(render_template('closedprojectdetails.html', fields=fields, checkboxes=str(checkboxes), admin=admin, username=user, tabnum=tabnum, createnews=createnews, editnews=editnews))
     else:
 	# Clean settings first
 	if len(fields['uri']):
