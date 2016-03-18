@@ -93,21 +93,30 @@ def logout(settings=''):
                 projecturl = "%s/%s" % (clioinfra.config['apiroot'], session['project'])
             else:
                 projecturl = "%s/%s" % (clioinfra.config['proxy'], session['project'])
+	    session['project'] = ''
             return redirect(projecturl, code=302)
+	else:
+	    return make_response(render_template('iish/login.html'))
     except:
         return make_response(render_template('iish/login.html'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login(settings=''):
     clioinfra = Configuration()
+    opensession = {}
     openldap = OpenLDAP()
     if request.args.get('project'):
-	session['project'] = request.args.get('project')
+	opensession['project'] = request.args.get('project')
+    else:
+	opensession['project'] = ''
+
     try:
         thisuser = openldap.authentificate(request.form.get('login'), request.form.get('password'))
 	if thisuser[0][1]['uid'][0]:
 	    session['name'] = thisuser[0][1]['displayName'][0]
 	    session['uid'] = thisuser[0][1]['uid'][0]
+	    if opensession['project']:
+		session['project'] = opensession['project']
 	name = str(thisuser[0][1]['displayName'][0])
 	if session['project']:
 	    sandboxflag = re.search("sandbox", request.url)
