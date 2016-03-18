@@ -21,30 +21,34 @@ $(document).ready(function(){
         <li><a data-toggle="tab" href="#sectionB">Closed Page</a></li>
         <li><a data-toggle="tab" href="#sectionC">Dataverse</a></li>
         </ul>
+
 <div class="tab-content">
 <div id="sectionA" class="tab-pane fade">
 <div class="settings">
-<h2>{{ projectdata.title }}</h2>
-{% if projectdata.explore %}
-<div id="block-views-introduction-block" class="block block-views last even">
-{% else %}
-<div id="block-views-introduction-wideblock" class="block block-views last even">
-{% endif %}
-        <h2 class="block__title block-title">About</h2>
+	<h2>{{ projectdata.title }}</h2>
+	{% if projectdata.explore %}
+	<div id="block-views-introduction-block" class="block block-views last even">
+	{% else %}
+	<div id="block-views-introduction-wideblock" class="block block-views last even">
+	{% endif %}
+  	<h2 class="block__title block-title">About</h2>
 
-  <div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
-
-      <div class="view-content">
+  	<div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
+      	<div class="view-content">
         <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
 
-  <div class="views-field views-field-body">        <div class="field-content"><p>
-<div class="introfont">
-{{ projectdata.about | safe }}
-</div>
-</p> 
-</div>  </div>  </div>
-    </div>
-</div>
+  		<div class="views-field views-field-body">        
+		<div class="field-content">
+		<p>
+		<div class="introfont">
+		{{ projectdata.about | safe }}
+		</div>
+		</p> 
+		</div>  
+ 		</div>  
+  	</div>
+    	</div>
+	</div>
 </div>
 
 {% if projectdata.explore %}
@@ -138,56 +142,55 @@ $(document).ready(function(){
     </div>
 </div>
 </div>
-
 {% if projectdata.closedexplore %}
 <div>
-  <div class="region-inner region-preface-second-inner">
-<div class="block-inner clearfix">
-<div id="block-menu-menu-explore-discover" class="block block-menu first odd" role="navigation">
+  	<div class="region-inner region-preface-second-inner">
+	<div class="block-inner clearfix">
+	<div id="block-menu-menu-explore-discover" class="block block-menu first odd" role="navigation">
 
         <h2 class="block__title block-title">Explore &amp; datasets</h2>
 
-<ul class="menu">
-{% if projectdata.closedbrowsedata %}
-  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
-{% endif %}
-{% if projectdata.closedharvarddataverse %}
-<li class="menu__item is-leaf leaf"><a href="https://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Harvard network datasets</a></li>
-{% endif %}
-{% if projectdata.closediishdataverses %}
-<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">IISH datasets</a></li>
-{% endif %}
-{% if projectdata.closedworkingpapers %}
-<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Working papers</a></li>
-{% endif %}
-</ul>
-</div>
+	<ul class="menu">
+	{% if projectdata.closedbrowsedata %}
+  	<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
+	{% endif %}
 
+	{% if projectdata.closedharvarddataverse %}
+	<li class="menu__item is-leaf leaf"><a href="https://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Harvard network datasets</a></li>
+	{% endif %}
+
+	{% if projectdata.closediishdataverses %}
+	<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">IISH datasets</a></li>
+	{% endif %}
+
+	{% if projectdata.closedworkingpapers %}
+	<li class="menu__item is-leaf last leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Working papers</a></li>
+	{% endif %}
+	</ul>
+	</div>
+	</div>
+	</div>
 </div>
-</div></div>
 {% endif %}
 
 {% if projectdata.closeddescription %}
 <div id="block-views-desc-block" class="block block-views last even">
-
-  <h2 class="block__title block-title">Brief description of the project</h2>
-  <div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
-      <div class="view-content">
-        <div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
-
-  <div class="views-field views-field-body">        <div class="field-content"><p>
-{{ projectdata.closeddescription | safe }}
-</p>
-</div>  </div>  </div>
-    </div>
-</div>
+  	<h2 class="block__title block-title">Brief description of the project</h2>
+  	<div class="view view-introduction view-id-introduction view-display-id-block view-dom-id-943e4ea54bf0fe59cab13cfb9d6e2d45">
+      	<div class="view-content">
+        	<div class="views-row views-row-1 views-row-odd views-row-first views-row-last">
+  		<div class="views-field views-field-body">        
+		<div class="field-content"><p>
+		{{ projectdata.closeddescription | safe }}
+		</p>
+		</div>  </div>  </div>
+    	</div>
+	</div>
 </div>
 {% else %}
-<div id="block-views-chart-block" class="block block-views last even">
-	<center>
+<div id="block-views-widechart-block">
         <h2 class="block__title block-title">Visualize data</h2>
   <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
-	</center>
 </div>
 {% endif %}
 {% if projectdata.closeddescription %}
