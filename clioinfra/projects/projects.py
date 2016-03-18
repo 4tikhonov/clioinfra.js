@@ -191,13 +191,12 @@ def projectpage(e):
 ]
 	# Check public and closed section parameters
 	for item in options:
+	    (value, closedvalue) = ('', '')
 	    closeditem = "closed%s" % item
-	    try:
+	    if item in projectinfo:
 	        value = projectinfo[item]
+	    if closeditem in projectinfo:
 		closedvalue = projectinfo[closeditem]
-	    except:
-		value = ''
-		closedvalue = ''
 
 	    if value:
 	        projectinfo['explore'] = 'active'
