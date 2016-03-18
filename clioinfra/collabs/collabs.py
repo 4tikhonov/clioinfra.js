@@ -1184,7 +1184,7 @@ def signup(settings=''):
     (admin, user, tabnum, createnews, editnews) = ('','',0,'','')
     fields = {}
     checkboxes = {}
-    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news", "newstitle", "newstext"]
+    fieldslist = ["dataverse", "apitoken", "email", "passwd", "uri", "title", "logo", "description", "summary", "about", "contact", "partners", "news", "newstitle", "newssummary", "newstext"]
     if request.args.get("user"):
 	user = request.args.get("user")
 	if user == 'admin':
