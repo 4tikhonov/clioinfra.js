@@ -1,5 +1,6 @@
 {% extends "iish/iishbase.html" %}
 {% block content %}
+<div id="block-content">
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
    <link href="https://www.bootstrap-switch.org/docs/css/bootstrap.min.css" rel="stylesheet">
@@ -101,14 +102,26 @@ $(document).ready(function(){
   <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
 </div>
 
+{% if projectdata.newstitle %}
+        <div>
+		<h4>Latest News</h4>
+                <a href="/collabs/settings?project=labourrelations&view=newseditor&action=edit&newsid={{ projectdata.newsid }}">{{ projectdata.newstitle }}</a>
+		<br />
+                {{ projectdata.newssummary|safe }}
+        </div>
+{% endif %}
+
+{% if projectdata.summary %}
 <br />
 <table border=0 valign=top width="100%">
 	<tr>
 	<td width="100%" valign="top">
+	<h4>Summary</h4>
 	{{ projectdata.summary | safe }}
 	</td>
 	</tr>
 </table>
+{% endif %}
 </div>
 </div>
                 <div id="sectionB" class="tab-pane fade">
@@ -220,6 +233,7 @@ $(document).ready(function(){
 		</div>
                 </div>
 
+</div>
 </div>
 </div>
 {% endblock %}
