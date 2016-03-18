@@ -264,15 +264,16 @@ a.views-more-link,
   height: 100vh;
 }
 
-#block-views-chart-block {
-  background-color: #4B0082;
+#block-views-widechart-block {
+  display:inline-block;
+  background-color: #1B0082;
   color: #fff;
-  padding-top: 5px;
   padding-bottom: 10px;
-  height: 100%;
+  height: 270px;
   width: 920px;
-  float: center;
   margin-bottom: 50px;
+  margin-right: auto; margin-left: auto;
+  text-align: center;
 }
 
 #block-views-visualization-block {
