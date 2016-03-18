@@ -28,6 +28,7 @@ $(document).ready(function(){
     	<ul class="nav nav-tabs" id="myTab">
         <li><a data-toggle="tab" href="#sectionA">Public Page</a></li>
         <li><a data-toggle="tab" href="#sectionB">Closed Page</a></li>
+	<li><a data-toggle="tab" href="#sectionC">News Editor</a></li>
     	</ul>
 
 	<div class="settings">
@@ -53,6 +54,11 @@ $(document).ready(function(){
 		<h2 class="text-muted">Restricted Section</h2>
     		{% block closedprojectdetails %}{% endblock %}
 		</div>
+
+		<div id="sectionC" class="tab-pane fade">
+		{% block newseditor %}{% endblock %}
+		</div>
+
 
 		<button type="submit" class="btn btn-success">Save</button>
 
