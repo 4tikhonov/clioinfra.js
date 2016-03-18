@@ -193,24 +193,32 @@
                 <label for="passwordField">News title</label>
                         <input name="newstitle" type="text" class="form-control input-sm" id="title" placeholder="Title of the news" value="">
         </div>
+                <label for="passwordField">News summary</label>
+        <div class="form-group">
+                <textarea name="newssummary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported"></textarea>
+
 		<label for="passwordField">News text</label>
         <div class="form-group">
-                <textarea name="newstext" class="form-control custom-control" id="textareaID" rows="15" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported"></textarea>
+                <textarea name="newstext" class="form-control custom-control" id="textareaID" rows="10" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported"></textarea>
         </div>
 {% elif editnews %}
         <div class="form-group">
                 <label for="passwordField">News title</label>
                         <input name="newstitle" type="text" class="form-control input-sm" id="title" placeholder="Title of the news" value="{{ fields.newstitle }}">
         </div>
+                <label for="passwordField">News summary</label>
+        <div class="form-group">
+                <textarea name="newssummary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported">{{ fields.newssummary|safe }}</textarea>
+
                 <label for="passwordField">News text</label>
         <div class="form-group">
-                <textarea name="newstext" class="form-control custom-control" id="textareaID" rows="15" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported">{{ fields.newstext|safe }}</textarea>
+                <textarea name="newstext" class="form-control custom-control" id="textareaID" rows="10" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported">{{ fields.newstext|safe }}</textarea>
         </div>
 {% else %}
 <div>
                 <a href="/collabs/settings?project=labourrelations&view=newseditor&action=edit&newsid={{ fields.newsid }}">{{ fields.newstitle }}</a>&nbsp;|&nbsp;<a href="/collabs/settings?project=labourrelations&view=newseditor&action=edit&newsid={{ fields.newsid }}">Edit</a>
                 <br>
-		{{ fields.newstext }}
+		{{ fields.newssummary }}
                 <br>Updated: 2016-03-18 13:11
         </span>
         </div>
