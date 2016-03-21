@@ -87,7 +87,7 @@ def browse(settings=''):
 def logout(settings=''):
     session['name'] = ''
     try:
-        if session['project']:
+        if 'project' in session:
             sandboxflag = re.search("sandbox", request.url)
             if sandboxflag:
                 projecturl = "%s/%s" % (clioinfra.config['apiroot'], session['project'])
@@ -119,12 +119,16 @@ def login(settings=''):
 	    if opensession['project']:
 		session['project'] = opensession['project']
 	    name = str(thisuser[0][1]['displayName'][0])
-	if 'project' in session:
+	try:
+	    projectname = session['project']
+	except:
+	    projectname = ''
+	if projectname:
 	    sandboxflag = re.search("sandbox", request.url)
 	    if sandboxflag:
-		projecturl = "%s/%s" % (clioinfra.config['apiroot'], session['project'])
+		projecturl = "%s/%s" % (clioinfra.config['apiroot'], projectname)
 	    else:
-	        projecturl = "%s/%s" % (clioinfra.config['proxy'], session['project'])
+	        projecturl = "%s/%s" % (clioinfra.config['proxy'], projectname)
 	    return redirect(projecturl, code=302)
 	else:
 	    return make_response(render_template('iish/login.html', username=name))
