@@ -102,6 +102,7 @@ def logout(settings=''):
 
 @app.route('/login', methods=['POST', 'GET'])
 def login(settings=''):
+    name = ''
     clioinfra = Configuration()
     opensession = {}
     openldap = OpenLDAP()
@@ -117,8 +118,8 @@ def login(settings=''):
 	    session['uid'] = thisuser[0][1]['uid'][0]
 	    if opensession['project']:
 		session['project'] = opensession['project']
-	name = str(thisuser[0][1]['displayName'][0])
-	if session['project']:
+	    name = str(thisuser[0][1]['displayName'][0])
+	if 'project' in session:
 	    sandboxflag = re.search("sandbox", request.url)
 	    if sandboxflag:
 		projecturl = "%s/%s" % (clioinfra.config['apiroot'], session['project'])
