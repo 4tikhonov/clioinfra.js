@@ -215,14 +215,17 @@
                 <textarea name="newstext" class="form-control custom-control" id="textareaID" rows="10" autofocus="" style="resize:horizontal" placeholder="Please enter the text, HTML is supported">{{ fields.newstext|safe }}</textarea>
         </div>
 {% else %}
-<div>
+	{% if fields.newstitle %}
+	<div>
                 <a href="/collabs/settings?project=labourrelations&view=newseditor&action=edit&newsid={{ fields.newsid }}">{{ fields.newstitle }}</a>&nbsp;|&nbsp;<a href="/collabs/settings?project=labourrelations&view=newseditor&action=edit&newsid={{ fields.newsid }}">Edit</a>
                 <br>
 		{{ fields.newssummary }}
-                <br>Updated: 2016-03-18 13:11
-        </span>
         </div>
-        <br />
+	<br />
+	{% else %}
+	There are no news at the moment...
+	<br />
+	{% endif %}	
         <p>
         <a href="/collabs/settings?project=labourrelations&view=newseditor&action=create">Create News Article</a>
         </p>
