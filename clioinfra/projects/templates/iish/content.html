@@ -62,7 +62,7 @@ $(document).ready(function(){
     
 {% if projectdata.browsedata %}
 <ul class="menu">
-  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
+  <li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Datasets</a></li>
 {% endif %}
 {% if projectdata.harvarddataverse %}
 <li class="menu__item is-leaf leaf"><a href="https://cliov4.sandbox.socialhistoryservices.org/datasets/search" title="" class="menu__link">Harvard network datasets</a></li>
@@ -97,10 +97,12 @@ $(document).ready(function(){
 </div>
 {% endif %}
 
+{% if projectdata.modmaps %}
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
   <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
 </div>
+{% endif %}
 
 {% if projectdata.newstitle %}
         <div>
@@ -165,7 +167,7 @@ $(document).ready(function(){
 
 	<ul class="menu">
 	{% if projectdata.closedbrowsedata %}
-  	<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Public datasets</a></li>
+  	<li class="menu__item is-leaf first leaf"><a href="/collabs/datasetspace?dv={{ dataverse }}&action=indicators" title="" class="menu__link">Datasets</a></li>
 	{% endif %}
 
 	{% if projectdata.closedharvarddataverse %}
@@ -201,16 +203,20 @@ $(document).ready(function(){
 	</div>
 </div>
 {% else %}
-<div id="block-views-widechart-block">
+        {% if projectdata.closedmodmaps %}
+	<div id="block-views-widechart-block">
         <h2 class="block__title block-title">Visualize data</h2>
   <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
-</div>
+	</div>
+	{% endif %}
 {% endif %}
 {% if projectdata.closeddescription %}
+	{% if projectdata.closedmodmaps %}
 <div id="block-views-visualization-block" class="block block-views last even">
         <h2 class="block__title block-title">Visualize datasets</h2>
   <a href="https://www.clio-infra.eu/analyze/maps?dataset=latest"><img width="450" height="180" src="/static/mapsample.png"></a>
-</div>
+	</div>
+	{% endif %}
 {% endif %}
 
 <br />
