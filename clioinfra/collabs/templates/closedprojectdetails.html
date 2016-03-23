@@ -34,11 +34,6 @@
                 <textarea name="closedpartners" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter information about partners of the project">{{ fields.closedpartners }}</textarea>
         </div>
 
-        <div class="form-group">
-                <label for="partners">News (optional)</label>
-                <textarea name="closednews" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Latest news">{{ fields.closednews }}</textarea>
-        </div>
-
 	<div class="form-group">
 	<table class="table table-bordered">
         <thead>
@@ -52,8 +47,7 @@
         <tbody>
             <tr>
                 <td>
-                <input type="checkbox" name="closedsearchmetadata" {{ fields.closedsearchmetadata }}> Metadata Search<br>
-                <input type="checkbox" name="closedbrowsedata" {{ fields.closedbrowsedata }}> Browse Datasets <br>
+                <input type="checkbox" name="closedbrowsedata" {{ fields.closedbrowsedata }}> Datasets <br>
                 <input type="checkbox" name="closedfulltextsearch" {{ fields.closedfulltextsearch }}> Full-text Search <br>
 		<input type="checkbox" name="closediishdataverses" {{ fields.closediishdataverses }}> Search in IISH Dataverses <br>
 		<input type="checkbox" name="closedharvarddataverse" {{ fields.closedharvarddataverse }}> Harvard Dataverse<br>
@@ -129,11 +123,6 @@
                 <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Enter information about partners of the project">{{ fields.partners }}</textarea>
         </div>
 
-        <div class="form-group">
-                <label for="partners">News (optional)</label>
-                <textarea name="summary" class="form-control custom-control" id="textareaID" rows="3" autofocus="" style="resize:horizontal" placeholder="Latest news">{{ fields.news }}</textarea>
-        </div>
-
 	<div class="form-group">
 	<table class="table table-bordered">
         <thead>
@@ -147,8 +136,7 @@
         <tbody>
             <tr>
                 <td>
-                <input type="checkbox" name="searchmetadata" {{ fields.searchmetadata }}> Metadata Search<br>
-                <input type="checkbox" name="browsedata" {{ fields.browsedata }}> Browse Datasets <br>
+                <input type="checkbox" name="browsedata" {{ fields.browsedata }}> Datasets <br>
                 <input type="checkbox" name="fulltextsearch" {{ fields.fulltextsearch }}> Full-text Search <br>
 		<input type="checkbox" name="iishdataverses" {{ fields.iishdataverses }}> Search in IISH Dataverses <br>
 		<input type="checkbox" name="harvarddataverse" {{ fields.harvarddataverse }}> Harvard Dataverse<br>
