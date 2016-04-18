@@ -988,8 +988,39 @@ def dataverse():
 
 @app.route('/indicators')
 def indicators():
-    data = load_indicators("indicators.csv")
-    return Response(data,  mimetype='application/json')
+    #data = load_indicators("indicators.csv")
+    config = configuration()
+    pid = config['topicindex']
+
+    if pid:
+        (handles, pidslist) = pidfrompanel(pid)
+        hquery = formdatasetquery(handles,'')
+	datainfo = readdatasets('datasets', json.loads(hquery))
+        csvio = StringIO(str(datainfo[0]['csvframe']))
+        data = pd.read_csv(csvio, sep='\t', dtype='unicode',quoting=csv.QUOTE_NONE)
+	columns = []	
+	for item in data.columns:
+	    col = re.sub(r"\"", "", item)
+	    columns.append(col)
+	data.columns = columns
+	storeddata = readdatasets('datasets', '')
+	linking = {}
+	for item in storeddata:
+	    try:
+	        linking[item['title']] = item['handle']
+	    except:
+		skip = 'yes'
+ 	data['handle'] = ''
+	data = data.drop('ID', axis=1)
+	for row in data.index:
+	    title = data.ix[row]['Name']
+	    try:
+		data.ix[row]['handle'] = linking[title]
+	    except:
+	        data.ix[row]['handle'] = ''
+        return Response(data.to_csv(orient='records'),  mimetype='application/json')
+    else:
+	return 'No data'
 
 @app.route('/search')
 def search():
