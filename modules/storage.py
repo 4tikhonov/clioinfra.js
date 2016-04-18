@@ -77,7 +77,10 @@ def readdatasets(dbname, query):
     client = MongoClient()
     db = client.get_database(dbname)
     collection = db.data
-    result = db.data.find(query)
+    if query:
+       result = db.data.find(query)
+    else:
+	result = db.data.find({},{"title": 1,"handle":1,"units":1})
 
     return result
 
