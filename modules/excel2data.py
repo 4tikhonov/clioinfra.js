@@ -58,7 +58,7 @@ def downloadfile(root, path, fileID, key):
     fullpath = path + str(fileID)
     if key:
         cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&show_entity_ids=true&q=authorName:*&format=original\" -O " + fullpath + " --no-check-certificate"
-	cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&show_entity_ids=true&q=authorName:*\" -O " + fullpath + " --no-check-certificate"
+	cmd = "/usr/bin/wget -q \"" + root + "/api/access/datafile/" + str(fileID) + "?key=" + str(key) + "&format=original&show_entity_ids=true&q=authorName:*\" -O " + fullpath + " --no-check-certificate"
 	print cmd
         p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
         response = p.stdout.read()
@@ -72,6 +72,7 @@ def excelvalidator(path, filename, resultfile, tmpdir):
 
     # Read as dataframe
     file = open(resultfile + ".tmp", 'r')
+    print cmd
     contents = file.read()
     strings = contents.split("\n")
     columnlen = 0
@@ -98,9 +99,16 @@ def excelvalidator(path, filename, resultfile, tmpdir):
     #df.convert_objects(convert_numeric=True)
     data = df
     # Columns, title and units
-    col = data.ix[2]
-    title = data.ix[0][0]
-    units = data.ix[1][0]
+    try:
+        col = data.ix[2]
+        title = data.ix[0][0]
+        units = data.ix[1][0]
+    except:
+	print data.to_html()
+        col = data[0]
+        title = ''
+        units = ''
+
     csvfile = resultfile + '.csv'
     try:
 	df.columns = col
