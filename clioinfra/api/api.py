@@ -736,9 +736,8 @@ def advanced_statistics():
 # Dataverse API
 @app.route('/download')
 def download():
-    (classification, pid, root, switch) = ('modern', '', '', 'modern')
+    (classification, pid, root, switch, datafile) = ('modern', '', '', 'modern', '')
     handle = ''
-    classification = 'modern'
     config = configuration()
     cmd = "--insecure -u " + config['key'] + ": " + config['dataverseroot'] + "/dvn/api/data-deposit/v1.1/swordv2/statement/study/"
 
@@ -821,8 +820,8 @@ def download():
     if classification:
 	outfile = "clioinfra.xlsx"
 	dirforzip = get_papers(config['dataverseroot'], config['key'], cmd, handle, tmpdir, arc, finaldir)
-	fullpath = config['webtest'] + "/" + str(outfile)
-	fullpath = dirforzip + "/" + str(outfile)
+	#fullpath = config['webtest'] + "/" + str(outfile)
+	fullpath = dirforzip
 
 	# Check selection
 	isselection = 'yes'
@@ -831,7 +830,7 @@ def download():
 		isselection = 'yes'
 
 	if isselection:
-	    (outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	    (datafile, outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
 	else:
 	    # Copy original dataset
 	    source = os.listdir(tmpdir)
@@ -840,6 +839,8 @@ def download():
 
 	#return outfilefinal
         arc = 'dataarchive.zip'
+  	if datafile:
+	    arc = "%s.zip" % datafile
         compile2zip(dirforzip, arc)
         root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
 	#root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
