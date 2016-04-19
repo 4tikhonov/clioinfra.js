@@ -44,6 +44,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (class1, dataset, title, units) = content2dataframe(config, handle)
     filetitle = title
     filetitle = re.sub(' ', '_', filetitle)
+    filetitle = re.sub(r'[\(\)]', '_', filetitle)
     if filetitle:
        fullpath = "%s/%s.xlsx" % (fullpath, filetitle)
 
@@ -112,7 +113,6 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (countryinfo, notcountry) = selectint(maindata.index)
 
     (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
-    finalsubset = finalsubset.loc[(finalsubset!='').any(axis=1)]
     # Apply filter to countries
     if datafilter['ctrlist']:
         tmpcoder = icoder.ix[ctrlist]
