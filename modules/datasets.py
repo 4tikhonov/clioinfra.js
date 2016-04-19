@@ -392,6 +392,7 @@ def datasetfilter(maindata, datafilter):
 def dataset_analyzer(datasubset, coder, yearscolumns):
     xset = datasubset
     xrow = datasubset.T
+    datasubset = datasubset.dropna(how='all')
     finalsubset = datasubset.replace(np.nan, '', regex=True)
     try:
         icoder = coder.ix[1:]
@@ -503,7 +504,7 @@ def dataset2panel(config, totalpanel, geocoder, logscale):
                 #country = str(geocoder.ix[int(code)][config['webmappercountry']])
             #except:
                 #country = 'Unknown country'
-            value = totalpanel[year][code]
+            value = totalpanel[int(year)][int(code)]
             if value:
                 origvalue = value
 		rvalue = "%.1f" % value
