@@ -29,6 +29,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 
     (geocoder, geolist, oecd2webmapper) = buildgeocoder(dataset, config, '')
     (modern, historical) = loadgeocoder(config, dataset, 'geocoder')
+
     coderyears = []
     # Default years selection
     for i in range(1500, 2016):
@@ -41,6 +42,11 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 
     # Reading dataset
     (class1, dataset, title, units) = content2dataframe(config, handle)
+    filetitle = title
+    filetitle = re.sub(' ', '_', filetitle)
+    if filetitle:
+       fullpath = "%s/%s.xlsx" % (fullpath, filetitle)
+
     #return ('test', 'test')
 
     if switch == 'modern':
@@ -106,6 +112,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (countryinfo, notcountry) = selectint(maindata.index)
 
     (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
+    finalsubset = finalsubset.loc[(finalsubset!='').any(axis=1)]
     # Apply filter to countries
     if datafilter['ctrlist']:
         tmpcoder = icoder.ix[ctrlist]
@@ -116,4 +123,4 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 	if config['emptyvalues'] == 'no':
 	    (coderyears, notyears) = selectint(finalsubset.columns)
         datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)
-    return (fullpath, finalsubset)
+    return (filetitle, fullpath, finalsubset)
