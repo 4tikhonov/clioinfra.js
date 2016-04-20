@@ -61,17 +61,17 @@ def buildgeocoder(geocoder, config, query):
 	ignore = 0
 	try:
             countryitem = geocoder.ix[cID]
-	    mainID = int(geocoder.ix[cID][config['webmappercode']])
-	    geoitem['id'] = int(geocoder.ix[cID][config['webmappercode']])
-            geoitem['validfrom'] = int(geocoder.ix[cID]['start year']) 
-            geoitem['validuntil'] = int(geocoder.ix[cID]['end year']) 
-            years = '(' + str(int(geocoder.ix[cID]['start year'])) + '-' + str(int(geocoder.ix[cID]['end year'])) + ')'
-            geoitem['label'] = geocoder.ix[cID][config['webmappercountry']] + ' ' + str(years)
-            geoitem['year'] = str(geocoder.ix[cID][config['webmappercountry']]) + ' ' + years
-            geoitem['name'] = str(geocoder.ix[cID][config['webmappercountry']])
+	    mainID = int(countryitem[config['webmappercode']])
+	    geoitem['id'] = int(countryitem[config['webmappercode']])
+            geoitem['validfrom'] = int(countryitem['start year']) 
+            geoitem['validuntil'] = int(countryitem['end year']) 
+            years = '(' + str(int(countryitem['start year'])) + '-' + str(int(countryitem['end year'])) + ')'
+            geoitem['label'] = countryitem[config['webmappercountry']] + ' ' + str(years)
+            geoitem['year'] = str(countryitem[config['webmappercountry']]) + ' ' + years
+            geoitem['name'] = str(countryitem[config['webmappercountry']])
 	    geolist[int(geoitem['id'])] = geoitem['label']
 	    try:
-	        oecd[int(geocoder.ix[cID][config['webmapperoecd']])] = int(geoitem['id'])
+	        oecd[int(countryitem[config['webmapperoecd']])] = int(geoitem['id'])
 		#oecd[cID] = cID
 	    except:
 		skipoecd = 'on'
