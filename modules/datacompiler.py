@@ -46,7 +46,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     filetitle = re.sub(' ', '_', filetitle)
     filetitle = re.sub(r'[\(\)]', '_', filetitle)
     if filetitle:
-       fullpath = "%s/%s.xlsx" % (fullpath, filetitle)
+       fullpath = "%s/%s_%s.xlsx" % (fullpath, filetitle, switch)
 
     #return ('test', 'test')
 
@@ -113,6 +113,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
     (countryinfo, notcountry) = selectint(maindata.index)
 
     (finalsubset, icoder, isyear, ctrfilter, nodata) = dataset_analyzer(datasubset, coder, yearscolumns)
+    #return (finalsubset, fullpath, finalsubset)
     # Apply filter to countries
     if datafilter['ctrlist']:
         tmpcoder = icoder.ix[ctrlist]
@@ -120,6 +121,7 @@ def dataframe_compiler(config, fullpath, handle, switch, datafilter):
 
     #return (finalsubset.to_html(), 'test')
     if fullpath:
+	config['emptyvalues'] = 'no'
 	if config['emptyvalues'] == 'no':
 	    (coderyears, notyears) = selectint(finalsubset.columns)
         datafile = create_excel_dataset(fullpath, icoder, metadata, icoder.columns, coderyears, finalsubset, isyear, ctrfilter)

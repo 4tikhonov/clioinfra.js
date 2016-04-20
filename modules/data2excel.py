@@ -209,13 +209,13 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
         j = 0        
         for columnname in metacolumns:
             thisvalue = ''
-            #c = ws.cell(row=i, column=j)            
+            c = ws.cell(row=i, column=j)            
             try:
                 thisvalue = str(geocoder.ix[int(idc)][columnname])                
             except:
                 skip = 1
                 
-	    c = ws.cell(row=i, column=j)
+	    #c = ws.cell(row=i, column=j)
             if thisvalue != '':
                 c.value = thisvalue
 	    else:
@@ -232,10 +232,16 @@ def create_excel_dataset(fullpath, geocoder, metadata, metacolumns, yearscolumns
 
 	if activectr == 'yes':
 	    # Checking active years
-	    for year in yearscolumns:
-                if year in datayears:
+	    try:
+	        ctrdata = dataset.ix[int(idc)]
+	    except:
+		ctrdata = []
+
+	    for year in datayears:
+                if year: #in datayears:
                     try:
-			tmpval = dataset.ix[int(idc)][int(year)]
+			#tmpval = dataset.ix[int(idc)][int(year)]
+			tmpval = ctrdata[int(year)]
                         c = ws.cell(row=i, column=j)
                         c.value = tmpval
                     except:
