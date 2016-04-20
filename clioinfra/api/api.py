@@ -831,6 +831,7 @@ def download():
 
 	if isselection:
 	    (datafile, outfilefinal, finalsubset) = dataframe_compiler(config, fullpath, handle, classification, datafilter)
+	    #return datafile.to_html()
 	else:
 	    # Copy original dataset
 	    source = os.listdir(tmpdir)
@@ -840,7 +841,7 @@ def download():
 	#return outfilefinal
         arc = 'dataarchive.zip'
   	if datafile:
-	    arc = "%s.zip" % datafile
+	    arc = "%s_%s.zip" % (datafile, switch)
         compile2zip(dirforzip, arc)
         root = config['apiroot'] + "/collabs/static/tmp/" + str(arc)
 	#root = config['apiroot'] + "/collabs/static/tmp/" + str(outfile)
