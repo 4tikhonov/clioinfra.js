@@ -173,9 +173,9 @@ d3.tsv(apilink, function(error, data) {
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
-      .attr("transform", "rotate(0)")
-      .attr("y", 0)
-      .attr("x", 220)
+      .attr("transform", "rotate(-90)")
+      .attr("y", 10)
+      .attr("x", -30)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
       .text('{{ units }}');
