@@ -88,6 +88,67 @@ class Configuration:
 
 	return True
 
+class DataFilter(Configuration):
+    def __init__(self, params):
+	Configuration.__init__(self)
+	#self.c = Configuraton()
+	self.datafilter = {}
+        for item in params:
+	    self.datafilter[item] = params.get(item)
+
+    def countries(self):
+	ctrparam = 'ctrlist'
+ 	if ctrparam in self.datafilter:
+            customcountrycodes = ''
+            tmpcustomcountrycodes = self.datafilter[ctrparam]
+	    if tmpcustomcountrycodes:
+        	c = tmpcustomcountrycodes.split(',')
+        	for ids in sorted(c):
+           	    if ids:
+               		customcountrycodes = str(customcountrycodes) + str(ids) + ','
+        	customcountrycodes = customcountrycodes[:-1]
+                if len(customcountrycodes):
+                    countriesNum = len(customcountrycodes.split(','))
+		    categoriesMax = 5 #self.config['categoriesMax']
+                    if countriesNum < categoriesMax:
+                        if countriesNum >= 1:
+                            categoriesMax = countriesNum
+			    self.datafilter['categoriesMax'] = categoriesMax
+
+                self.datafilter['ctrlist'] = tmpcustomcountrycodes
+	    else:
+		self.datafilter['ctrlist'] = ''
+	return self.datafilter['ctrlist']
+   
+    def parameters(self):
+	return self.datafilter
+
+    def maxyear(self):
+	if 'toyear' in self.datafilter:
+	    return int(self.datafilter['toyear'])
+	else:
+	    return int(self.config['maxyear'])
+
+    def minyear(self):
+        if 'fromyear' in self.datafilter:
+            return int(self.datafilter['fromyear'])
+	else:
+	    return int(self.config['minyear'])
+
+    def classification(self):
+	if 'classification' in self.datafilter:
+	    return self.datafilter['classification']
+	else:
+	    return 'modern'
+
+    def showframe(self):
+	if 'action' in self.datafilter:
+	    if self.datafilter['action'] == 'geocoder':
+		return True
+
+    def allsettings(self):
+	return self.config['categoriesMax']
+
 # OpenLDAP class to implement authentification services
 class OpenLDAP(Configuration):
     def __init__(self):
