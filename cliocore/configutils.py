@@ -91,7 +91,6 @@ class Configuration:
 class DataFilter(Configuration):
     def __init__(self, params):
 	Configuration.__init__(self)
-	#self.c = Configuraton()
 	self.datafilter = {}
         for item in params:
 	    self.datafilter[item] = params.get(item)
@@ -124,14 +123,14 @@ class DataFilter(Configuration):
 	return self.datafilter
 
     def maxyear(self):
-	if 'toyear' in self.datafilter:
-	    return int(self.datafilter['toyear'])
+	if 'before' in self.datafilter:
+	    return int(self.datafilter['before'])
 	else:
 	    return int(self.config['maxyear'])
 
     def minyear(self):
-        if 'fromyear' in self.datafilter:
-            return int(self.datafilter['fromyear'])
+        if 'after' in self.datafilter:
+            return int(self.datafilter['after'])
 	else:
 	    return int(self.config['minyear'])
 
@@ -140,6 +139,12 @@ class DataFilter(Configuration):
 	    return self.datafilter['classification']
 	else:
 	    return 'modern'
+
+    def countryfilter(self):
+	if 'name' in self.datafilter:
+	    return self.datafilter['name']
+	else:
+	    return False
 
     def showframe(self):
 	if 'action' in self.datafilter:
