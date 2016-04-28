@@ -70,6 +70,7 @@ from paneldata import build_panel, paneldatafilter, panel2dict, panel2csv
 from datasets import *
 from datacompiler import dataframe_compiler
 from data2excel import panel2excel
+from cliocore.configutils import Configuration, Utils, DataFilter
 
 # Function to create json from dict 
 def json_generator(c, jsondataname, data):
@@ -865,6 +866,20 @@ def webmapper():
     (regions, countries, ctr2reg, webmapper, geocoder) = histo(api)
 
     data = json.dumps(webmapper, encoding="utf-8", sort_keys=True, indent=4)
+    return Response(data,  mimetype='application/json')
+
+@app.route('/geofilter')
+def geofilter():
+    settings = Configuration()
+    (classification, geodataset, title, units) = content2dataframe(settings.config, settings.config['geocoderhandle'])
+    settings = DataFilter(request.args)
+    geodataset = geodataset.convert_objects(convert_numeric=True)
+    geodataset = geodataset.loc[geodataset['start year'] >= settings.minyear()]
+    geodataset = geodataset.loc[geodataset['start year'] <= settings.maxyear()]
+    if settings.showframe():
+        return geodataset.to_html()
+    (geocoder, geolist, oecd) = buildgeocoder(geodataset, settings.config, settings.countryfilter())
+    data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
 
 @app.route('/geocoder')
