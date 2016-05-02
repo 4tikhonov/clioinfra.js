@@ -61,8 +61,8 @@ class Dataset(Configuration):
             ptmpids = clearpids.split(',')
             for fullhandle in ptmpids:
                 (thispid, revpid, cliopid, clearpid) = findpid(fullhandle)           
-                pids.append(clearpid)
-                pidslist = pidslist + thispid + ','
+                self.pids.append(clearpid)
+                self.pidslist = self.pidslist + thispid + ','
         else:
             self.pids.append(pid)
             self.pidslist = pid
