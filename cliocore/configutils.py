@@ -140,6 +140,9 @@ class DataFilter(Configuration):
 	else:
 	    return 'modern'
 
+    def selected(self):
+	return self.datafilter['selected']
+
     def countryfilter(self):
 	if 'name' in self.datafilter:
 	    return self.datafilter['name']
