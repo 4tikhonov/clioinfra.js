@@ -109,7 +109,10 @@ class Storage:
         return self.resultarray
 
     def readdatasets(self, query):
-        result = self.connection.data.find(query)
+        if query:
+            result = self.connection.data.find(query)
+        else:
+            result = self.connection.data.find({},{"title": 1,"handle":1,"units":1})
         return result
 
     def formdatasetquery(self, handles, datasets):
