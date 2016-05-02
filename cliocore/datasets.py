@@ -76,6 +76,23 @@ class Dataset(Configuration):
 	    return self.handles
  	return false
 
+    def retrievedatasets(self, handles):
+	self.storeddata = []
+	storage = Storage(self.database)
+	if handles:
+            self.hquery = storage.formdatasetquery(handles,'')
+            self.datainfo = storage.readdatasets(json.loads(self.hquery))
+	    for self.item in self.datainfo:
+                self.csvio = StringIO(str(self.item['csvframe']))
+                self.data = pd.read_csv(self.csvio, sep='\t', dtype='unicode',quoting=csv.QUOTE_NONE)
+                self.columns = []
+                for itemcol in self.data.columns:
+                    self.col = re.sub(r"\"", "", itemcol)
+                    self.columns.append(self.col)
+                self.data.columns = self.columns
+		self.storeddata.append(self.data)
+	return self.storeddata
+
     def clioindex(self):
 	self.handles = self.getindexpid()
 	storage = Storage(self.database)
