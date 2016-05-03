@@ -92,6 +92,7 @@ class DataFilter(Configuration):
     def __init__(self, params):
 	Configuration.__init__(self)
 	self.datafilter = {}
+	self.datafilter['selected'] = ''
         for item in params:
 	    self.datafilter[item] = params.get(item)
 
