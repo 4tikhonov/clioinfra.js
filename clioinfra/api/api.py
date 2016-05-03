@@ -71,6 +71,7 @@ from datasets import *
 from datacompiler import dataframe_compiler
 from data2excel import panel2excel
 from cliocore.configutils import Configuration, Utils, DataFilter
+from cliocore.datasets import Dataset
 
 # Function to create json from dict 
 def json_generator(c, jsondataname, data):
@@ -870,14 +871,48 @@ def webmapper():
 
 @app.route('/geofilter')
 def geofilter():
+    pids = []
+    ctrlist = {}
+    ctrfilter = []
     settings = Configuration()
+    clioinfra = Dataset()
+    clioindex = clioinfra.clioindex()
+    columns = ['1', 'Webmapper code', 'Webmapper numeric code', 'ccode', 'country name', 'start year', 'end year']
     (classification, geodataset, title, units) = content2dataframe(settings.config, settings.config['geocoderhandle'])
     settings = DataFilter(request.args)
+    if settings.selected():
+        pids = clioinfra.findhandles(settings.selected())
+	datasets = clioinfra.retrievedatasets(pids)
+	selection = []
+	for item in datasets:
+	    dataset = datasets[item]
+	    dataset.columns = dataset.ix[1]
+	    dataset = dataset.convert_objects(convert_numeric=True)
+            dataset.index = dataset['Webmapper numeric code']
+
+	    if (settings.minyear()):
+	        dataset = dataset.loc[dataset['start year'] >= settings.minyear()]
+	        dataset = dataset.loc[dataset['start year'] <= settings.maxyear()]
+	    for col in columns:
+		dataset = dataset.drop(col, axis=1)
+	    dataset['total'] = dataset.sum(axis=1)
+	    dataset = dataset.ix[dataset['total'] > 0]
+	    selection.append(dataset.index)
+
+	for row in selection:
+	    for countryID in row:
+		if countryID not in ctrlist:
+		    ctrlist[countryID] = countryID
+		    ctrfilter.append(countryID)
+
     geodataset = geodataset.convert_objects(convert_numeric=True)
     geodataset = geodataset.loc[geodataset['start year'] >= settings.minyear()]
     geodataset = geodataset.loc[geodataset['start year'] <= settings.maxyear()]
     if settings.showframe():
-        return geodataset.to_html()
+	geodataset.index = geodataset['Webmapper numeric code']  
+	if ctrfilter:
+	    geodataset = geodataset.ix[ctrfilter]
+
     (geocoder, geolist, oecd) = buildgeocoder(geodataset, settings.config, settings.countryfilter())
     data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
