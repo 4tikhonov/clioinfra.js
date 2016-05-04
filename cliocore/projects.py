@@ -35,7 +35,7 @@ except ImportError:
 
 import requests
 import re
-from storage import Storage
+from storagemanager import Storage
 
 class Project:
     def __init__(self, database):
