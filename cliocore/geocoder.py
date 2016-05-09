@@ -44,6 +44,13 @@ class Geocoder(Configuration):
         self.geocoderhandle = self.config['geocoderhandle']
 	(self.classification, self.geodataset, self.title, self.units) = content2dataframe(self.config, self.geocoderhandle)
 
+    def historical(self):
+	return self.geonames
+
+    def modernboundaries(self):
+	self.modern.index = self.modern['ccode']
+	return self.modern
+
     def selectint(self, cols):
         (isint, notint) = ([], [])
         for colname in cols:
@@ -63,6 +70,8 @@ class Geocoder(Configuration):
         self.geolist = {}
         self.oecd = {}
         self.geocoder = self.geodataset.convert_objects(convert_numeric=True)
+	self.modern = self.geocoder
+   	self.modern = self.modern.loc[self.modern['ccode'] > 0]
         self.geocoder.index = self.geocoder[self.config['webmappercode']]
         (self.cfilter, self.notint) = self.selectint(self.geocoder.index)
 
