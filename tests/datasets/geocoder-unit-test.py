@@ -17,6 +17,7 @@ class ConfigTestClass(unittest.TestCase):
 	self.geo = Geocoder()
 	self.geo.buildgeocoder('')
 	self.assertTrue(self.geo.geonames)
+	print self.geo.modernboundaries()
 	clioindex = self.clioinfra.clioindex()
         self.assertTrue(self.clioinfra.config['dataverseroot'])
         self.assertTrue(self.clioinfra.config['apiroot'])
