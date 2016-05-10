@@ -93,6 +93,7 @@ class DataFilter(Configuration):
 	Configuration.__init__(self)
 	self.datafilter = {}
 	self.datafilter['selected'] = ''
+	self.datafilter['classification'] = 'historical'
         for item in params:
 	    self.datafilter[item] = params.get(item)
 
