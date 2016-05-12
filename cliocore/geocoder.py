@@ -64,7 +64,7 @@ class Geocoder(Configuration):
                     notint.append(colname)
         return (isint, notint)
 
-    def buildgeocoder(self, newfilter):
+    def buildgeocoder(self, filtersettings):
         self.geodict = {}
         self.geonames = []
         self.geolist = {}
@@ -72,11 +72,17 @@ class Geocoder(Configuration):
         self.geocoder = self.geodataset.convert_objects(convert_numeric=True)
 	self.modern = self.geocoder
    	self.modern = self.modern.loc[self.modern[self.config['webmapperoecd']] > 0]
-	if newfilter['classification'] == 'modern':
+	if filtersettings.datafilter['classification'] == 'modern':
 	    self.geocoder = self.modern
-	    self.geocoder.index = self.geocoder[self.config['webmapperoecd']]	
+	    self.geocoder.index = self.geocoder[self.config['webmapperoecd']]
 	else:
             self.geocoder.index = self.geocoder[self.config['webmappercode']]
+
+	# Apply filter
+        if filtersettings.minyear():
+            self.geocoder = self.geocoder.loc[self.geocoder['start year'] >= filtersettings.minyear()]
+        if filtersettings.maxyear():
+            self.geocoder = self.geocoder[self.geocoder['start year'] <= filtersettings.maxyear()]
         (self.cfilter, self.notint) = self.selectint(self.geocoder.index)
 
         i = 0
@@ -91,7 +97,7 @@ class Geocoder(Configuration):
                 geoitem['validfrom'] = int(countryitem['start year'])
                 geoitem['validuntil'] = int(countryitem['end year'])
                 years = '(' + str(int(countryitem['start year'])) + '-' + str(int(countryitem['end year'])) + ')'
-		if newfilter['classification'] == 'modern':
+		if filtersettings.datafilter['classification'] == 'modern':
 		    geoitem['label'] = str(countryitem[self.config['webmappercountry']])	
 		    geoitem['id'] = int(countryitem[self.config['webmapperoecd']])
 		else:
@@ -107,8 +113,8 @@ class Geocoder(Configuration):
                 ignore = cID
 
             if ignore == 0:
-                if 'name' in newfilter:
-		    searchname = newfilter['name']
+                if 'name' in filtersettings.datafilter:
+		    searchname = filtersettings.datafilter['name']
                     result = re.search(r"^%s" % searchname, geoitem['name'], flags=re.IGNORECASE)
                     if result:
                         if geoitem['name']:
