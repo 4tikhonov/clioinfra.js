@@ -882,7 +882,7 @@ def geofilter():
     columns = ['1', 'Webmapper code', 'Webmapper numeric code', 'ccode', 'country name', 'start year', 'end year']
     (classification, geodataset, title, units) = content2dataframe(settings.config, settings.config['geocoderhandle'])
     settings = DataFilter(request.args)
-    (geo, g1, g2) = geocoder.buildgeocoder(settings.datafilter)
+    (geo, g1, g2) = geocoder.buildgeocoder(settings)
     if settings.classification() == 'modern':
 	geodataset = geocoder.modernboundaries()
 
@@ -919,7 +919,7 @@ def geofilter():
 	if ctrfilter:
 	    geodataset = geodataset.ix[ctrfilter]
 
-    (geocoder, geolist, oecd) = geocoder.buildgeocoder(settings.datafilter)
+    (geocoder, geolist, oecd) = geocoder.buildgeocoder(settings)
     data = json.dumps(geocoder, encoding="utf-8", sort_keys=True, indent=4)
     return Response(data,  mimetype='application/json')
 
